@@ -1,0 +1,2 @@
+# ignorar el .env del backend, ya que contiene información sensible sobre la contraseña de nuestro cluster de mongodb atlas
+.env
