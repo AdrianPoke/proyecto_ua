@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from "react";
-import NavBarDefault from "./NavBarDefault"; // Importar NavBarDefault
-import NavBarAuth from "./NavBarAuth"; // Importar NavBarAuth
+import React from "react";
+import NavBarDefault from "./NavBarDefault";
+import NavBarAuth from "./NavBarAuth";
 import Footer from "./Footer";
+import useAuth from "../hooks/useAuth"; // Importa el custom hook
 
 function Layout({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Verificar si el usuario está autenticado al cargar la página
-  useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated");
-    setIsAuthenticated(authStatus === "true");
-  }, []);
+  const isAuthenticated = useAuth(); // Usa el hook para obtener el estado de autenticación
 
   return (
     <div>
@@ -22,7 +17,6 @@ function Layout({ children }) {
       {/* Contenido principal */}
       <main>{children}</main>
 
-      {/* Pie de página */}
       <Footer />
     </div>
   );

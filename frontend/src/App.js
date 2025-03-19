@@ -24,6 +24,8 @@ import Politicas from "./pages/Politicas";
 import Registro from "./pages/Registro";
 import Perfil from "./pages/Perfil";
 
+import Logout from "./Components/Logout";
+
 function App() {
   return (
     <Router>
@@ -53,6 +55,8 @@ function App() {
           <Route path="/perfil/descargas" element={<Descargas />} />
           <Route path="/perfil/datos" element={<Datos />} />
           <Route path="/perfil/assets-subidos" element={<AssetsSubidos />} />
+
+          <Route path="/logout" element={<Logout />} />
 
           {/* Ruta para páginas no encontradas */}
           <Route path="*" element={<NotFound />} />
