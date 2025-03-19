@@ -1,11 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from './Components/Layout';
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Categorias from "./pages/Categorias";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./Components/AuthGuard";  // Import the AuthGuard
+
+// PAGINAS DE MOLAMAZO GAMES
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Registro from "./pages/Registro"
+import Categorias from "./pages/Categorias";
 import Perfil from "./pages/Perfil";
 
 function App() {
@@ -14,6 +17,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/login" element={<Login />} />
           {/* AuthGuard checks if the user is authenticated */}
           <Route path="/categorias" element={<AuthGuard><Categorias /></AuthGuard>} />

@@ -9,7 +9,9 @@ function NavBarAuth() {
     localStorage.removeItem("authToken");
 
     // Redirige al login después de hacer logout
-    navigate("/login");
+    navigate("/home");
+    window.location.reload();
+
   };
 
   return (

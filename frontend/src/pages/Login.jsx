@@ -13,9 +13,10 @@ function Login() {
     if (email && password) {
       // Guarda un token falso en localStorage
       localStorage.setItem("authToken", "sampleToken");
-
-      // Redirige al perfil después de "loguearse"
+     
       navigate("/perfil");
+      window.location.reload();
+
     } else {
       alert("Por favor, ingresa tu email y contraseña.");
     }
