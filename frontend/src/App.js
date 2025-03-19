@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Categorias from "./pages/Categorias";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./Components/AuthGuard";  // Import the AuthGuard
+import Perfil from "./pages/Perfil";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           {/* AuthGuard checks if the user is authenticated */}
-          <Route path="/categorias" element={<AuthGuard><Categorias /></AuthGuard>} /> {/* Protect route */}
+          <Route path="/categorias" element={<AuthGuard><Categorias /></AuthGuard>} />
+          <Route path="/perfil" element={<AuthGuard><Perfil /></AuthGuard>} /> {/* Protect route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
