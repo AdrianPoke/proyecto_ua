@@ -18,8 +18,10 @@ function NavBarAuth() {
     <nav>
       <ul>
         <li><Link to="/">Home</Link></li>
-        <li><Link to="/perfil">Perfil</Link></li>
+        <li><Link to="/subir-assets">Subir Assets</Link></li>
         <li><Link to="/categorias">Explorar Categorías</Link></li>
+        <li><Link to="/busqueda-avanzada">Búsqueda Avanzada</Link></li>
+        <li><Link to="/perfil">Perfil</Link></li>
         <li>
           <button onClick={handleLogout}>Logout</button> {/* Llamamos a logout */}
         </li>
