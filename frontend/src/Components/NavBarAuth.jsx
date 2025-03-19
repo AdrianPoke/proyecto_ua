@@ -1,17 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import useLogout from "../hooks/useLogout"; // Importar el hook de logout
+import { Link } from "react-router-dom"; // Usamos Link para navegación
+import useLogout from "../hooks/useLogout"; // Importamos el hook de logout
 
-function NavBarAuth() {
-  const logout = useLogout(); // Usar el hook de logout
+function NavBarAuth({ setIsAuthenticated }) {
+  const logout = useLogout(setIsAuthenticated);  // Usamos el hook de logout
 
   return (
     <nav>
       <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/perfil">Profile</Link></li>
+        <li><Link to="/">Home</Link></li>  {/* Enlace a Home */}
+        <li><Link to="/Perfil">Perfil</Link></li>  {/* Enlace a Perfil */}
+        <li><Link to="/Categorias">Explorar Categorías</Link></li>  {/* Enlace a Assets */}
         <li>
-          <Link to="#" onClick={logout}>Logout</Link> {/* Usar el enlace para hacer logout */}
+          <button onClick={logout}>Logout</button> {/* Llamamos a logout */}
         </li>
       </ul>
     </nav>

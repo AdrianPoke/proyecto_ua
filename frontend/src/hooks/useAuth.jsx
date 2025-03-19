@@ -6,19 +6,22 @@ function useAuth() {
   useEffect(() => {
     const authStatus = localStorage.getItem("isAuthenticated");
     setIsAuthenticated(authStatus === "true");
-  }, []); // Ejecuta solo al montar el componente
 
-  // Forzar la actualización del estado de autenticación cuando el localStorage cambia
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const authStatus = localStorage.getItem("isAuthenticated");
-      setIsAuthenticated(authStatus === "true");
-    }, 500); // Verificar cada medio segundo si el estado ha cambiado
+    // Escuchar cambios en el localStorage de forma reactiva sin usar intervalos
+    const storageEventListener = (e) => {
+      if (e.key === "isAuthenticated") {
+        setIsAuthenticated(e.newValue === "true");
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, []);
+    window.addEventListener("storage", storageEventListener);
 
-  return isAuthenticated;
+    return () => {
+      window.removeEventListener("storage", storageEventListener);
+    };
+  }, []); // Solo se ejecuta al montar el componente
+
+  return [isAuthenticated, setIsAuthenticated];
 }
 
 export default useAuth;

@@ -2,16 +2,16 @@ import React from "react";
 import NavBarDefault from "./NavBarDefault";
 import NavBarAuth from "./NavBarAuth";
 import Footer from "./Footer";
-import useAuth from "../hooks/useAuth"; // Importa el custom hook
+import useAuth from "../hooks/useAuth";  // Usamos el hook para la autenticación
 
 function Layout({ children }) {
-  const isAuthenticated = useAuth(); // Usa el hook para obtener el estado de autenticación
+  const [isAuthenticated, setIsAuthenticated] = useAuth();  // Traemos el estado de autenticación
 
   return (
     <div>
       {/* Barra de navegación condicional */}
       <header>
-        {isAuthenticated ? <NavBarAuth /> : <NavBarDefault />}
+        {isAuthenticated ? <NavBarAuth setIsAuthenticated={setIsAuthenticated} /> : <NavBarDefault setIsAuthenticated={setIsAuthenticated} />}
       </header>
 
       {/* Contenido principal */}
