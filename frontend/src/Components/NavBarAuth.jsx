@@ -1,18 +1,25 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Usamos Link para navegación
-import useLogout from "../hooks/useLogout"; // Importamos el hook de logout
+import { Link, useNavigate } from "react-router-dom"; // Usamos el hook useNavigate
 
-function NavBarAuth({ setIsAuthenticated }) {
-  const logout = useLogout(setIsAuthenticated);  // Usamos el hook de logout
+function NavBarAuth() {
+  const navigate = useNavigate(); // Usamos el hook useNavigate para navegar
+
+  const handleLogout = () => {
+    // Elimina el token de localStorage al hacer logout
+    localStorage.removeItem("authToken");
+
+    // Redirige al login después de hacer logout
+    navigate("/login");
+  };
 
   return (
     <nav>
       <ul>
-        <li><Link to="/">Home</Link></li>  {/* Enlace a Home */}
-        <li><Link to="/Perfil">Perfil</Link></li>  {/* Enlace a Perfil */}
-        <li><Link to="/Categorias">Explorar Categorías</Link></li>  {/* Enlace a Assets */}
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/perfil">Perfil</Link></li>
+        <li><Link to="/categorias">Explorar Categorías</Link></li>
         <li>
-          <button onClick={logout}>Logout</button> {/* Llamamos a logout */}
+          <button onClick={handleLogout}>Logout</button> {/* Llamamos a logout */}
         </li>
       </ul>
     </nav>
