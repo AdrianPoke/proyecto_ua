@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Layout from './Components/Layout';
-import NotFound from "./pages/NotFound";
 import AuthGuard from "./Components/AuthGuard";  // Import the AuthGuard
+import GuestGuard from "./Components/GuestGuard";  // Import the AuthGuard
 
 
 import Home from "./pages/Home";
@@ -40,8 +41,8 @@ function App() {
           {/* Rutas públicas */}
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/registro" element={<Registro />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<GuestGuard><Registro /></GuestGuard>} />
+          <Route path="/login" element={<GuestGuard><Login /></GuestGuard>} />
           <Route path="/politicas" element={<Politicas />} />
           <Route path="/busqueda-avanzada" element={<BusquedaAvanzada />} />
           <Route path="/categorias" element={<Categorias />} />
@@ -58,7 +59,7 @@ function App() {
           <Route path="/perfil/favoritos" element={<AuthGuard><Favoritos /></AuthGuard>} />
 
           {/* Ruta para páginas no encontradas */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
     </Router>
