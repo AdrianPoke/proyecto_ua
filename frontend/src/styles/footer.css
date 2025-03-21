@@ -1,0 +1,71 @@
+@import url('./variables.css');
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
+}
+
+.footer {
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  text-align: center;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto; /* Empuja el footer al final */
+}
+
+.logo-container img {
+    width: 50px;  /* Ancho del logo */
+    height: auto; /* Mantiene la proporción */
+    max-height: 50px; /* Ajusta la altura máxima */
+  }
+  
+
+.logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.social-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.footer-text {
+  font-size: 14px;
+}
+
+.policy-link {
+  color: var(--color-principal);
+  text-decoration: none;
+}
+
+.policy-link:hover {
+  text-decoration: underline;
+}

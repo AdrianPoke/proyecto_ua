@@ -1,0 +1,74 @@
+@import url('./variables.css');
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-menu);
+  padding: 10px 20px;
+  color: var(--color-texto);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  width: 60%; /* Asegura que la barra de búsqueda pueda expandirse */
+}
+
+.logo img {
+  width: 50px;
+  margin-left: 15px;
+  height: 50px;
+  margin-right: 15px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-fondo);
+  padding: 8px;
+  border-radius: 5px;
+  flex-grow: 1; /* Permite que la barra de búsqueda ocupe más espacio */
+}
+
+.search-bar input {
+  background: transparent;
+  border: none;
+  color: var(--color-texto);
+  outline: none;
+  width: 100%; /* Ocupar todo el ancho disponible */
+}
+
+.search-button {
+  background: none;
+  border: none;
+  color: var(--color-texto);
+  cursor: pointer;
+  padding-left: 8px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 50px; /* Añade más separación entre elementos */
+}
+
+.nav-link {
+  color: var(--color-texto);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav-link .icon {
+  color: var(--color-principal);
+}
+
+.profile-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-right: 30px;
+}

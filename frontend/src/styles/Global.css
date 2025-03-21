@@ -1,0 +1,84 @@
+@import url('./variables.css');
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-principal);
+}
+
+a {
+  color: var(--color-principal);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-secundario);
+}
+
+input, textarea {
+  border: 1px solid var(--color-borde-input);
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+nav {
+  background-color: var(--color-menu);
+  padding: 15px;
+}
+
+button {
+  background-color: var(--color-principal);
+  color: var(--color-fondo);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--color-secundario);
+}
+/* Asegura que el body y el root ocupen toda la pantalla */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asegura que el root y la aplicación sean de altura completa */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Contenedor principal del Layout */
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Hace que el contenido crezca para empujar el footer hacia abajo */
+.content {
+  flex-grow: 1;
+}
+
+/* Footer pegado abajo */
+.footer {
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  text-align: center;
+  padding: 20px;
+  margin-top: auto; /* Empuja el footer hacia abajo */
+}

@@ -5,7 +5,7 @@ import Layout from './Components/Layout';
 import AuthGuard from "./Components/AuthGuard";  // Import the AuthGuard
 import GuestGuard from "./Components/GuestGuard";  // Import the AuthGuard
 
-
+import "./styles/Global.css";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro"

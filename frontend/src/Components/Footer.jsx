@@ -1,23 +1,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "../styles/footer.css"; // Importamos los estilos
+import logo from "../logo.png";
+import x from "../icons/x.png";
 
 function Footer() {
   return (
-    <footer>
+    <footer className="footer">
       <div className="logo-container">
-        <img src="path/to/logo.png" alt="MoLaMaZo Assets" className="logo" />
+        <img src={logo} alt="Logo" />
+        <span className="brand-name">MoLaMaZo Assets</span>
       </div>
+
       <div className="social-links">
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon">
-          <img src="path/to/twitter-icon.png" alt="Twitter" />
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+        <img src={x} alt="Logo" />
         </a>
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon">
-          <img src="path/to/instagram-icon.png" alt="Instagram" />
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+          <img src="/icons/instagram-icon.png" alt="Instagram" className="social-icon" />
         </a>
-        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="social-icon">
-          <img src="path/to/youtube-icon.png" alt="YouTube" />
+        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+          <img src="/icons/youtube-icon.png" alt="YouTube" className="social-icon" />
         </a>
       </div>
+
       <div className="footer-text">
         <p>© 2025 MoLaMaZoGAMES - Todos los derechos reservados</p>
         <div>

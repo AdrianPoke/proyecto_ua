@@ -1,0 +1,46 @@
+@import url('./variables.css');
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-menu);
+  padding: 10px 20px;
+  color: var(--color-texto);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 50px;
+  height: 50px;
+  margin-left: 15px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 50px; /* Añade más separación entre elementos */
+}
+
+.nav-link {
+  color: var(--color-texto);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.login-button {
+  background-color: var(--color-principal);
+  padding: 8px 15px;
+  border-radius: 5px;
+  color: var(--color-fondo);
+}
+
+.login-button:hover {
+  background-color: var(--color-secundario);
+}

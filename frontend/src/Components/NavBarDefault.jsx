@@ -1,18 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Usamos el hook useNavigate
+import { Link } from "react-router-dom";
+import "../styles/NavBarDefault.css"; // Importamos los estilos
+import logo from "../logo.png";
 
 function NavBarDefault() {
-
-
   return (
-    <nav>
-      <ul>
-        <li><Link to="/">Home</Link></li> {/* Enlace a Home */}
-        <li><Link to="/categorias">Categorias</Link></li> {/* Enlace a Home */}
-        <li><Link to="/busqueda-avanzada">Búsqueda Avanzada</Link></li> {/* Enlace a Home */}
-        <li><Link to="/registro">Registrate</Link></li> {/* Enlace a Registro */}
-        <li><Link to="/login">Iniciar Sesión</Link></li>
-      </ul>
+    <nav className="navbar">
+      <div className="navbar-left">
+        <Link to="/" className="logo">
+        <img src={logo} alt="Logo" />
+        </Link>
+      </div>
+
+      <div className="navbar-right">
+        <Link to="/categorias" className="nav-link">Categorías</Link>
+        <Link to="/busqueda-avanzada" className="nav-link">Búsqueda Avanzada</Link>
+        <Link to="/registro" className="nav-link">Regístrate</Link>
+        <Link to="/login" className="nav-link login-button">Iniciar Sesión</Link>
+      </div>
     </nav>
   );
 }
