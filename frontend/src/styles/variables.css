@@ -1,9 +1,31 @@
 :root {
-    --color-principal: #3EE676;
-    --color-secundario: #333C36;
-    --color-fondo: #101011;
-    --color-texto: #F2F2F2;
-    --color-menu: #1F1F22;
-    --color-borde-input: #636363;
+  /*Paleta principal*/
+  --color-principal: #3EE676;
+  --color-principal-hover: #32C766;
+  --color-secundario: #333C36;
+
+  /*Fondos y superficies*/
+  --color-fondo: #101011;
+  --color-menu: #1F1F22;
+
+  /*Texto*/
+  --color-texto: #F2F2F2;
+  --color-texto-secundario: #CCCCCC;
+  --color-placeholder: #888888;
+
+  /*Bordes*/
+  --color-borde-input: #636363;
+
+  /*Espaciado y tamaños*/
+  --input-padding: 12px;
+  --input-radius: 8px;
+  --form-width: 500px;
+
+  /*Transiciones*/
+  --transicion-base: 0.3s ease;
+
+  /*Margenes*/
+  --margen-25: 25px;
+  --margen-15: 15px;
   }
   

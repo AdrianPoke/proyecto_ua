@@ -1,0 +1,102 @@
+@import url('./variables.css');
+
+/* Página de login centrada y con fondo */
+.login-page {
+  background-color: var(--color-fondo);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Cabecera con logo y título en línea */
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: var(--margen-25);
+}
+
+.login-logo {
+  width: 50px;
+  height: 50px;
+}
+
+.login-header h2 {
+  color: var(--color-texto);
+  font-size: 1.8rem;
+  border-left: 3px solid var(--color-principal);
+  padding-left: var(--margen-15);
+  margin: 0;
+}
+
+/* Contenedor principal del formulario */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: var(--input-padding);
+  border-radius: var(--input-radius);
+  border: 1px solid var(--color-borde-input);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: var(--form-width);
+}
+
+.login-form label {
+  color: var(--color-texto);
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.login-form input {
+  width: 100%;
+  background-color: var(--color-menu);
+  border: 1px solid var(--color-borde-input);
+  padding: var(--input-padding);
+  border-radius: var(--input-radius);
+  color: var(--color-texto);
+  margin-bottom: var(--margen-15);
+  font-size: 0.95rem;
+}
+
+.login-form input::placeholder {
+  color: var(--color-placeholder);
+}
+
+.login-form button {
+  width: 100%;
+  background-color: var(--color-principal);
+  color: var(--color-fondo);
+  padding: var(--input-padding);
+  border: none;
+  border-radius: var(--input-radius);
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color var(--transicion-base);
+}
+
+.login-form button:hover {
+  background-color: var(--color-principal-hover);
+}
+
+.login-form p {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--color-texto);
+  font-size: 0.85rem;
+}
+
+.login-form p a {
+  color: var(--color-principal);
+  text-decoration: none;
+  font-weight: bold;
+}

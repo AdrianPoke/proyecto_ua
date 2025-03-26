@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Global.css"; // Importa los estilos globales
+import "../styles/login.css";
+import logo from "../logo.png";
 
 function Login() {
   
@@ -25,34 +27,39 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Página de Login</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Ingrese su correo"
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Ingrese su contraseña"
-            required
-          />
-        </div>
-        <div>
-          <button type="submit">Iniciar sesión</button>
-        </div>
-      </form>
+<div className="login-page">
+  <div className="login-container">
+  <div className="login-header">
+      <img src={logo} alt="Logo" className="login-logo" />
+      <h2>Formulario de Inicio de Sesión</h2>
     </div>
+
+    <form className="login-form" onSubmit={handleLogin}>
+      <label>Email:</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Ingrese su correo"
+        required
+      />
+
+      <label>Contraseña:</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Mínimo 10 caracteres"
+        required
+      />
+
+      <button type="submit">Inicia Sesión</button>
+
+      <p>¿No tienes una cuenta creada? <a href="/registro">Regístrate aquí</a></p>
+    </form>
+  </div>
+</div>
+
   );
 }
 
