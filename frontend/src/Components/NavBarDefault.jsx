@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/NavBarDefault.css"; // Importamos los estilos
+import { FaSearch } from "react-icons/fa";
+import "../styles/NavBarAuth.css"; // Reutilizamos el CSS de Auth
 import logo from "../logo.png";
 
 function NavBarDefault() {
@@ -8,8 +9,14 @@ function NavBarDefault() {
     <nav className="navbar">
       <div className="navbar-left">
         <Link to="/" className="logo">
-        <img src={logo} alt="Logo" />
+          <img src={logo} alt="Logo" />
         </Link>
+        <div className="search-bar">
+          <input type="text" placeholder="Inserte palabras clave ..." />
+          <button className="search-button">
+            <FaSearch />
+          </button>
+        </div>
       </div>
 
       <div className="navbar-right">

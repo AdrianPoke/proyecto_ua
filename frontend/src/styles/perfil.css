@@ -1,0 +1,87 @@
+@import url('./variables.css');
+
+.perfil-container {
+  display: flex;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  min-height: 100vh;
+  padding: 30px;
+}
+
+/* ───────── Sidebar ───────── */
+.perfil-sidebar {
+  width: 250px;
+  background-color: var(--color-menu);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.perfil-foto {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.perfil-nombre {
+  color: var(--color-principal);
+  font-size: 18px;
+  margin: 5px 0;
+}
+
+.perfil-email {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: var(--color-texto-secundario);
+  text-align: center;
+}
+
+.perfil-redes {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.perfil-redes a {
+  color: var(--color-texto);
+  font-size: 18px;
+  text-decoration: none;
+}
+
+/* ───────── Menú ───────── */
+.perfil-menu {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.perfil-menu button {
+  background-color: transparent;
+  border: 1px solid var(--color-borde-input);
+  color: var(--color-texto);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color var(--transicion-base);
+}
+
+.perfil-menu button:hover {
+  background-color: var(--color-secundario);
+}
+
+/* ───────── Contenido dinámico ───────── */
+.perfil-contenido {
+  flex: 1;
+  padding: 20px;
+}

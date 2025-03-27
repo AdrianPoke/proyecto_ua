@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaSearch, FaPlusCircle } from "react-icons/fa";
 import "../styles/NavBarAuth.css"; // Importa los estilos
 import logo from "../logo.png";
+import pr from "../icons/profile.png";
 
 
 function NavBarAuth() {
@@ -27,7 +28,7 @@ function NavBarAuth() {
         <Link to="/categorias" className="nav-link">Categorías</Link>
         <Link to="/busqueda-avanzada" className="nav-link">Búsqueda Avanzada</Link>
         <Link to="/perfil" className="profile-icon">
-          <img src="/perfil.jpg" alt="Perfil" />
+        <img src={pr} alt="Profile" />
         </Link>
       </div>
     </nav>

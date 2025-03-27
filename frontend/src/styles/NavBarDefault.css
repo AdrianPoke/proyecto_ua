@@ -23,7 +23,7 @@
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 50px; /* Añade más separación entre elementos */
+  gap: 30px; /* Añade más separación entre elementos */
 }
 
 .nav-link {

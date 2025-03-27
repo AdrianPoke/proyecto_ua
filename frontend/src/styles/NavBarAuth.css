@@ -27,6 +27,7 @@
   align-items: center;
   background-color: var(--color-fondo);
   padding: 8px;
+  margin-left: 35px;
   border-radius: 5px;
   flex-grow: 1; /* Permite que la barra de búsqueda ocupe más espacio */
 }
@@ -51,6 +52,7 @@
   display: flex;
   align-items: center;
   gap: 50px; /* Añade más separación entre elementos */
+  margin-right: 20px;
 }
 
 .nav-link {
