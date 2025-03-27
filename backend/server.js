@@ -1,10 +1,7 @@
-// server.js (Backend)
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-
-const User = require('./modelos/Usuario'); // Asegúrate de que la ruta sea correcta
 
 const app = express();
 app.use(express.json());
@@ -15,15 +12,12 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado a MongoDB'))
   .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
 
-// Ruta para obtener todos los usuarios
-app.get('/api/usuarios', async (req, res) => {
-    try {
-        const usuarios = await User.find();
-        res.json(usuarios);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los usuarios' });
-    }
-});
+// Rutas
+const authRoutes = require('./rutas/auth');
+const usuarioRoutes = require('./rutas/usuarios');
+
+app.use('/api', authRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
