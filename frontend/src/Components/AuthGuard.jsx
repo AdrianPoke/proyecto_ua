@@ -1,14 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 const AuthGuard = ({ children }) => {
-  const authToken = localStorage.getItem("authToken");  // Verifica si el token está en localStorage
+  const [loading, setLoading] = useState(true);
+  const [autenticado, setAutenticado] = useState(false);
 
-  if (!authToken) {
-    return <Navigate to="/login" replace />;  // Si no está autenticado, redirige al login
+  useEffect(() => {
+    const verificarToken = async () => {
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        setAutenticado(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:5000/api/verify-token", {
+          headers: {
+            Authorization: token,
+          },
+        });
+
+        if (res.ok) {
+          setAutenticado(true);
+        } else {
+          setAutenticado(false);
+          localStorage.removeItem("authToken");
+        }
+      } catch (error) {
+        console.error("Error al verificar token:", error);
+        setAutenticado(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verificarToken();
+  }, []);
+
+  if (loading) return null;
+
+  if (!autenticado) {
+    return <Navigate to="/login" replace />;
   }
 
-  return children;  // Si está autenticado, permite renderizar el componente
+  return children;
 };
 
 export default AuthGuard;
