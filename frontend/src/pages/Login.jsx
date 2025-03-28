@@ -35,7 +35,7 @@ function Login() {
         // ✅ Guardar solo el token JWT
         localStorage.setItem("authToken", data.token);
   
-        navigate("/perfil");
+        navigate("/home");
         window.location.reload();
       } else {
         alert(data.mensaje || "Error al iniciar sesión.");
