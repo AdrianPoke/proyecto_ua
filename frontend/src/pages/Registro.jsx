@@ -56,7 +56,7 @@ function Registro() {
         </div>
 
         <form className="login-form" onSubmit={handleRegistro}>
-          <label>Nombre:</label>
+          <label>Nombre Real de Usuario:</label>
           <input
             type="text"
             value={nombre}
