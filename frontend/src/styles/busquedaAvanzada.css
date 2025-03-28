@@ -83,6 +83,13 @@
   text-align: center;
   padding: 5px;
 }
+.resultados-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
 
 .resultado-imagen img {
   width: 100%;

@@ -1,0 +1,105 @@
+@import url("./perfil.css");
+
+:root {
+  /*Paleta principal*/
+  --color-principal: #3EE676;
+  --color-principal-hover: #32C766;
+  --color-secundario: #333C36;
+
+  /*Fondos y superficies*/
+  --color-fondo: #101011;
+  --color-menu: #1F1F22;
+
+  /*Texto*/
+  --color-texto: #F2F2F2;
+  --color-texto-secundario: #CCCCCC;
+  --color-placeholder: #888888;
+
+  /*Bordes*/
+  --color-borde-input: #636363;
+
+  /*Espaciado y tamaños*/
+  --input-padding: 12px;
+  --input-radius: 8px;
+  --form-width: 500px;
+
+  /*Transiciones*/
+  --transicion-base: 0.3s ease;
+
+  /*Margenes*/
+  --margen-25: 25px;
+  --margen-15: 15px;
+}
+
+.perfil-container {
+  display: flex;
+  gap: 20px;
+}
+
+.perfil-datos {
+  flex: 1;
+  padding: 20px;
+  background-color: var(--color-fondo);
+  border-radius: 8px;
+}
+
+.seccion-titulo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: var(--margen-25);
+  color: var(--color-texto);
+}
+
+.datos-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--margen-25);
+}
+
+.form-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--margen-15);
+}
+
+.form-col label {
+  font-weight: 500;
+  color: var(--color-principal);
+}
+
+.input-text,
+.input-email,
+.input-password,
+.input-url {
+  padding: var(--input-padding);
+  border: 1px solid var(--color-borde-input);
+  border-radius: var(--input-radius);
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  outline: none;
+}
+
+.drop-zone {
+  border: 2px dashed var(--color-secundario);
+  padding: var(--margen-25);
+  text-align: center;
+  color: var(--color-texto);
+  border-radius: var(--input-radius);
+  background-color: var(--color-fondo);
+}
+
+.boton-verde {
+  align-self: flex-start;
+  margin-top: 15px;
+  padding: var(--input-padding) var(--margen-25);
+  background-color: var(--color-principal);
+  color: white;
+  border: none;
+  border-radius: var(--input-radius);
+  cursor: pointer;
+  transition: background-color var(--transicion-base);
+}
+
+.boton-verde:hover {
+  background-color: var(--color-principal-hover);
+}

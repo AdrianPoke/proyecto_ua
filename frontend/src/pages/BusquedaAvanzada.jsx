@@ -1,8 +1,30 @@
 import React, { useState } from "react";
 import "../styles/busquedaAvanzada.css";
 
+// Array de assets compartidos
+const assets = [
+  { id: 1, title: "Cyborg Model 3D", image: "/assets/warrior.webp" },
+  { id: 2, title: "Tileset Taberna 3D", image: "/assets/pac1.jpg" },
+  { id: 3, title: "Tavern Assets", image: "/assets/pac2.webp" },
+  { id: 4, title: "Fantasy Pack", image: "/assets/pac3.webp" },
+  { id: 5, title: "Retro Arcade Pack", image: "/assets/pac4.webp" },
+  { id: 6, title: "Pack of Monsters", image: "/assets/pac5.png" },
+  { id: 7, title: "Space Invaders Pack", image: "/assets/pac6.png" },
+  { id: 8, title: "Zombie Cenital Tileset", image: "/assets/pac7.webp" },
+  { id: 9, title: "JavaScripts", image: "/assets/scr.jpg" },
+  { id: 10, title: "Movimiento de Salto 2D", image: "/assets/scr1.jpg" },
+  { id: 11, title: "Text Script Example", image: "/assets/scr2.png" },
+  { id: 12, title: "Message Script", image: "/assets/SCR3.jpg" },
+  { id: 13, title: "Movement TOP-DOWN", image: "/assets/scr4.png" },
+  { id: 14, title: "Factory Package", image: "/assets/titpac.jpg" },
+];
+
 function BusquedaAvanzada() {
   const [busqueda, setBusqueda] = useState("");
+
+  const assetsFiltrados = assets.filter((asset) =>
+    asset.title.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
     <div className="busqueda-container">
@@ -68,17 +90,14 @@ function BusquedaAvanzada() {
         </div>
       </div>
 
-      <h3 className="resultados-titulo">Resultados (10)</h3>
+      <h3 className="resultados-titulo">Resultados ({assetsFiltrados.length})</h3>
       <div className="resultados-grid">
-        {[...Array(10)].map((_, index) => (
-          <div className="resultado-card" key={index}>
+        {assetsFiltrados.map((asset) => (
+          <div className="resultado-card" key={asset.id}>
             <div className="resultado-imagen">
-              <img
-                src={`/assets/nieve${index + 1}.webp`} // puedes cambiar esto según tus rutas
-                alt={`Asset ${index + 1}`}
-              />
+              <img src={asset.image} alt={asset.title} />
             </div>
-            <p className="resultado-titulo">Título</p>
+            <p className="resultado-titulo">{asset.title}</p>
           </div>
         ))}
       </div>

@@ -7,35 +7,18 @@ function Perfil() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPerfil = async () => {
-      const token = localStorage.getItem("authToken");
-
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        const res = await fetch("http://localhost:5000/api/usuarios/perfil", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("Error al obtener perfil");
-        }
-
-        const data = await res.json();
-        setUsuario(data);
-      } catch (error) {
-        console.error("Error:", error);
-        alert("No se pudo cargar el perfil.");
-      }
+    // Simulación de carga de usuario sin base de datos
+    const usuarioEjemplo = {
+      nombre: "Andrew C. Curtis",
+      email: "andrew@gmail.com",
+      foto_perfil: "https://randomuser.me/api/portraits/men/32.jpg",
+      enlace_twitter: "https://x.com/andrew",
+      enlace_instagram: "https://instagram.com/andrew",
+      enlace_linkedin: "https://linkedin.com/in/andrew",
     };
 
-    fetchPerfil();
-  }, [navigate]);
+    setTimeout(() => setUsuario(usuarioEjemplo), 500); // Simula carga
+  }, []);
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
@@ -46,10 +29,7 @@ function Perfil() {
       {/* Panel izquierdo */}
       <div className="perfil-sidebar">
         <img
-          src={
-            usuario.foto_perfil ||
-            "https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-          }
+          src={usuario.foto_perfil}
           alt="Perfil"
           className="perfil-foto"
         />
@@ -57,21 +37,15 @@ function Perfil() {
         <p className="perfil-email">{usuario.email}</p>
 
         <div className="perfil-redes">
-          {usuario.enlace_twitter && (
-            <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-              X
-            </a>
-          )}
-          {usuario.enlace_instagram && (
-            <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-              📷
-            </a>
-          )}
-          {usuario.enlace_linkedin && (
-            <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-              🔗
-            </a>
-          )}
+          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
+            <i className="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
+            <i className="fa-brands fa-instagram"></i>
+          </a>
+          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+            <i className="fa-brands fa-linkedin"></i>
+          </a>
         </div>
 
         <nav className="perfil-menu">
