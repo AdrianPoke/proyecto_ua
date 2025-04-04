@@ -15,9 +15,11 @@ mongoose.connect(process.env.MONGO_URI)
 // Rutas
 const authRoutes = require('./rutas/auth');
 const usuarioRoutes = require('./rutas/usuarios');
+const categoriaRoutes = require('./rutas/categorias'); // Asegúrate de que esta ruta esté correcta
 
 app.use('/api', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/categorias', categoriaRoutes); // Usamos las rutas de categorías
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
