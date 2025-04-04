@@ -30,7 +30,7 @@ function Footer() {
         <p>© 2025 MoLaMaZoGAMES - Todos los derechos reservados</p>
         <div>
           <Link to="/politicas" className="policy-link">Ver Política de privacidad</Link> - 
-          <Link to="/politicas" className="policy-link"> Ver Política de accesibilidad</Link>
+          <Link to="/accesibilidad" className="policy-link"> Ver Política de accesibilidad</Link>
         </div>
       </div>
     </footer>

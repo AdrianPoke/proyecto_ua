@@ -12,6 +12,7 @@ import Registro from "./pages/Registro"
 import Perfil from "./pages/Perfil";
 import BusquedaAvanzada from "./pages/BusquedaAvanzada";
 import Politicas from "./pages/Politicas";
+import Accesibilidad from "./pages/Accesibilidad";
 
 
 // PAGINAS DEL PERFIL DE USUARIO
@@ -44,6 +45,7 @@ function App() {
           <Route path="/registro" element={<GuestGuard><Registro /></GuestGuard>} />
           <Route path="/login" element={<GuestGuard><Login /></GuestGuard>} />
           <Route path="/politicas" element={<Politicas />} />
+          <Route path="/accesibilidad" element={<Accesibilidad />} />
           <Route path="/busqueda-avanzada" element={<BusquedaAvanzada />} />
           <Route path="/categorias" element={<Categorias />} />
           <Route path="/categorias/:categoria" element={<AssetsCategoria />} />
