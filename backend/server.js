@@ -15,11 +15,13 @@ mongoose.connect(process.env.MONGO_URI)
 // Rutas
 const authRoutes = require('./rutas/auth');
 const usuarioRoutes = require('./rutas/usuarios');
-const categoriaRoutes = require('./rutas/categorias'); // Asegúrate de que esta ruta esté correcta
+const categoriaRoutes = require('./rutas/categorias'); // Si necesitas también las categorías
+const assetRoutes = require('./rutas/assets'); // Las rutas de assets
 
 app.use('/api', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/categorias', categoriaRoutes); // Usamos las rutas de categorías
+app.use('/api/categorias', categoriaRoutes);
+app.use('/api/assets', assetRoutes);  // Integración de las rutas de assets
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
