@@ -1,0 +1,225 @@
+@import url('./variables.css');
+
+body {
+  background-color: var(--color-fondo);
+}
+
+.editar-asset-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+}
+
+.editar-asset-header {
+  margin-bottom: 30px;
+}
+
+.editar-asset-header h1 {
+  font-size: 2rem;
+  color: var(--color-principal);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editar-asset-form {
+  display: grid;
+  gap: 30px;
+  background-color: var(--color-menu);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.form-preview {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.asset-preview {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: var(--color-fondo);
+}
+
+.form-section {
+  background-color: var(--color-menu);
+  padding: 25px;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde-input);
+}
+
+.form-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: var(--color-principal);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-texto);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--input-padding);
+  border: 1px solid var(--color-borde-input);
+  border-radius: var(--input-radius);
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group input[type="file"] {
+  width: 100%;
+  padding: var(--input-padding);
+  border: 2px dashed var(--color-borde-input);
+  border-radius: var(--input-radius);
+  background-color: var(--color-menu);
+  cursor: pointer;
+  color: var(--color-texto);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+}
+
+.dropzone {
+  border: 2px dashed var(--color-principal);
+  border-radius: var(--input-radius);
+  padding: 30px;
+  text-align: center;
+  background-color: var(--color-menu);
+  color: var(--color-placeholder);
+  cursor: pointer;
+  transition: border-color var(--transicion-base);
+}
+
+.dropzone:hover {
+  border-color: var(--color-principal-hover);
+}
+
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: var(--color-fondo);
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  padding: 12px 25px;
+  border: none;
+  border-radius: var(--input-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transicion-base);
+}
+
+.btn-cancelar {
+  background-color: var(--color-menu);
+  color: var(--color-texto);
+  border: 1px solid var(--color-borde-input);
+}
+
+.btn-guardar {
+  background-color: var(--color-principal);
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: var(--color-secundario);
+  color: var(--color-texto);
+  border-color: var(--color-borde-input);
+}
+
+.btn-guardar:hover {
+  background-color: var(--color-principal-hover);
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+  .editar-asset-container {
+    padding: 20px;
+  }
+
+  .editar-asset-form {
+    padding: 20px;
+  }
+
+  .form-section {
+    padding: 20px;
+  }
+
+  .asset-preview {
+    height: 250px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancelar,
+  .btn-guardar {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .editar-asset-container {
+    padding: 15px;
+  }
+
+  .editar-asset-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .editar-asset-form {
+    padding: 15px;
+  }
+
+  .form-section {
+    padding: 15px;
+  }
+
+  .asset-preview {
+    height: 200px;
+  }
+} 

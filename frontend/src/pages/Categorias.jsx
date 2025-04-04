@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/categorias.css'; // Asegúrate de tener este CSS creado
 
 const categorias = [
-  { nombre: 'MODELOS 3D', imagen: '/assets/categorias/modelos3d.jpg' },
+  { nombre: 'MODELOS 3D', imagen: '/assets/categorias/model3d.jpg' },
   { nombre: 'GRÁFICOS 2D', imagen: '/assets/categorias/graficos2d.jpg' },
   { nombre: 'AUDIO', imagen: '/assets/categorias/audio.jpg' },
   { nombre: 'SCRIPTS', imagen: '/assets/categorias/scr.jpg' },

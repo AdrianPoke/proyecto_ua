@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/busquedaAvanzada.css";
 
 // Array de assets compartidos
@@ -21,10 +22,15 @@ const assets = [
 
 function BusquedaAvanzada() {
   const [busqueda, setBusqueda] = useState("");
+  const navigate = useNavigate();
 
   const assetsFiltrados = assets.filter((asset) =>
     asset.title.toLowerCase().includes(busqueda.toLowerCase())
   );
+
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
 
   return (
     <div className="busqueda-container">
@@ -93,7 +99,11 @@ function BusquedaAvanzada() {
       <h3 className="resultados-titulo">Resultados ({assetsFiltrados.length})</h3>
       <div className="resultados-grid">
         {assetsFiltrados.map((asset) => (
-          <div className="resultado-card" key={asset.id}>
+          <div 
+            className="resultado-card" 
+            key={asset.id}
+            onClick={() => handleVerAsset(asset.id)}
+          >
             <div className="resultado-imagen">
               <img src={asset.image} alt={asset.title} />
             </div>

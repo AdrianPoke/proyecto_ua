@@ -29,7 +29,8 @@ import Favoritos from "./pages/Favoritos";
 // ------------------------------------------------
 import Categorias from "./pages/Categorias";
 import SubirAssets from "./pages/SubirAssets";
-import VistaAsset from "./pages/VistaAsset";
+import VerAsset from "./pages/VerAsset";
+import EditarAsset from "./pages/EditarAsset";
 import AssetsCategoria from './pages/AssetsCategoria';
 // ------------------------------------------------
 
@@ -51,7 +52,8 @@ function App() {
           <Route path="/categorias/:categoria" element={<AssetsCategoria />} />
 
           {/* Rutas protegidas */}
-          <Route path="/vista-asset/:id" element={<AuthGuard><VistaAsset /></AuthGuard>} /> {/* Vista de asset individual */}
+          <Route path="/asset/:id" element={<AuthGuard><VerAsset /></AuthGuard>} /> {/* Vista de asset individual */}
+          <Route path="/asset/:id/editar" element={<AuthGuard><EditarAsset /></AuthGuard>} /> {/* Edición de asset */}
           <Route path="/subir-assets" element={<AuthGuard><SubirAssets /></AuthGuard>} /> {/* Página para subir un asset */}
           <Route path="/perfil" element={<AuthGuard><Perfil /></AuthGuard>} /> {/* Ruta principal del perfil */}
           <Route path="/perfil/assets-subidos" element={<AuthGuard><AssetsSubidos /></AuthGuard>} />
