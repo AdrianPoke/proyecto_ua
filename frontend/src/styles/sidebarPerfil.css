@@ -1,0 +1,100 @@
+@import url('./variables.css');
+
+.perfil-sidebar {
+  width: 250px;
+  background-color: var(--color-menu);
+  padding: 30px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  height: fit-content;
+  margin-right: 30px;
+}
+
+.perfil-foto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.perfil-nombre {
+  font-size: 1.2rem;
+  color: var(--color-texto);
+  text-align: center;
+  margin: 0;
+}
+
+.perfil-email {
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
+  text-align: center;
+  margin: 0;
+}
+
+.perfil-redes {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.perfil-redes a {
+  color: var(--color-texto-secundario);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.perfil-redes a:hover {
+  color: var(--color-principal);
+}
+
+.perfil-menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perfil-menu button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: var(--input-radius);
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perfil-menu button:hover {
+  background-color: var(--color-principal);
+  color: white;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .perfil-sidebar {
+    width: 220px;
+    padding: 25px;
+  }
+
+  .perfil-foto {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .perfil-sidebar {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 30px;
+  }
+} 

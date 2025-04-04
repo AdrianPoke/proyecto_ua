@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaDownload, FaCalendarAlt, FaClock } from 'react-icons/fa';
+import { FaDownload, FaCalendarAlt, FaClock, FaStar } from 'react-icons/fa';
+import SidebarPerfil from '../Components/SidebarPerfil';
 import '../styles/descargas.css';
 
 const Descargas = () => {
@@ -21,6 +22,10 @@ const Descargas = () => {
     setTimeout(() => setUsuario(usuarioEjemplo), 500);
   }, []);
 
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
+
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
@@ -28,44 +33,7 @@ const Descargas = () => {
   return (
     <div className="perfil-container">
       {/* Panel izquierdo */}
-      <div className="perfil-sidebar">
-        <img
-          src={usuario.foto_perfil}
-          alt="Perfil"
-          className="perfil-foto"
-        />
-        <h3 className="perfil-nombre">{usuario.nombre}</h3>
-        <p className="perfil-email">{usuario.email}</p>
-
-        <div className="perfil-redes">
-          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-x-twitter"></i>
-          </a>
-          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-instagram"></i>
-          </a>
-          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-        </div>
-
-        <nav className="perfil-menu">
-          <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
-          <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
-          <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
-          <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
-          <button onClick={() => navigate("/perfil/configuracion")}>⚙️ Configuración</button>
-          <button
-            onClick={() => {
-              localStorage.removeItem("authToken");
-              navigate("/login");
-              window.location.reload();
-            }}
-          >
-            🚪 Cerrar Sesión
-          </button>
-        </nav>
-      </div>
+      <SidebarPerfil usuario={usuario} />
 
       {/* Contenido principal */}
       <div className="perfil-contenido">
@@ -79,12 +47,12 @@ const Descargas = () => {
               <span className="stat-label">Total Descargas</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">5</span>
-              <span className="stat-label">Este Mes</span>
+              <span className="stat-value">8</span>
+              <span className="stat-label">Categorías</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">2</span>
-              <span className="stat-label">Esta Semana</span>
+              <span className="stat-value">4.7</span>
+              <span className="stat-label">Rating Promedio</span>
             </div>
           </div>
         </div>
@@ -98,8 +66,8 @@ const Descargas = () => {
           </select>
           <select className="filter-select" defaultValue="reciente">
             <option value="reciente">Más reciente</option>
-            <option value="antiguo">Más antiguo</option>
-            <option value="nombre">Por nombre</option>
+            <option value="descargas">Más descargados</option>
+            <option value="rating">Mejor rating</option>
           </select>
         </div>
 
@@ -108,51 +76,46 @@ const Descargas = () => {
           {[
             {
               id: 1,
-              nombre: "Asset 3D - Personaje Principal",
+              nombre: "Modelo 3D - Guerrero Medieval",
               categoria: "Modelos 3D",
+              formato: ".blend",
+              autor: "Juan Pérez",
               fecha: "2024-03-15",
               hora: "14:30",
-              imagen: "https://via.placeholder.com/300x200",
-              autor: "ModelCreator3D"
+              imagen: "https://via.placeholder.com/300x200"
             },
             {
               id: 2,
-              nombre: "Pack de Texturas HD",
+              nombre: "Pack de Texturas - Castillo",
               categoria: "Texturas",
-              fecha: "2024-03-14",
+              formato: ".png",
+              autor: "María García",
+              fecha: "2024-03-10",
               hora: "09:15",
-              imagen: "https://via.placeholder.com/300x200",
-              autor: "TextureMaster"
+              imagen: "https://via.placeholder.com/300x200"
             },
             {
               id: 3,
-              nombre: "Efectos de Sonido - Ambiente",
+              nombre: "Efectos de Sonido - Batalla",
               categoria: "Audio",
-              fecha: "2024-03-13",
+              formato: ".wav",
+              autor: "Carlos López",
+              fecha: "2024-03-05",
               hora: "16:45",
-              imagen: "https://via.placeholder.com/300x200",
-              autor: "SoundDesigner"
+              imagen: "https://via.placeholder.com/300x200"
             }
-          ].map((descarga) => (
-            <div key={descarga.id} className="descarga-card">
-              <div className="descarga-imagen">
-                <img src={descarga.imagen} alt={descarga.nombre} />
+          ].map((asset) => (
+            <div key={asset.id} className="asset-card">
+              <div className="asset-imagen" onClick={() => handleVerAsset(asset.id)}>
+                <img src={asset.imagen} alt={asset.nombre} />
               </div>
-              <div className="descarga-info">
-                <h3 className="descarga-nombre">{descarga.nombre}</h3>
-                <p className="descarga-categoria">{descarga.categoria}</p>
-                <p className="descarga-autor">Por: {descarga.autor}</p>
-                <div className="descarga-metadata">
-                  <span className="metadata-item">
-                    <FaCalendarAlt /> {descarga.fecha}
-                  </span>
-                  <span className="metadata-item">
-                    <FaClock /> {descarga.hora}
-                  </span>
-                </div>
-                <button className="descargar-nuevamente">
-                  <FaDownload /> Descargar
-                </button>
+              <div className="asset-info">
+                <h3 className="asset-nombre" onClick={() => handleVerAsset(asset.id)}>
+                  {asset.nombre}
+                </h3>
+                <p className="asset-categoria">{asset.categoria} <span className="asset-formato">{asset.formato}</span></p>
+                <p className="asset-autor">Por: {asset.autor}</p>
+                <p className="asset-fecha">Descargado: {asset.fecha} a las {asset.hora}</p>
               </div>
             </div>
           ))}

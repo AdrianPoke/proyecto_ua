@@ -11,11 +11,6 @@
 
 .descargas-header {
   margin-bottom: 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
 }
 
 .descargas-title {
@@ -24,15 +19,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .title-icon {
   font-size: 1.8rem;
+  color: var(--color-principal);
 }
 
 .descargas-stats {
   display: flex;
   gap: 20px;
+  margin-bottom: 30px;
 }
 
 .stat-item {
@@ -40,15 +38,14 @@
   padding: 15px 25px;
   border-radius: 8px;
   text-align: center;
-  border: 1px solid var(--color-borde-input);
+  flex: 1;
 }
 
 .stat-value {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: var(--color-principal);
-  margin-bottom: 5px;
 }
 
 .stat-label {
@@ -57,19 +54,19 @@
 }
 
 .descargas-filters {
-  margin-bottom: 30px;
   display: flex;
   gap: 15px;
+  margin-bottom: 30px;
 }
 
 .filter-select {
   padding: 10px;
   border-radius: var(--input-radius);
   border: 1px solid var(--color-borde-input);
-  background-color: var(--color-menu);
+  background-color: var(--color-fondo);
   color: var(--color-texto);
-  font-size: 0.95rem;
-  min-width: 150px;
+  font-size: 1rem;
+  min-width: 200px;
 }
 
 .descargas-grid {
@@ -78,85 +75,63 @@
   gap: 25px;
 }
 
-.descarga-card {
+.asset-card {
   background-color: var(--color-menu);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--color-borde-input);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
-.descarga-card:hover {
+.asset-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.descarga-imagen {
+.asset-imagen {
+  position: relative;
   width: 100%;
   height: 200px;
-  overflow: hidden;
 }
 
-.descarga-imagen img {
+.asset-imagen img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.descarga-info {
+.asset-info {
   padding: 20px;
 }
 
-.descarga-nombre {
+.asset-nombre {
   font-size: 1.2rem;
+  margin-bottom: 10px;
   color: var(--color-texto);
+}
+
+.asset-categoria {
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
   margin-bottom: 10px;
 }
 
-.descarga-categoria {
-  color: var(--color-principal);
-  font-size: 0.9rem;
-  margin-bottom: 5px;
-}
-
-.descarga-autor {
-  color: var(--color-texto-secundario);
-  font-size: 0.9rem;
-  margin-bottom: 15px;
-}
-
-.descarga-metadata {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  color: var(--color-texto-secundario);
-  font-size: 0.85rem;
-}
-
-.metadata-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.descargar-nuevamente {
-  width: 100%;
-  padding: 10px;
+.asset-formato {
   background-color: var(--color-principal);
-  color: var(--color-fondo);
-  border: none;
-  border-radius: var(--input-radius);
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: background-color var(--transicion-base);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-left: 8px;
 }
 
-.descargar-nuevamente:hover {
-  background-color: var(--color-principal-hover);
+.asset-autor {
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
+  margin-bottom: 10px;
+}
+
+.asset-fecha {
+  font-size: 0.9rem;
+  color: var(--color-texto-secundario);
 }
 
 /* Media Queries */
@@ -175,26 +150,12 @@
     padding: 20px;
   }
 
-  .descargas-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .descargas-title {
     font-size: 1.8rem;
   }
 
   .descargas-stats {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .stat-item {
-    padding: 12px 20px;
-  }
-
-  .stat-value {
-    font-size: 1.3rem;
+    flex-direction: column;
   }
 
   .descargas-filters {
@@ -215,28 +176,11 @@
     font-size: 1.5rem;
   }
 
-  .descargas-stats {
-    flex-direction: column;
-    gap: 10px;
+  .stat-value {
+    font-size: 1.5rem;
   }
 
-  .stat-item {
-    width: 100%;
-  }
-
-  .descarga-card {
-    max-width: 100%;
-  }
-
-  .descarga-imagen {
-    height: 180px;
-  }
-
-  .descarga-info {
-    padding: 15px;
-  }
-
-  .descarga-nombre {
+  .asset-nombre {
     font-size: 1.1rem;
   }
 } 

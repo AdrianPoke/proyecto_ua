@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaDownload, FaShare, FaStar } from 'react-icons/fa';
+import SidebarPerfil from '../Components/SidebarPerfil';
 import '../styles/favoritos.css';
 
 const Favoritos = () => {
@@ -21,6 +22,10 @@ const Favoritos = () => {
     setTimeout(() => setUsuario(usuarioEjemplo), 500);
   }, []);
 
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
+
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
@@ -28,44 +33,7 @@ const Favoritos = () => {
   return (
     <div className="perfil-container">
       {/* Panel izquierdo */}
-      <div className="perfil-sidebar">
-        <img
-          src={usuario.foto_perfil}
-          alt="Perfil"
-          className="perfil-foto"
-        />
-        <h3 className="perfil-nombre">{usuario.nombre}</h3>
-        <p className="perfil-email">{usuario.email}</p>
-
-        <div className="perfil-redes">
-          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-x-twitter"></i>
-          </a>
-          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-instagram"></i>
-          </a>
-          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-        </div>
-
-        <nav className="perfil-menu">
-          <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
-          <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
-          <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
-          <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
-          <button onClick={() => navigate("/perfil/configuracion")}>⚙️ Configuración</button>
-          <button
-            onClick={() => {
-              localStorage.removeItem("authToken");
-              navigate("/login");
-              window.location.reload();
-            }}
-          >
-            🚪 Cerrar Sesión
-          </button>
-        </nav>
-      </div>
+      <SidebarPerfil usuario={usuario} />
 
       {/* Contenido principal */}
       <div className="perfil-contenido">
@@ -79,8 +47,8 @@ const Favoritos = () => {
               <span className="stat-label">Total Favoritos</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">3</span>
-              <span className="stat-label">Categorías</span>
+              <span className="stat-value">8</span>
+              <span className="stat-label">Descargados</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">4.7</span>
@@ -96,10 +64,10 @@ const Favoritos = () => {
             <option value="texturas">Texturas</option>
             <option value="audio">Audio</option>
           </select>
-          <select className="filter-select" defaultValue="rating">
-            <option value="rating">Mayor rating</option>
+          <select className="filter-select" defaultValue="reciente">
             <option value="reciente">Más reciente</option>
             <option value="descargas">Más descargados</option>
+            <option value="rating">Mejor rating</option>
           </select>
         </div>
 
@@ -108,58 +76,60 @@ const Favoritos = () => {
           {[
             {
               id: 1,
-              nombre: "Modelo 3D - Espada Medieval",
+              nombre: "Modelo 3D - Guerrero Medieval",
               categoria: "Modelos 3D",
-              autor: "WeaponDesigner",
-              imagen: "https://via.placeholder.com/300x200",
-              descargas: 1250,
-              rating: 4.8
+              formato: ".blend",
+              autor: "Juan Pérez",
+              descargas: 850,
+              rating: 4.8,
+              imagen: "/assets/warrior.webp"
             },
             {
               id: 2,
-              nombre: "Pack de Texturas - Medieval",
+              nombre: "Pack de Texturas - Castillo",
               categoria: "Texturas",
-              autor: "TextureArtist",
-              imagen: "https://via.placeholder.com/300x200",
-              descargas: 850,
-              rating: 4.5
+              formato: ".png",
+              autor: "María García",
+              descargas: 620,
+              rating: 4.5,
+              imagen: "/assets/pac1.jpg"
             },
             {
               id: 3,
-              nombre: "Efectos de Sonido - Combate",
+              nombre: "Efectos de Sonido - Batalla",
               categoria: "Audio",
-              autor: "AudioMaster",
-              imagen: "https://via.placeholder.com/300x200",
-              descargas: 2100,
-              rating: 4.9
+              formato: ".wav",
+              autor: "Carlos López",
+              descargas: 430,
+              rating: 4.7,
+              imagen: "/assets/scr.jpg"
             }
-          ].map((favorito) => (
-            <div key={favorito.id} className="favorito-card">
-              <div className="favorito-imagen">
-                <img src={favorito.imagen} alt={favorito.nombre} />
-                <button className="remove-favorito">
-                  <FaHeart />
-                </button>
-              </div>
-              <div className="favorito-info">
-                <h3 className="favorito-nombre">{favorito.nombre}</h3>
-                <p className="favorito-categoria">{favorito.categoria}</p>
-                <p className="favorito-autor">Por: {favorito.autor}</p>
-                <div className="favorito-stats">
-                  <span className="stat">
-                    <FaDownload /> {favorito.descargas}
-                  </span>
-                  <span className="stat">
-                    <FaStar /> {favorito.rating}
-                  </span>
-                </div>
-                <div className="favorito-actions">
+          ].map((asset) => (
+            <div key={asset.id} className="asset-card">
+              <div className="asset-imagen" onClick={() => handleVerAsset(asset.id)}>
+                <img src={asset.imagen} alt={asset.nombre} />
+                <div className="asset-actions">
                   <button className="action-button download">
-                    <FaDownload /> Descargar
+                    <FaDownload />
                   </button>
                   <button className="action-button share">
                     <FaShare />
                   </button>
+                </div>
+              </div>
+              <div className="asset-info">
+                <h3 className="asset-nombre" onClick={() => handleVerAsset(asset.id)}>
+                  {asset.nombre}
+                </h3>
+                <p className="asset-categoria">{asset.categoria} <span className="asset-formato">{asset.formato}</span></p>
+                <p className="asset-autor">Por: {asset.autor}</p>
+                <div className="asset-stats">
+                  <span className="stat">
+                    <FaDownload /> {asset.descargas}
+                  </span>
+                  <span className="stat">
+                    <FaStar /> {asset.rating}
+                  </span>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUpload, FaEdit, FaTrash, FaDownload, FaStar } from 'react-icons/fa';
+import SidebarPerfil from '../Components/SidebarPerfil';
 import '../styles/assetsSubidos.css';
 
 const AssetsSubidos = () => {
@@ -21,6 +22,19 @@ const AssetsSubidos = () => {
     setTimeout(() => setUsuario(usuarioEjemplo), 500);
   }, []);
 
+  const handleEditarAsset = (id) => {
+    navigate(`/asset/${id}/editar`);
+  };
+
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
+
+  const handleEliminarAsset = (id) => {
+    // Aquí iría la lógica para eliminar el asset
+    console.log('Eliminar asset:', id);
+  };
+
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
@@ -28,44 +42,7 @@ const AssetsSubidos = () => {
   return (
     <div className="perfil-container">
       {/* Panel izquierdo */}
-      <div className="perfil-sidebar">
-        <img
-          src={usuario.foto_perfil}
-          alt="Perfil"
-          className="perfil-foto"
-        />
-        <h3 className="perfil-nombre">{usuario.nombre}</h3>
-        <p className="perfil-email">{usuario.email}</p>
-
-        <div className="perfil-redes">
-          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-x-twitter"></i>
-          </a>
-          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-instagram"></i>
-          </a>
-          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-        </div>
-
-        <nav className="perfil-menu">
-          <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
-          <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
-          <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
-          <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
-          <button onClick={() => navigate("/perfil/configuracion")}>⚙️ Configuración</button>
-          <button
-            onClick={() => {
-              localStorage.removeItem("authToken");
-              navigate("/login");
-              window.location.reload();
-            }}
-          >
-            🚪 Cerrar Sesión
-          </button>
-        </nav>
-      </div>
+      <SidebarPerfil usuario={usuario} />
 
       {/* Contenido principal */}
       <div className="perfil-contenido">
@@ -110,45 +87,62 @@ const AssetsSubidos = () => {
               id: 1,
               nombre: "Modelo 3D - Guerrero Medieval",
               categoria: "Modelos 3D",
+              formato: ".blend",
               fecha: "2024-03-15",
               descargas: 850,
               rating: 4.8,
-              imagen: "https://via.placeholder.com/300x200"
+              imagen: "/assets/warrior.webp"
             },
             {
               id: 2,
               nombre: "Pack de Texturas - Castillo",
               categoria: "Texturas",
+              formato: ".png",
               fecha: "2024-03-10",
               descargas: 620,
               rating: 4.5,
-              imagen: "https://via.placeholder.com/300x200"
+              imagen: "/assets/pac1.jpg"
             },
             {
               id: 3,
               nombre: "Efectos de Sonido - Batalla",
               categoria: "Audio",
+              formato: ".wav",
               fecha: "2024-03-05",
               descargas: 430,
               rating: 4.7,
-              imagen: "https://via.placeholder.com/300x200"
+              imagen: "/assets/scr.jpg"
             }
           ].map((asset) => (
             <div key={asset.id} className="asset-card">
-              <div className="asset-imagen">
+              <div className="asset-imagen" onClick={() => handleVerAsset(asset.id)}>
                 <img src={asset.imagen} alt={asset.nombre} />
                 <div className="asset-actions">
-                  <button className="action-button edit">
+                  <button 
+                    className="action-button edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditarAsset(asset.id);
+                    }}
+                  >
                     <FaEdit />
                   </button>
-                  <button className="action-button delete">
+                  <button 
+                    className="action-button delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEliminarAsset(asset.id);
+                    }}
+                  >
                     <FaTrash />
                   </button>
                 </div>
               </div>
               <div className="asset-info">
-                <h3 className="asset-nombre">{asset.nombre}</h3>
-                <p className="asset-categoria">{asset.categoria}</p>
+                <h3 className="asset-nombre" onClick={() => handleVerAsset(asset.id)}>
+                  {asset.nombre}
+                </h3>
+                <p className="asset-categoria">{asset.categoria} <span className="asset-formato">{asset.formato}</span></p>
                 <p className="asset-fecha">Subido: {asset.fecha}</p>
                 <div className="asset-stats">
                   <span className="stat">

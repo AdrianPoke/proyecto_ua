@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/home.css';
 
 const assets = [
@@ -19,6 +20,12 @@ const assets = [
 ];
 
 function Home() {
+  const navigate = useNavigate();
+
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
+
   return (
     <div className="home-container">
       <h2 className="home-title">Página Principal</h2>
@@ -29,7 +36,7 @@ function Home() {
       </div>
       <div className="assets-grid">
         {assets.map((asset) => (
-          <div key={asset.id} className="asset-card">
+          <div key={asset.id} className="asset-card" onClick={() => handleVerAsset(asset.id)}>
             <img src={asset.image} alt={asset.title} className="asset-image" />
             <div className="asset-title">{asset.title}</div>
           </div>
@@ -42,7 +49,7 @@ function Home() {
       </div>
       <div className="assets-grid">
         {assets.map((asset, index) => (
-          <div key={`top-${asset.id}`} className="asset-card">
+          <div key={`top-${asset.id}`} className="asset-card" onClick={() => handleVerAsset(asset.id)}>
             <img src={asset.image} alt={asset.title} className="asset-image" />
             <div className="asset-title">{asset.title}</div>
             <div className="asset-subtext">{`${(8 - index % 7).toFixed(1)}k descargas`}</div>
