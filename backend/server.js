@@ -17,11 +17,13 @@ const authRoutes = require('./rutas/auth');
 const usuarioRoutes = require('./rutas/usuarios');
 const categoriaRoutes = require('./rutas/categorias'); // Si necesitas también las categorías
 const assetRoutes = require('./rutas/assets'); // Las rutas de assets
+const comentarioRoutes = require('./rutas/comentarios');
 
 app.use('/api', authRoutes);
 app.use('/api/usuario', usuarioRoutes);
 app.use('/api/categoria', categoriaRoutes);
 app.use('/api/asset', assetRoutes);  // Integración de las rutas de assets
+app.use('/api/comentario', comentarioRoutes);
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
