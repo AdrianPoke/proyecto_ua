@@ -5,7 +5,7 @@ const AssetSchema = new mongoose.Schema({
   imagenes_previas: [String],
   autor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
   titulo: { type: String, required: true },
-  categoria: { type: mongoose.Schema.Types.ObjectId, ref: 'Categoria' },
+  categoria: { type: String, required: true },
   numero_descargas: { type: Number, default: 0 },
   descripcion: { type: String },
   fecha: { type: Date, default: Date.now },
