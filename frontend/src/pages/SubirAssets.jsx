@@ -1,76 +1,147 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import "../styles/subirAsset.css";
 import logo from "../logo.png";
 
 function SubirAssets() {
+  const [formData, setFormData] = useState({
+    titulo: "",
+    descripcion: "",
+    categoria: "",
+    formatos_disponibles: "",
+    etiquetas: "",
+    es_sensible: false,
+  });
+
+  const [imagenPrincipal, setImagenPrincipal] = useState(null);
+  const [imagenesPrevias, setImagenesPrevias] = useState([]);
+  const [archivoAsset, setArchivoAsset] = useState(null); // si deseas subir el .blend, .zip, etc
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const data = new FormData();
+    data.append("titulo", formData.titulo);
+    data.append("descripcion", formData.descripcion);
+    data.append("categoria", formData.categoria);
+    data.append("es_sensible", formData.es_sensible);
+  
+    formData.formatos_disponibles
+      .split(",")
+      .map(f => f.trim())
+      .forEach(f => data.append("formatos_disponibles", f));
+  
+    formData.etiquetas
+      .split(",")
+      .map(t => t.trim())
+      .forEach(t => data.append("etiquetas", t));
+  
+    if (imagenPrincipal) {
+      data.append("imagen_principal", imagenPrincipal);
+    }
+  
+    imagenesPrevias.forEach((file) => {
+      data.append("imagenes_previas", file);
+    });
+  
+    if (archivoAsset) {
+      data.append("archivo_asset", archivoAsset);  // Asegúrate de que el nombre sea correcto
+    }
+  
+    try {
+      const token = localStorage.getItem("authToken");
+  
+      const res = await axios.post("http://localhost:5000/api/asset", data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      alert("✅ Asset subido con éxito");
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error al subir el asset");
+    }
+  };
+  
+
   return (
     <div className="subir-asset-container">
       <h2 className="subir-asset-title">
         <img src={logo} alt="Logo" height={40} /> Formulario de Subida de Assets
       </h2>
 
-      <form className="subir-asset-form">
+      <form className="subir-asset-form" onSubmit={handleSubmit} encType="multipart/form-data">
         {/* Columna Izquierda */}
         <div className="subir-columna">
-          <label>* Subir archivos ⬆️</label>
-          <div className="dropzone">
-            <p>
-              Arrastra y suelta tus archivos en esta zona o haz clic para seleccionarlos
-              manualmente
-            </p>
-          </div>
+          <label>* Imagen Principal</label>
+          <input type="file" accept="image/*" required onChange={(e) => setImagenPrincipal(e.target.files[0])} />
 
-          <div className="formato-info">
-            <p>Formatos Soportados:</p>
-            <ul>
-              <li>Modelos 3D: OBJ, FBX, BLEND</li>
-              <li>Gráficos 2D e imágenes previas: PNG, JPG, WEBP</li>
-              <li>Audio: MP3, WAV, OGG, FLAC</li>
-              <li>Scripts: c#, JavaScript, Python</li>
-            </ul>
-          </div>
+          <label>Imágenes Previas</label>
+          <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
+
+          <label>Archivo del Asset (Opcional)</label>
+          <input type="file" onChange={(e) => setArchivoAsset(e.target.files[0])} />
+
+          <label>* Formatos Disponibles</label>
+          <input
+            type="text"
+            name="formatos_disponibles"
+            value={formData.formatos_disponibles}
+            onChange={handleChange}
+            placeholder="mp3, wav, blend, obj..."
+            required
+          />
+
+          <label>Etiquetas</label>
+          <input
+            type="text"
+            name="etiquetas"
+            value={formData.etiquetas}
+            onChange={handleChange}
+            placeholder="Naturaleza, Audio, Ambiente..."
+          />
+
+          <label>
+            <input type="checkbox" name="es_sensible" checked={formData.es_sensible} onChange={handleChange} /> Contenido
+            sensible
+          </label>
         </div>
 
         {/* Columna Derecha */}
         <div className="subir-columna">
           <label>* Título</label>
-          <input type="text" placeholder="Ej: Textura Nieve HD" />
+          <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required />
 
           <label>* Descripción</label>
-          <textarea placeholder="Describe brevemente tu asset..." />
-
-          <label>Imágenes previas</label>
-          <div className="dropzone">
-            <p>Sube imágenes opcionales</p>
-          </div>
+          <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required />
 
           <label>* Categoría</label>
-          <select>
+          <select name="categoria" value={formData.categoria} onChange={handleChange} required>
             <option value="">Seleccione</option>
-            <option value="modelos">Modelos 3D</option>
-            <option value="graficos">Gráficos 2D</option>
-            <option value="audio">Audio</option>
-            <option value="scripts">Scripts</option>
-            <option value="efectos">Efectos 3D</option>
-            <option value="materiales">Materiales</option>
-            <option value="ia">IA</option>
-            <option value="paquetes">Paquetes</option>
+            <option value="Modelos 3D">Modelos 3D</option>
+            <option value="Gráficos 2D">Gráficos 2D</option>
+            <option value="Audio">Audio</option>
+            <option value="Scripts">Scripts</option>
+            <option value="Efectos 3D">Efectos 3D</option>
+            <option value="Materiales">Materiales</option>
+            <option value="IA">IA</option>
+            <option value="Paquetes">Paquetes</option>
           </select>
 
-          <label>* Licencia de uso</label>
-          <select>
-            <option value="">Seleccione</option>
-            <option value="libre">Libre</option>
-            <option value="comercial">Comercial</option>
-            <option value="personal">Uso Personal</option>
-          </select>
-
-          <label>
-            <input type="checkbox" /> Contenido sensible
-          </label>
-
-          <button className="subir-asset-boton" type="submit">Subir</button>
-
+          <button className="subir-asset-boton" type="submit">
+            Subir
+          </button>
           <div className="campo-obligatorio">* Campos obligatorios</div>
         </div>
       </form>

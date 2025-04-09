@@ -2,14 +2,24 @@ const express = require("express");
 const router = express.Router();
 const { crearAsset, obtenerAssetPorId, buscarAssets } = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
+const upload = require("../middlewares/upload");
 
-// Primero las rutas específicas
+// 1. Buscar assets
 router.get('/buscar', buscarAssets);
 
-// Luego las rutas dinámicas
+// 2. Obtener asset por ID
 router.get("/:id", verificarToken, obtenerAssetPorId);
 
-// Ruta para crear un asset
-router.post("/", verificarToken, crearAsset);
+// 3. Crear asset (con archivos)
+router.post(
+  "/", 
+  verificarToken, 
+  upload.fields([
+    { name: "imagen_principal", maxCount: 1 },
+    { name: "imagenes_previas", maxCount: 5 },
+    { name: "archivo_asset", maxCount: 1 }
+  ]),
+  crearAsset
+);
 
 module.exports = router;

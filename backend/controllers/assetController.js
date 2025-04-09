@@ -1,21 +1,72 @@
-const Asset = require("../modelos/Asset");
+const mongoose = require("mongoose"); 
+const Asset = require("../modelos/Asset");  
+const { subirArchivo } = require('../utils/dropbox');  
+
 
 const crearAsset = async (req, res) => {
   try {
-    const {
-      imagen_principal,
-      imagenes_previas,
-      categoria, // ahora es nombre de categoría
-      titulo,
-      descripcion,
-      formatos_disponibles,
-      etiquetas,
-      es_sensible,
-    } = req.body;
+    console.log("📥 Datos recibidos en req.body:", req.body);
+    console.log("🖼️ Archivos recibidos en req.files:", req.files);
 
+    const { categoria, titulo, descripcion, es_sensible } = req.body;
     const autor = req.usuarioId;
 
+    const formatos_disponibles = req.body.formatos_disponibles
+      .split(',').map(f => f.trim());
+    const etiquetas = req.body.etiquetas
+      .split(',').map(e => e.trim());
+
+    console.log("🔤 Formatos:", formatos_disponibles);
+    console.log("🏷️ Etiquetas:", etiquetas);
+
+    const idTemporal = new mongoose.Types.ObjectId();
+    const nombreBase = `${titulo}_${idTemporal.toString()}`;
+
+    // Archivos de imagen principal y previas
+    const imagenPrincipalFile = req.files?.imagen_principal?.[0];
+    const imagenesPreviasFiles = req.files?.imagenes_previas || [];
+
+    // Verificar imagen principal
+    if (!imagenPrincipalFile) {
+      console.warn("⚠️ No se recibió imagen principal");
+      return res.status(400).json({ mensaje: "Falta la imagen principal" });
+    }
+
+    console.log("📷 Imagen principal:", imagenPrincipalFile.originalname);
+
+    imagenesPreviasFiles.forEach((f, i) => {
+      console.log(`🖼️ Imagen previa ${i + 1}:`, f.originalname);
+    });
+
+    const imagen_principal = await subirArchivo(
+      `${nombreBase}_principal.${imagenPrincipalFile.originalname.split('.').pop()}`,
+      imagenPrincipalFile.buffer
+    );
+
+    const imagenes_previas = await Promise.all(
+      imagenesPreviasFiles.map((file, i) =>
+        subirArchivo(
+          `${nombreBase}_prev${i + 1}.${file.originalname.split('.').pop()}`,
+          file.buffer
+        )
+      )
+    );
+
+    // Verificar archivo del asset
+    const archivoAssetFile = req.files?.archivo_asset?.[0];
+    if (archivoAssetFile) {
+      console.log("📦 Archivo Asset:", archivoAssetFile.originalname);
+      const archivo_asset = await subirArchivo(
+        `${nombreBase}_asset.${archivoAssetFile.originalname.split('.').pop()}`,
+        archivoAssetFile.buffer
+      );
+    } else {
+      console.log("⚠️ No se recibió archivo del asset");
+    }
+
+    // Crear el nuevo asset
     const nuevoAsset = new Asset({
+      _id: idTemporal,
       imagen_principal,
       imagenes_previas,
       autor,
@@ -27,14 +78,18 @@ const crearAsset = async (req, res) => {
       es_sensible,
     });
 
+    console.log("🆕 Nuevo asset listo para guardar:", nuevoAsset);
+
     await nuevoAsset.save();
 
-    res.status(201).json({ mensaje: "Asset creado con éxito", asset: nuevoAsset });
+    res.status(201).json({ mensaje: "✅ Asset creado con éxito", asset: nuevoAsset });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error en la creación del asset:", error);
     res.status(500).json({ mensaje: "Hubo un error al crear el asset" });
   }
 };
+
+
 
 
 const obtenerAssetPorId = async (req, res) => {
