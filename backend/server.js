@@ -19,9 +19,9 @@ const categoriaRoutes = require('./rutas/categorias'); // Si necesitas también 
 const assetRoutes = require('./rutas/assets'); // Las rutas de assets
 
 app.use('/api', authRoutes);
-app.use('/api/usuarios', usuarioRoutes);
-app.use('/api/categorias', categoriaRoutes);
-app.use('/api/assets', assetRoutes);  // Integración de las rutas de assets
+app.use('/api/usuario', usuarioRoutes);
+app.use('/api/categoria', categoriaRoutes);
+app.use('/api/asset', assetRoutes);  // Integración de las rutas de assets
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;

@@ -5,6 +5,6 @@ const verificarToken = require("../middlewares/verificarToken");
 
 // Usamos el middleware de verificarToken para proteger la ruta
 router.post("/", verificarToken, crearAsset);
-router.get("/:id", obtenerAssetPorId);
+router.get("/:id", verificarToken, obtenerAssetPorId);
 
 module.exports = router;
