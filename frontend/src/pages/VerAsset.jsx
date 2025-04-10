@@ -10,7 +10,7 @@ const VerAsset = () => {
   const [loading, setLoading] = useState(true);
 
   const handleDescargar = async () => {
-    const assetId = '67f83650ed4c9cbfdba037d3';
+    const assetId = '67f834a8fccfcdd7a4adca08';
   
     try {
       const response = await fetch(`http://localhost:5000/api/asset/${assetId}/descargar`, {

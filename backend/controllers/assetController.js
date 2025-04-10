@@ -163,45 +163,38 @@ const buscarAssets = async (req, res) => {
 };
 
 
+
 const descargarAsset = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Buscar asset por ID
     const asset = await Asset.findById(id);
-    if (!asset) {
-      return res.status(404).json({ mensaje: "Asset no encontrado" });
+    if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
+
+    const archivoAsset = asset.archivos.find(a => a.tipo === "asset");
+    if (!archivoAsset) return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
+
+    // Convertimos la URL de dropbox si está en formato ?dl=0
+    let url = archivoAsset.url;
+    if (url.includes("dropbox.com")) {
+      url = url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
     }
 
-    // Buscar archivo de tipo 'asset'
-    const archivoAsset = asset.archivos.find(a => a.tipo === 'asset');
-    if (!archivoAsset) {
-      return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
-    }
-
-    // Obtener extensión del archivo y su tipo MIME
     const ext = path.extname(archivoAsset.nombre);
-    const tipoMime = mime.lookup(ext) || 'application/octet-stream';
+    const tipoMime = mime.lookup(ext) || "application/octet-stream";
 
-    // Descargar archivo desde Dropbox como stream
-    const dropboxStream = await axios({
-      method: 'GET',
-      url: archivoAsset.url, // Ya con ?dl=1
-      responseType: 'stream'
-    });
+    const response = await axios.get(url, { responseType: "stream" });
 
-    // Cabeceras para descarga
-    res.setHeader('Content-Disposition', `attachment; filename="${archivoAsset.nombre}"`);
-    res.setHeader('Content-Type', tipoMime);
+    res.setHeader("Content-Disposition", `attachment; filename="${archivoAsset.nombre}"`);
+    res.setHeader("Content-Type", tipoMime);
 
-    // Enviar stream
-    dropboxStream.data.pipe(res);
-
+    response.data.pipe(res);
   } catch (error) {
     console.error("❌ Error en descarga directa:", error);
     res.status(500).json({ mensaje: "Error al descargar el asset" });
   }
 };
+
 
 
 
