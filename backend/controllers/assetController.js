@@ -174,7 +174,7 @@ const descargarAsset = async (req, res) => {
     const archivoAsset = asset.archivos.find(a => a.tipo === "asset");
     if (!archivoAsset) return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
 
-    // Convertimos la URL de dropbox si está en formato ?dl=0
+    // Adaptar URL para descarga directa
     let url = archivoAsset.url;
     if (url.includes("dropbox.com")) {
       url = url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
@@ -182,18 +182,32 @@ const descargarAsset = async (req, res) => {
 
     const ext = path.extname(archivoAsset.nombre);
     const tipoMime = mime.lookup(ext) || "application/octet-stream";
+    const tituloLimpio = asset.titulo.trim().toLowerCase().replace(/ /g, "_").replace(/[^\w\-]/g, '');
+    const nombreFinal = `${tituloLimpio}${ext}`;
 
-    const response = await axios.get(url, { responseType: "stream" });
+    // Descargar archivo como buffer
+    const response = await axios.get(url, { responseType: "arraybuffer" });
 
-    res.setHeader("Content-Disposition", `attachment; filename="${archivoAsset.nombre}"`);
-    res.setHeader("Content-Type", tipoMime);
+    // Crear el ZIP
+    const zip = new AdmZip();
+    zip.addFile(nombreFinal, Buffer.from(response.data));
 
-    response.data.pipe(res);
+    const zipBuffer = zip.toBuffer();
+
+    res.setHeader("Content-Disposition", `attachment; filename="${tituloLimpio}.zip"`);
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Length", zipBuffer.length);
+
+    res.send(zipBuffer);
   } catch (error) {
     console.error("❌ Error en descarga directa:", error);
     res.status(500).json({ mensaje: "Error al descargar el asset" });
   }
 };
+
+
+
+
 
 
 
