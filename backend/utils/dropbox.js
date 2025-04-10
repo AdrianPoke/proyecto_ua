@@ -19,8 +19,7 @@ async function subirArchivo(nombreArchivo, contenido) {
 
   const sharedLink = await dbx.sharingCreateSharedLinkWithSettings({ path });
 
-  // Convertimos dl=0 (vista previa) a dl=1 (descarga directa)
-  return sharedLink.result.url.replace('?dl=0', '?raw=1');
+  return sharedLink.result.url.replace('?dl=0', '?dl=1');
 }
 
 module.exports = { subirArchivo };

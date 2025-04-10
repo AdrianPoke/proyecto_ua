@@ -9,6 +9,44 @@ const VerAsset = () => {
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const handleDescargar = async () => {
+    const assetId = '67f83650ed4c9cbfdba037d3';
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/asset/${assetId}/descargar`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+  
+      if (!response.ok) throw new Error("Error al descargar el asset");
+  
+      const disposition = response.headers.get("Content-Disposition");
+      let nombreArchivo = `asset_${assetId}`;
+      if (disposition && disposition.includes("filename=")) {
+        nombreArchivo = disposition.split("filename=")[1].replace(/"/g, '');
+      }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = nombreArchivo;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("❌ Error en la descarga:", error);
+      alert("Hubo un error al intentar descargar el asset.");
+    }
+  };
+  
+  
+  
+
   useEffect(() => {
     // Simular carga de datos del asset
     setTimeout(() => {
@@ -136,9 +174,10 @@ const VerAsset = () => {
           </div>
 
           <div className="action-buttons">
-            <button className="btn-download">
-              <FaDownload /> Descargar
-            </button>
+          <button className="btn-download" onClick={handleDescargar}>
+            <FaDownload /> Descargar
+          </button>
+
             <button className="btn-favorite">
               <FaHeart /> Favorito
             </button>

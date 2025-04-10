@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { crearAsset, obtenerAssetPorId, buscarAssets } = require("../controllers/assetController");
+const {
+  crearAsset,
+  obtenerAssetPorId,
+  buscarAssets,
+  descargarAsset 
+} = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
 
@@ -10,7 +15,10 @@ router.get('/buscar', buscarAssets);
 // 2. Obtener asset por ID
 router.get("/:id", verificarToken, obtenerAssetPorId);
 
-// 3. Crear asset (con archivos)
+// 3. Descargar asset completo en .zip
+router.get("/:id/descargar", verificarToken, descargarAsset);
+
+// 4. Crear asset (con archivos)
 router.post(
   "/", 
   verificarToken, 

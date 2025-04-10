@@ -1,7 +1,10 @@
 const mongoose = require("mongoose"); 
 const Asset = require("../modelos/Asset");  
 const { subirArchivo } = require('../utils/dropbox');  
-
+const AdmZip = require('adm-zip');
+const axios = require('axios');
+const path = require('path');
+const mime = require("mime-types"); 
 
 const crearAsset = async (req, res) => {
   try {
@@ -11,74 +14,54 @@ const crearAsset = async (req, res) => {
     const { categoria, titulo, descripcion, es_sensible } = req.body;
     const autor = req.usuarioId;
 
-    const formatos_disponibles = req.body.formatos_disponibles
-      .split(',').map(f => f.trim());
-    const etiquetas = req.body.etiquetas
-      .split(',').map(e => e.trim());
-
-    console.log("🔤 Formatos:", formatos_disponibles);
-    console.log("🏷️ Etiquetas:", etiquetas);
+    const formatos_disponibles = req.body.formatos_disponibles.split(',').map(f => f.trim());
+    const etiquetas = req.body.etiquetas.split(',').map(e => e.trim());
 
     const idTemporal = new mongoose.Types.ObjectId();
-    const nombreBase = `${titulo}_${idTemporal.toString()}`;
+    const nombreBase = `${titulo.replace(/ /g, "_")}_${idTemporal.toString()}`;
+    const archivos = [];
 
-    // Archivos de imagen principal y previas
+    // Imagen principal
     const imagenPrincipalFile = req.files?.imagen_principal?.[0];
-    const imagenesPreviasFiles = req.files?.imagenes_previas || [];
-
-    // Verificar imagen principal
     if (!imagenPrincipalFile) {
-      console.warn("⚠️ No se recibió imagen principal");
       return res.status(400).json({ mensaje: "Falta la imagen principal" });
     }
+    const extPrincipal = imagenPrincipalFile.originalname.split('.').pop();
+    const nombrePrincipal = `${nombreBase}_principal.${extPrincipal}`;
+    const urlPrincipal = await subirArchivo(nombrePrincipal, imagenPrincipalFile.buffer);
+    archivos.push({ tipo: 'principal', nombre: nombrePrincipal, url: urlPrincipal });
 
-    console.log("📷 Imagen principal:", imagenPrincipalFile.originalname);
-
-    imagenesPreviasFiles.forEach((f, i) => {
-      console.log(`🖼️ Imagen previa ${i + 1}:`, f.originalname);
-    });
-
-    const imagen_principal = await subirArchivo(
-      `${nombreBase}_principal.${imagenPrincipalFile.originalname.split('.').pop()}`,
-      imagenPrincipalFile.buffer
-    );
-
-    const imagenes_previas = await Promise.all(
-      imagenesPreviasFiles.map((file, i) =>
-        subirArchivo(
-          `${nombreBase}_prev${i + 1}.${file.originalname.split('.').pop()}`,
-          file.buffer
-        )
-      )
-    );
-
-    // Verificar archivo del asset
-    const archivoAssetFile = req.files?.archivo_asset?.[0];
-    if (archivoAssetFile) {
-      console.log("📦 Archivo Asset:", archivoAssetFile.originalname);
-      const archivo_asset = await subirArchivo(
-        `${nombreBase}_asset.${archivoAssetFile.originalname.split('.').pop()}`,
-        archivoAssetFile.buffer
-      );
-    } else {
-      console.log("⚠️ No se recibió archivo del asset");
+    // Imágenes previas
+    const imagenesPreviasFiles = req.files?.imagenes_previas || [];
+    for (let i = 0; i < imagenesPreviasFiles.length; i++) {
+      const file = imagenesPreviasFiles[i];
+      const ext = file.originalname.split('.').pop();
+      const nombrePrev = `${nombreBase}_prev${i + 1}.${ext}`;
+      const urlPrev = await subirArchivo(nombrePrev, file.buffer);
+      archivos.push({ tipo: 'previa', nombre: nombrePrev, url: urlPrev });
     }
 
-    // Crear el nuevo asset
+    // Archivo del asset (opcional)
+    const archivoAssetFile = req.files?.archivo_asset?.[0];
+    if (archivoAssetFile) {
+      const ext = archivoAssetFile.originalname.split('.').pop();
+      const nombreAsset = `${nombreBase}_asset.${ext}`;
+      const urlAsset = await subirArchivo(nombreAsset, archivoAssetFile.buffer);
+      archivos.push({ tipo: 'asset', nombre: nombreAsset, url: urlAsset });
+    }
+
+    // Crear asset
     const nuevoAsset = new Asset({
       _id: idTemporal,
-      imagen_principal,
-      imagenes_previas,
+      archivos,
       autor,
       titulo,
       categoria,
       descripcion,
       formatos_disponibles,
       etiquetas,
-      es_sensible,
+      es_sensible
     });
-
-    console.log("🆕 Nuevo asset listo para guardar:", nuevoAsset);
 
     await nuevoAsset.save();
 
@@ -118,38 +101,30 @@ const buscarAssets = async (req, res) => {
 
     let filtros = {};
 
-    // Filtro por título
     if (titulo) {
       filtros.titulo = { $regex: titulo, $options: 'i' };
     }
 
-    // Filtro por nombre de categoría (ahora string)
     if (categoria) {
-      filtros.categoria = { $regex: categoria, $options: 'i' }; // Insensible a mayúsculas
+      filtros.categoria = { $regex: categoria, $options: 'i' };
     }
 
-    // Filtro por es_sensible
     if (es_sensible !== undefined) {
       filtros.es_sensible = es_sensible === 'true';
     }
 
-    // Filtro por etiquetas
     if (etiquetas) {
       const etiquetasArray = etiquetas.split(',').map(et => et.trim());
       filtros.etiquetas = { $in: etiquetasArray };
     }
 
-    // Filtro por formatos
     if (formatos) {
       const formatosArray = formatos.split(',').map(f => f.trim());
       filtros.formatos_disponibles = { $in: formatosArray };
     }
 
-    // Construcción de la consulta con sort dinámico
-    let query = Asset.find(filtros)
-      .populate('autor', 'nombre email');
+    let query = Asset.find(filtros).populate('autor', 'nombre email');
 
-    // Orden dinámico
     if (orden === 'populares') {
       query = query.sort({ numero_descargas: -1 });
     } else {
@@ -157,8 +132,30 @@ const buscarAssets = async (req, res) => {
     }
 
     const assets = await query;
-    res.status(200).json(assets);
-    
+
+    // 🔁 Adaptar respuesta para incluir solo lo necesario
+    const assetsAdaptados = assets.map(asset => {
+      const imagenPrincipal = asset.archivos.find(a => a.tipo === 'principal')?.url || null;
+      const previas = asset.archivos.filter(a => a.tipo === 'previa').map(a => a.url);
+
+      return {
+        _id: asset._id,
+        titulo: asset.titulo,
+        categoria: asset.categoria,
+        descripcion: asset.descripcion,
+        autor: asset.autor,
+        formatos_disponibles: asset.formatos_disponibles,
+        etiquetas: asset.etiquetas,
+        numero_descargas: asset.numero_descargas,
+        createdAt: asset.createdAt,
+        es_sensible: asset.es_sensible,
+        imagenPrincipal,
+        imagenesPrevias: previas
+      };
+    });
+
+    res.status(200).json(assetsAdaptados);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: 'Hubo un error al buscar los assets' });
@@ -166,6 +163,49 @@ const buscarAssets = async (req, res) => {
 };
 
 
+const descargarAsset = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar asset por ID
+    const asset = await Asset.findById(id);
+    if (!asset) {
+      return res.status(404).json({ mensaje: "Asset no encontrado" });
+    }
+
+    // Buscar archivo de tipo 'asset'
+    const archivoAsset = asset.archivos.find(a => a.tipo === 'asset');
+    if (!archivoAsset) {
+      return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
+    }
+
+    // Obtener extensión del archivo y su tipo MIME
+    const ext = path.extname(archivoAsset.nombre);
+    const tipoMime = mime.lookup(ext) || 'application/octet-stream';
+
+    // Descargar archivo desde Dropbox como stream
+    const dropboxStream = await axios({
+      method: 'GET',
+      url: archivoAsset.url, // Ya con ?dl=1
+      responseType: 'stream'
+    });
+
+    // Cabeceras para descarga
+    res.setHeader('Content-Disposition', `attachment; filename="${archivoAsset.nombre}"`);
+    res.setHeader('Content-Type', tipoMime);
+
+    // Enviar stream
+    dropboxStream.data.pipe(res);
+
+  } catch (error) {
+    console.error("❌ Error en descarga directa:", error);
+    res.status(500).json({ mensaje: "Error al descargar el asset" });
+  }
+};
 
 
-module.exports = { crearAsset, obtenerAssetPorId, buscarAssets };
+
+
+
+
+module.exports = { crearAsset, obtenerAssetPorId, buscarAssets, descargarAsset };
