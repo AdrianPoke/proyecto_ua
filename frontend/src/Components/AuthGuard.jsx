@@ -42,6 +42,7 @@ const AuthGuard = ({ children }) => {
   if (loading) return null;
 
   if (!autenticado) {
+    sessionStorage.setItem("reloadAfterRedirectToLogin", "true");
     return <Navigate to="/login" replace />;
   }
 

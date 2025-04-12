@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/login.css";
@@ -9,14 +9,23 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // 🔁 Si venimos del AuthGuard tras perder el token, recargamos para actualizar el navbar
+  useEffect(() => {
+    const shouldReload = sessionStorage.getItem("reloadAfterRedirectToLogin");
+    if (shouldReload) {
+      sessionStorage.removeItem("reloadAfterRedirectToLogin");
+      window.location.reload();
+    }
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     if (!email || !password) {
       alert("Por favor, ingresa tu email y contraseña.");
       return;
     }
-  
+
     try {
       const res = await fetch("http://localhost:5000/api/login", {
         method: "POST",
@@ -28,15 +37,15 @@ function Login() {
           contraseña: password, // debe coincidir con el campo en el backend
         }),
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok) {
-        // ✅ Guardar solo el token JWT
+        // ✅ Guardar el token JWT
         localStorage.setItem("authToken", data.token);
-  
-        navigate("/home");
-        window.location.reload();
+
+        // Redirigir y recargar para que la barra superior se actualice
+        window.location.href = "/home";
       } else {
         alert(data.mensaje || "Error al iniciar sesión.");
       }
@@ -45,7 +54,6 @@ function Login() {
       alert("Error del servidor. Inténtalo más tarde.");
     }
   };
-  
 
   return (
     <div className="login-page">
