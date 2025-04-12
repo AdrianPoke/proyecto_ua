@@ -1,5 +1,6 @@
 const mongoose = require("mongoose"); 
 const Asset = require("../modelos/Asset");  
+const Usuario = require("../modelos/Usuario");
 const { subirArchivo } = require('../utils/dropbox');  
 const AdmZip = require('adm-zip');
 const axios = require('axios');
@@ -168,13 +169,25 @@ const descargarAsset = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const usuario = await Usuario.findById(req.usuarioId);
+    if (!usuario) return res.status(404).json({ mensaje: "Usuario no encontrado" });
+
     const asset = await Asset.findById(id);
     if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
 
     const archivoAsset = asset.archivos.find(a => a.tipo === "asset");
     if (!archivoAsset) return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
 
-    // Adaptar URL para descarga directa
+    const yaDescargado = usuario.assets_descargados.includes(id);
+    if (!yaDescargado) {
+      usuario.assets_descargados.push(id);
+      await usuario.save();
+
+      // ✅ Incrementar descargas solo si es la primera vez de este usuario
+      asset.numero_descargas += 1;
+      await asset.save();
+    }
+
     let url = archivoAsset.url;
     if (url.includes("dropbox.com")) {
       url = url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
@@ -185,13 +198,9 @@ const descargarAsset = async (req, res) => {
     const tituloLimpio = asset.titulo.trim().toLowerCase().replace(/ /g, "_").replace(/[^\w\-]/g, '');
     const nombreFinal = `${tituloLimpio}${ext}`;
 
-    // Descargar archivo como buffer
     const response = await axios.get(url, { responseType: "arraybuffer" });
-
-    // Crear el ZIP
     const zip = new AdmZip();
     zip.addFile(nombreFinal, Buffer.from(response.data));
-
     const zipBuffer = zip.toBuffer();
 
     res.setHeader("Content-Disposition", `attachment; filename="${tituloLimpio}.zip"`);
@@ -204,6 +213,7 @@ const descargarAsset = async (req, res) => {
     res.status(500).json({ mensaje: "Error al descargar el asset" });
   }
 };
+
 
 
 
