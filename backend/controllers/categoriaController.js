@@ -11,6 +11,23 @@ const obtenerNombresCategorias = async (req, res) => {
   }
 };
 
+const obtenerFormatosPorCategoria = async (req, res) => {
+  try {
+    const { nombre } = req.params;
+
+    const categoria = await Categoria.findOne({ nombre });
+
+    if (!categoria) {
+      return res.status(404).json({ mensaje: "Categoría no encontrada" });
+    }
+
+    res.json({ formatos_permitidos: categoria.formatos_disponibles || [] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al obtener formatos" });
+  }
+};
+
 module.exports = {
-  obtenerNombresCategorias,
+  obtenerNombresCategorias, obtenerFormatosPorCategoria
 };

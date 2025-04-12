@@ -1,11 +1,13 @@
 const mongoose = require("mongoose"); 
 const Asset = require("../modelos/Asset");  
 const Usuario = require("../modelos/Usuario");
+const Categoria = require("../modelos/Categoria");
 const { subirArchivo } = require('../utils/dropbox');  
 const AdmZip = require('adm-zip');
 const axios = require('axios');
 const path = require('path');
 const mime = require("mime-types"); 
+
 
 const crearAsset = async (req, res) => {
   try {
@@ -15,14 +17,23 @@ const crearAsset = async (req, res) => {
     const { categoria, titulo, descripcion, es_sensible } = req.body;
     const autor = req.usuarioId;
 
-    const formatos_disponibles = req.body.formatos_disponibles.split(',').map(f => f.trim());
-    const etiquetas = req.body.etiquetas.split(',').map(e => e.trim());
+    const etiquetas = req.body.etiquetas
+      ? req.body.etiquetas.split(',').map(e => e.trim())
+      : [];
+
+    // 🔍 Obtener categoría y normalizar los formatos permitidos
+    const categoriaDoc = await Categoria.findOne({ nombre: categoria });
+    if (!categoriaDoc) {
+      return res.status(400).json({ mensaje: "Categoría no válida" });
+    }
+    const formatosPermitidos = (categoriaDoc.formatos_disponibles || []).map(f => f.toLowerCase());
 
     const idTemporal = new mongoose.Types.ObjectId();
     const nombreBase = `${titulo.replace(/ /g, "_")}_${idTemporal.toString()}`;
     const archivos = [];
+    const formatosSubidos = [];
 
-    // Imagen principal
+    // ✅ Imagen principal (obligatoria)
     const imagenPrincipalFile = req.files?.imagen_principal?.[0];
     if (!imagenPrincipalFile) {
       return res.status(400).json({ mensaje: "Falta la imagen principal" });
@@ -32,7 +43,7 @@ const crearAsset = async (req, res) => {
     const urlPrincipal = await subirArchivo(nombrePrincipal, imagenPrincipalFile.buffer);
     archivos.push({ tipo: 'principal', nombre: nombrePrincipal, url: urlPrincipal });
 
-    // Imágenes previas
+    // ✅ Imágenes previas (opcionales)
     const imagenesPreviasFiles = req.files?.imagenes_previas || [];
     for (let i = 0; i < imagenesPreviasFiles.length; i++) {
       const file = imagenesPreviasFiles[i];
@@ -42,16 +53,28 @@ const crearAsset = async (req, res) => {
       archivos.push({ tipo: 'previa', nombre: nombrePrev, url: urlPrev });
     }
 
-    // Archivo del asset (opcional)
-    const archivoAssetFile = req.files?.archivo_asset?.[0];
-    if (archivoAssetFile) {
-      const ext = archivoAssetFile.originalname.split('.').pop();
-      const nombreAsset = `${nombreBase}_asset.${ext}`;
-      const urlAsset = await subirArchivo(nombreAsset, archivoAssetFile.buffer);
+    // ✅ Archivos del asset (pueden ser varios)
+    const archivosAsset = req.files?.archivo_asset || [];
+    for (let i = 0; i < archivosAsset.length; i++) {
+      const file = archivosAsset[i];
+      const ext = file.originalname.split('.').pop().toLowerCase();
+
+      if (!formatosPermitidos.includes(ext)) {
+        return res.status(400).json({
+          mensaje: `❌ Formato .${ext} no permitido para la categoría "${categoria}"`,
+        });
+      }
+
+      const nombreAsset = `${nombreBase}_asset_${i + 1}.${ext}`;
+      const urlAsset = await subirArchivo(nombreAsset, file.buffer);
       archivos.push({ tipo: 'asset', nombre: nombreAsset, url: urlAsset });
+
+      if (!formatosSubidos.includes(ext)) {
+        formatosSubidos.push(ext);
+      }
     }
 
-    // Crear asset
+    // ✅ Crear el documento del asset
     const nuevoAsset = new Asset({
       _id: idTemporal,
       archivos,
@@ -59,12 +82,19 @@ const crearAsset = async (req, res) => {
       titulo,
       categoria,
       descripcion,
-      formatos_disponibles,
+      formatos_disponibles: formatosSubidos,
       etiquetas,
-      es_sensible
+      es_sensible: es_sensible === "true" || es_sensible === true
     });
 
     await nuevoAsset.save();
+
+    // ✅ Asociar al usuario
+    const usuario = await Usuario.findById(autor);
+    if (usuario) {
+      usuario.assets_subidos.push(nuevoAsset._id);
+      await usuario.save();
+    }
 
     res.status(201).json({ mensaje: "✅ Asset creado con éxito", asset: nuevoAsset });
   } catch (error) {
@@ -175,53 +205,54 @@ const descargarAsset = async (req, res) => {
     const asset = await Asset.findById(id);
     if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
 
-    const archivoAsset = asset.archivos.find(a => a.tipo === "asset");
-    if (!archivoAsset) return res.status(400).json({ mensaje: "Este asset no tiene archivo descargable" });
+    const archivosAsset = asset.archivos.filter(a => a.tipo === "asset");
+    if (!archivosAsset.length) {
+      return res.status(400).json({ mensaje: "Este asset no tiene archivos descargables" });
+    }
 
     const yaDescargado = usuario.assets_descargados.includes(id);
     if (!yaDescargado) {
       usuario.assets_descargados.push(id);
       await usuario.save();
-
-      // ✅ Incrementar descargas solo si es la primera vez de este usuario
       asset.numero_descargas += 1;
       await asset.save();
     }
 
-    let url = archivoAsset.url;
-    if (url.includes("dropbox.com")) {
-      url = url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
+    const zip = new AdmZip();
+    const tituloLimpio = asset.titulo.trim().toLowerCase().replace(/ /g, "_").replace(/[^\w\-]/g, '');
+
+    for (let i = 0; i < archivosAsset.length; i++) {
+      const archivo = archivosAsset[i];
+      let url = archivo.url;
+      if (url.includes("dropbox.com")) {
+        url = url
+          .replace("www.dropbox.com", "dl.dropboxusercontent.com")
+          .replace("?dl=0", "")
+          .replace("?dl=1", "");
+      }
+
+      try {
+        const response = await axios.get(url, { responseType: "arraybuffer" });
+        const ext = path.extname(archivo.nombre); // extraer extensión original
+        const nuevoNombre = `${tituloLimpio}_asset_${i + 1}${ext}`;
+        zip.addFile(nuevoNombre, Buffer.from(response.data));
+      } catch (err) {
+        console.warn(`⚠️ Error descargando ${archivo.nombre}:`, err.message);
+      }
     }
 
-    const ext = path.extname(archivoAsset.nombre);
-    const tipoMime = mime.lookup(ext) || "application/octet-stream";
-    const tituloLimpio = asset.titulo.trim().toLowerCase().replace(/ /g, "_").replace(/[^\w\-]/g, '');
-    const nombreFinal = `${tituloLimpio}${ext}`;
-
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const zip = new AdmZip();
-    zip.addFile(nombreFinal, Buffer.from(response.data));
     const zipBuffer = zip.toBuffer();
 
     res.setHeader("Content-Disposition", `attachment; filename="${tituloLimpio}.zip"`);
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Length", zipBuffer.length);
-
     res.send(zipBuffer);
+
   } catch (error) {
-    console.error("❌ Error en descarga directa:", error);
+    console.error("❌ Error al generar la descarga:", error);
     res.status(500).json({ mensaje: "Error al descargar el asset" });
   }
 };
-
-
-
-
-
-
-
-
-
 
 
 
