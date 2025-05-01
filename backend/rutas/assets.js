@@ -4,7 +4,7 @@ const {
   crearAsset,
   obtenerAssetPorId,
   buscarAssets,
-  descargarAsset 
+  descargarAsset
 } = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
@@ -29,5 +29,6 @@ router.post(
   ]),
   crearAsset
 );
+
 
 module.exports = router;

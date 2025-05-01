@@ -17,9 +17,14 @@ const crearAsset = async (req, res) => {
     const { categoria, titulo, descripcion, es_sensible } = req.body;
     const autor = req.usuarioId;
 
-    const etiquetas = req.body.etiquetas
-      ? req.body.etiquetas.split(',').map(e => e.trim())
-      : [];
+    let etiquetas = [];
+
+    if (Array.isArray(req.body.etiquetas)) {
+      etiquetas = req.body.etiquetas.map(e => e.trim());
+    } else if (typeof req.body.etiquetas === 'string') {
+      etiquetas = req.body.etiquetas.split(',').map(e => e.trim());
+    }
+
 
     // 🔍 Obtener categoría y normalizar los formatos permitidos
     const categoriaDoc = await Categoria.findOne({ nombre: categoria });
@@ -102,8 +107,6 @@ const crearAsset = async (req, res) => {
     res.status(500).json({ mensaje: "Hubo un error al crear el asset" });
   }
 };
-
-
 
 
 const obtenerAssetPorId = async (req, res) => {
