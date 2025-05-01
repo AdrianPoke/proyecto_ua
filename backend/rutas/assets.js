@@ -4,13 +4,21 @@ const {
   crearAsset,
   obtenerAssetPorId,
   buscarAssets,
-  descargarAsset
+  descargarAsset,
+  obtenerAssetsRecientes,
+  obtenerAssetsPopulares
 } = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
 
-// 1. Buscar assets
+// 1. Buscar assets con filtros
 router.get('/buscar', buscarAssets);
+
+// 1.1. Obtener assets más recientes
+router.get('/recientes', obtenerAssetsRecientes);
+
+// 1.2. Obtener assets más populares
+router.get('/populares', obtenerAssetsPopulares);
 
 // 2. Obtener asset por ID
 router.get("/:id", verificarToken, obtenerAssetPorId);
@@ -29,6 +37,5 @@ router.post(
   ]),
   crearAsset
 );
-
 
 module.exports = router;

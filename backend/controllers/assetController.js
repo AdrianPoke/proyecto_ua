@@ -108,6 +108,80 @@ const crearAsset = async (req, res) => {
   }
 };
 
+const obtenerAssetsRecientes = async (req, res) => {
+  try {
+    const limite = parseInt(req.query.limite) || 10; // Valor por defecto: 10
+
+    const assets = await Asset.find()
+      .sort({ createdAt: -1 })
+      .limit(limite)
+      .populate("autor", "nombre email");
+
+    const assetsAdaptados = assets.map(asset => {
+      const imagenPrincipal = asset.archivos.find(a => a.tipo === 'principal')?.url || null;
+      const previas = asset.archivos.filter(a => a.tipo === 'previa').map(a => a.url);
+
+      return {
+        _id: asset._id,
+        titulo: asset.titulo,
+        categoria: asset.categoria,
+        descripcion: asset.descripcion,
+        autor: asset.autor,
+        formatos_disponibles: asset.formatos_disponibles,
+        etiquetas: asset.etiquetas,
+        numero_descargas: asset.numero_descargas,
+        createdAt: asset.createdAt,
+        es_sensible: asset.es_sensible,
+        imagenPrincipal,
+        imagenesPrevias: previas
+      };
+    });
+
+    res.status(200).json(assetsAdaptados);
+  } catch (error) {
+    console.error("❌ Error al obtener assets recientes:", error);
+    res.status(500).json({ mensaje: "Error al obtener los assets recientes" });
+  }
+};
+
+
+const obtenerAssetsPopulares = async (req, res) => {
+  try {
+    const limite = parseInt(req.query.limite) || 10; // Por defecto: 10
+
+    const assets = await Asset.find()
+      .sort({ numero_descargas: -1 })
+      .limit(limite)
+      .populate("autor", "nombre email");
+
+    const assetsAdaptados = assets.map(asset => {
+      const imagenPrincipal = asset.archivos.find(a => a.tipo === 'principal')?.url || null;
+      const previas = asset.archivos.filter(a => a.tipo === 'previa').map(a => a.url);
+
+      return {
+        _id: asset._id,
+        titulo: asset.titulo,
+        categoria: asset.categoria,
+        descripcion: asset.descripcion,
+        autor: asset.autor,
+        formatos_disponibles: asset.formatos_disponibles,
+        etiquetas: asset.etiquetas,
+        numero_descargas: asset.numero_descargas,
+        createdAt: asset.createdAt,
+        es_sensible: asset.es_sensible,
+        imagenPrincipal,
+        imagenesPrevias: previas
+      };
+    });
+
+    res.status(200).json(assetsAdaptados);
+  } catch (error) {
+    console.error("❌ Error al obtener assets populares:", error);
+    res.status(500).json({ mensaje: "Error al obtener los assets más descargados" });
+  }
+};
+
+
 
 const obtenerAssetPorId = async (req, res) => {
   const { id } = req.params;
@@ -259,4 +333,4 @@ const descargarAsset = async (req, res) => {
 
 
 
-module.exports = { crearAsset, obtenerAssetPorId, buscarAssets, descargarAsset };
+module.exports = { crearAsset, obtenerAssetPorId, buscarAssets, descargarAsset, obtenerAssetsRecientes, obtenerAssetsPopulares };
