@@ -91,6 +91,49 @@ const obtenerAssetsSubidos = async (req, res) => {
   }
 };
 
+const añadirAFavoritos = async (req, res) => {
+  try {
+    const usuarioId = req.usuarioId;
+    const { assetId } = req.params;
+
+    const usuario = await User.findById(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    // Si ya está en favoritos, no se añade de nuevo
+    if (usuario.assets_favoritos.includes(assetId)) {
+      return res.status(400).json({ mensaje: "El asset ya está en favoritos" });
+    }
+
+    usuario.assets_favoritos.push(assetId);
+    await usuario.save();
+
+    res.status(200).json({ mensaje: "Asset añadido a favoritos" });
+  } catch (error) {
+    console.error("❌ Error al añadir a favoritos:", error);
+    res.status(500).json({ mensaje: "Error al añadir el asset a favoritos" });
+  }
+};
+
+const obtenerFavoritos = async (req, res) => {
+  try {
+    const usuarioId = req.usuarioId;
+
+    const usuario = await User.findById(usuarioId)
+      .populate("assets_favoritos");
+
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    res.status(200).json(usuario.assets_favoritos);
+  } catch (error) {
+    console.error("❌ Error al obtener favoritos:", error);
+    res.status(500).json({ mensaje: "Error al obtener los assets favoritos" });
+  }
+};
 
 
-module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos };
+
+module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos, añadirAFavoritos, obtenerFavoritos };

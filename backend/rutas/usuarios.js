@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos } = require('../controllers/usuarioController');
+const { 
+    obtenerUsuarios,
+    obtenerAssetsDescargados,
+    actualizarPerfil,
+    obtenerAssetsSubidos,
+    añadirAFavoritos,
+    obtenerFavoritos
+  } = require('../controllers/usuarioController');
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
 
@@ -11,5 +18,7 @@ router.put('/perfil', verificarToken, upload.fields([
   ]), actualizarPerfil);
 
 router.get('/subidos', verificarToken, obtenerAssetsSubidos);
+router.post('/favoritos/:assetId', verificarToken, añadirAFavoritos);
+router.get('/favoritos', verificarToken, obtenerFavoritos);
 
 module.exports = router;
