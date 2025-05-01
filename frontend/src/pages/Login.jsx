@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/login.css";
 import logo from "../logo.png";
@@ -7,7 +7,7 @@ import logo from "../logo.png";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   // 🔁 Si venimos del AuthGuard tras perder el token, recargamos para actualizar el navbar
   useEffect(() => {

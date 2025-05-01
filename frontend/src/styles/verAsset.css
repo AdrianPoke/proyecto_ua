@@ -1,16 +1,18 @@
 @import url('./variables.css');
 
-body {
+html, body {
+  height: 100%;
   background-color: var(--color-fondo);
 }
 
 .ver-asset-container {
-  max-width: 1400px;
+/*  max-width: 1400px;*/
   margin: 0 auto;
   padding: 30px;
   color: var(--color-texto);
   background-color: var(--color-fondo);
 }
+
 
 .asset-header {
   display: flex;

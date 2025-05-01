@@ -99,3 +99,56 @@ input[type="checkbox"] {
   color: var(--color-placeholder);
   margin-top: 10px;
 }
+/* Media Queries para responsive design */
+@media screen and (max-width: 1024px) {
+  .subir-asset-form {
+    grid-template-columns: 1fr; /* Pasa a una sola columna */
+    gap: 30px;
+  }
+
+  .subir-asset-container {
+    padding: 30px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .subir-asset-container {
+    padding: 20px;
+  }
+
+  .subir-asset-title {
+    font-size: 22px;
+    gap: 10px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    font-size: 13px;
+  }
+
+  .subir-asset-boton {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .subir-asset-container {
+    padding: 15px;
+  }
+
+  .subir-asset-title {
+    font-size: 20px;
+  }
+
+  .dropzone {
+    padding: 20px;
+  }
+
+  .subir-asset-boton {
+    font-size: 14px;
+  }
+}
