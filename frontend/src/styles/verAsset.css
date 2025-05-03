@@ -304,3 +304,36 @@ html, body {
     font-size: 1.5rem;
   }
 } 
+
+
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.carousel-image {
+  max-width: 300px;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  object-fit: contain;
+  background-color: var(--color-fondo);
+}
+
+.carousel-btn {
+  background-color: var(--color-menu);
+  border: 1px solid var(--color-borde-input);
+  color: var(--color-principal);
+  font-size: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background-color: var(--color-principal);
+  color: white;
+}

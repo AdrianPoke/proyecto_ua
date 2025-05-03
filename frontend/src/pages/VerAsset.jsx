@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaStar, FaDownload, FaHeart, FaShare, FaUser, FaCalendar, FaTag, FaFileAlt } from 'react-icons/fa';
+import { FaDownload, FaHeart, FaShare, FaUser, FaCalendar, FaTag, FaFileAlt } from 'react-icons/fa';
 import '../styles/verAsset.css';
 
 const VerAsset = () => {
@@ -8,32 +8,51 @@ const VerAsset = () => {
   const navigate = useNavigate();
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
+
+  useEffect(() => {
+    const fetchAsset = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/asset/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        if (!res.ok) throw new Error("Error al obtener el asset");
+        const data = await res.json();
+        setAsset(data);
+      } catch (error) {
+        console.error("❌ Error al cargar asset:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAsset();
+  }, [id]);
 
   const handleDescargar = async () => {
-    const assetId = '681345682a3e2371407c241e';
-  
     try {
-      const response = await fetch(`http://localhost:5000/api/asset/${assetId}/descargar`, {
+      const res = await fetch(`http://localhost:5000/api/asset/${id}/descargar`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
       });
-  
-      if (!response.ok) throw new Error("Error al descargar el asset");
-  
-      const disposition = response.headers.get("Content-Disposition");
-      let nombreArchivo = `asset_${assetId}`;
-      if (disposition && disposition.includes("filename=")) {
-        nombreArchivo = disposition.split("filename=")[1].replace(/"/g, '');
-      }
-  
-      const blob = await response.blob();
+
+      if (!res.ok) throw new Error("Error al descargar el asset");
+
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition");
+      const fileNameMatch = disposition?.match(/filename="?(.+?)"?$/);
+      const fileName = fileNameMatch ? fileNameMatch[1] : `asset_${id}.zip`;
+
       const url = window.URL.createObjectURL(blob);
-  
       const link = document.createElement('a');
       link.href = url;
-      link.download = nombreArchivo;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -43,36 +62,6 @@ const VerAsset = () => {
       alert("Hubo un error al intentar descargar el asset.");
     }
   };
-  
-  
-  
-
-  useEffect(() => {
-    // Simular carga de datos del asset
-    setTimeout(() => {
-      setAsset({
-        id: 1,
-        nombre: "Modelo 3D - Guerrero Medieval",
-        descripcion: "Un modelo 3D detallado de un guerrero medieval con armadura completa. Incluye texturas en alta resolución y diferentes poses de animación. Perfecto para juegos de rol o proyectos históricos.",
-        categoria: "Modelos 3D",
-        formato: "FBX, OBJ",
-        autor: "Juan Pérez",
-        fechaSubida: "15/03/2024",
-        descargas: 1250,
-        valoracion: 4.8,
-        precio: 0,
-        licencia: "Creative Commons",
-        imagenPrincipal: "/assets/warrior.webp",
-        imagenes: [
-          "/assets/warrior.webp",
-          "/assets/warrior-pose1.jpg",
-          "/assets/warrior-pose2.jpg"
-        ],
-        etiquetas: ["medieval", "guerrero", "3D", "personaje", "juego"]
-      });
-      setLoading(false);
-    }, 1000);
-  }, [id]);
 
   if (loading) {
     return (
@@ -92,36 +81,57 @@ const VerAsset = () => {
     );
   }
 
+  // Imagen principal
+  const principal = asset.archivos.find((a) => a.tipo === 'principal');
+  const imagenPrincipal = dropboxToRaw(principal?.url);
+
+  // Imágenes previas
+  const previas = asset.archivos
+    .filter((a) => a.tipo === 'previa')
+    .map((a) => dropboxToRaw(a.url));
+
+  // Todas las imágenes del carrusel (principal + previas)
+  const imagenes = [imagenPrincipal, ...previas];
+
+  const handleNext = () => {
+    setPreviewIndex((prev) => (prev + 1) % imagenes.length);
+  };
+
+  const handlePrev = () => {
+    setPreviewIndex((prev) => (prev - 1 + imagenes.length) % imagenes.length);
+  };
+
   return (
     <div className="ver-asset-container">
       <div className="asset-header">
-        <h1>{asset.nombre}</h1>
+        <h1>{asset.titulo}</h1>
         <div className="asset-stats">
           <div className="stat">
-            <FaStar className="icon" />
-            <span>{asset.valoracion}</span>
-          </div>
-          <div className="stat">
             <FaDownload className="icon" />
-            <span>{asset.descargas}</span>
+            <span>{asset.numero_descargas} descargas</span>
           </div>
         </div>
       </div>
 
       <div className="asset-content">
         <div className="asset-gallery">
-          <img src={asset.imagenPrincipal} alt={asset.nombre} className="main-image" />
-          <div className="thumbnail-container">
-            {asset.imagenes.map((img, index) => (
-              <img 
-                key={index} 
-                src={img} 
-                alt={`${asset.nombre} - Vista ${index + 1}`} 
-                className="thumbnail"
-                onClick={() => {/* Implementar vista previa */}}
+          <img
+            src={imagenes[previewIndex]}
+            alt={`Vista ${previewIndex + 1}`}
+            className="main-image"
+          />
+
+          {imagenes.length > 1 && (
+            <div className="carousel-container">
+              <button className="carousel-btn" onClick={handlePrev}>⟨</button>
+              <img
+                src={imagenes[previewIndex]}
+                alt={`Vista previa ${previewIndex + 1}`}
+                className="carousel-image"
               />
-            ))}
-          </div>
+              <button className="carousel-btn" onClick={handleNext}>⟩</button>
+            </div>
+          )}
         </div>
 
         <div className="asset-info">
@@ -131,12 +141,12 @@ const VerAsset = () => {
               <div className="info-item">
                 <FaUser className="icon" />
                 <span>Autor:</span>
-                <strong>{asset.autor}</strong>
+                <strong>{asset.autor?.nombre || "Desconocido"}</strong>
               </div>
               <div className="info-item">
                 <FaCalendar className="icon" />
                 <span>Fecha:</span>
-                <strong>{asset.fechaSubida}</strong>
+                <strong>{new Date(asset.createdAt).toLocaleDateString()}</strong>
               </div>
               <div className="info-item">
                 <FaTag className="icon" />
@@ -145,8 +155,8 @@ const VerAsset = () => {
               </div>
               <div className="info-item">
                 <FaFileAlt className="icon" />
-                <span>Formato:</span>
-                <strong>{asset.formato}</strong>
+                <span>Formatos:</span>
+                <strong>{asset.formatos_disponibles?.join(", ") || "Ninguno"}</strong>
               </div>
             </div>
           </div>
@@ -159,25 +169,34 @@ const VerAsset = () => {
           <div className="info-section">
             <h2>Etiquetas</h2>
             <div className="tags-container">
-              {asset.etiquetas.map((tag, index) => (
-                <span key={index} className="tag">{tag}</span>
+              {asset.etiquetas?.map((tag, i) => (
+                tag && <span key={i} className="tag">{tag}</span>
               ))}
             </div>
           </div>
 
           <div className="info-section">
-            <h2>Licencia y Uso</h2>
-            <p>
-              Este asset está disponible bajo licencia {asset.licencia}.
-              {asset.precio === 0 ? " Descarga gratuita." : ` Precio: ${asset.precio}€`}
-            </p>
+            <h2>Privacidad</h2>
+            <p>{asset.es_sensible ? "Este asset se considera sensible." : "No es un contenido sensible."}</p>
+          </div>
+
+          <div className="info-section">
+            <h2>Archivos incluidos</h2>
+            <ul>
+              {asset.archivos?.map((file, i) => (
+                <li key={i}>
+                  <a href={dropboxToRaw(file.url)} target="_blank" rel="noopener noreferrer">
+                    {file.nombre} ({file.tipo})
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="action-buttons">
-          <button className="btn-download" onClick={handleDescargar}>
-            <FaDownload /> Descargar
-          </button>
-
+            <button className="btn-download" onClick={handleDescargar}>
+              <FaDownload /> Descargar
+            </button>
             <button className="btn-favorite">
               <FaHeart /> Favorito
             </button>
@@ -191,4 +210,4 @@ const VerAsset = () => {
   );
 };
 
-export default VerAsset; 
+export default VerAsset;
