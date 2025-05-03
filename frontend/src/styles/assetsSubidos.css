@@ -115,8 +115,8 @@
 }
 
 .action-button {
-  width: 40px;
-  height: 40px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   border: none;
   display: flex;
@@ -227,6 +227,17 @@
 
   .filter-select {
     width: 100%;
+  }
+
+  .assets-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center; /* centra las tarjetas */
+  }
+
+  .asset-card {
+    width: 90%; /* o un max-width fijo si prefieres */
+    max-width: 400px;
   }
 }
 

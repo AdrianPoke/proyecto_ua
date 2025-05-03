@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import '../styles/sidebarPerfil.css';
 
 const SidebarPerfil = ({ usuario }) => {
   const navigate = useNavigate();
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
   return (
     <div className="perfil-sidebar">
@@ -27,7 +28,12 @@ const SidebarPerfil = ({ usuario }) => {
         </a>
       </div>
 
-      <nav className="perfil-menu">
+      {/* Botón hamburguesa solo visible en móvil */}
+      <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
+        ☰ Opciones
+      </button>
+
+      <nav className={`perfil-menu ${menuAbierto ? "activo" : ""}`}>
         <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
         <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
         <button onClick={() => navigate("/perfil/assets-subidos")}>📤 Assets Subidos</button>

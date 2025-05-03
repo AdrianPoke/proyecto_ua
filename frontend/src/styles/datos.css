@@ -72,3 +72,45 @@
 .boton-verde:hover {
   background-color: var(--color-principal-hover);
 }
+
+.drop-zone input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: block;
+  margin: 10px auto 0;
+  font-size: 0.95rem;
+}
+
+
+@media (max-width: 768px) {
+  .perfil-container {
+    flex-direction: column;
+    padding: 0 15px;
+  }
+
+  .perfil-datos {
+    width: 100%;
+  }
+
+  .datos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-col {
+    width: 100%;
+  }
+
+  .boton-verde {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .drop-zone {
+    overflow-x: auto;
+    padding: 15px;
+  }  
+}

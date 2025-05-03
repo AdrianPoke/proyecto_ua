@@ -98,3 +98,50 @@
     margin-bottom: 30px;
   }
 } 
+
+
+/* Botón hamburguesa solo en móvil */
+.perfil-hamburguesa {
+display: none;
+width: 100%;
+margin-bottom: 15px;
+background-color: var(--color-principal);
+color: white;
+border: none;
+padding: 10px;
+font-size: 16px;
+border-radius: 5px;
+cursor: pointer;
+}
+
+/* Responsive: hamburguesa y menú plegable */
+@media screen and (max-width: 768px) {
+.perfil-sidebar {
+  width: 100%;
+  margin-right: 0;
+  padding: 10px;
+}
+
+.perfil-hamburguesa {
+  display: block;
+}
+
+.perfil-menu {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.perfil-menu.activo {
+  display: flex;
+}
+
+.perfil-container {
+  flex-direction: column;
+}
+
+.perfil-contenido {
+  padding-top: 20px;
+}
+}

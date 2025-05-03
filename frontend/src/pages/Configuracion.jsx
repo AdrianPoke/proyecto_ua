@@ -5,6 +5,7 @@ import '../styles/configuracion.css';
 
 const Configuracion = () => {
   const [usuario, setUsuario] = useState(null);
+  const [menuAbierto, setMenuAbierto] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +50,12 @@ const Configuracion = () => {
           </a>
         </div>
 
-        <nav className="perfil-menu">
+        {/* Botón hamburguesa solo visible en móvil */}
+        <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
+          ☰ Opciones
+        </button>
+
+        <nav className={`perfil-menu ${menuAbierto ? "activo" : ""}`}>
           <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
           <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
           <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
