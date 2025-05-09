@@ -220,3 +220,48 @@ ul li a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+
+.comentarios-container {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: var(--color-menu);
+  border: 1px solid var(--color-borde-input);
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+}
+
+.comentarios-container h2 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--color-principal);
+}
+
+.comentario-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-borde-input);
+}
+
+.comentario-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--color-borde-input);
+}
+
+.comentario-item strong {
+  display: block;
+  font-size: 14px;
+  color: var(--color-texto);
+}
+
+.comentario-item p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+}

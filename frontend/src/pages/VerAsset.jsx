@@ -11,6 +11,7 @@ const VerAsset = () => {
   const navigate = useNavigate();
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [comentarios, setComentarios] = useState([]);
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
@@ -32,7 +33,26 @@ const VerAsset = () => {
       }
     };
 
+    const fetchComentarios = async () => {
+  try {
+    const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      setComentarios(data);
+    } else {
+      setComentarios([]);
+    }
+  } catch (error) {
+    console.error("❌ Error al cargar comentarios:", error);
+  }
+};
+
     fetchAsset();
+    fetchComentarios();
   }, [id]);
 
   const handleDescargar = async () => {
@@ -93,14 +113,14 @@ const VerAsset = () => {
   const imagenes = [imagenPrincipal, ...previas];
 
   const sliderSettings = {
-  dots: imagenes.length > 1,
-  infinite: imagenes.length > 1,
-  speed: 500,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  arrows: imagenes.length > 1,
-  className: "asset-slider"
-};
+    dots: imagenes.length > 1,
+    infinite: imagenes.length > 1,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: imagenes.length > 1,
+    className: "asset-slider"
+  };
 
   return (
     <div className="ver-asset-container">
@@ -171,7 +191,6 @@ const VerAsset = () => {
             <p>{asset.es_sensible ? "Este asset se considera sensible." : "No es un contenido sensible."}</p>
           </div>
 
-        
           <div className="action-buttons">
             <button className="btn-download" onClick={handleDescargar}>
               <FaDownload /> Descargar
@@ -184,6 +203,24 @@ const VerAsset = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Contenedor de Comentarios */}
+      <div className="comentarios-container">
+        <h2>Comentarios</h2>
+        {comentarios.length === 0 ? (
+          <p>No hay comentarios aún.</p>
+        ) : (
+          comentarios.map((comentario) => (
+            <div key={comentario._id} className="comentario-item">
+              <img src={dropboxToRaw(comentario.usuario.foto_perfil)} alt="usuario" className="comentario-avatar" />
+              <div>
+                <strong>{comentario.usuario.nombre}</strong>
+                <p>{comentario.contenido}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
