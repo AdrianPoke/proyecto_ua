@@ -1,72 +1,97 @@
 @import url('./variables.css');
 
-.subir-asset-container {
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
   background-color: var(--color-fondo);
   color: var(--color-texto);
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: 'Inter', sans-serif;
 }
 
-.subir-asset-title {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 40px;
+.subir-asset-header {
   display: flex;
   align-items: center;
-  gap: 15px;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.subir-asset-container {
+  width: 100vw;
+  padding: 40px 60px;
+  box-sizing: border-box;
+  background-color: var(--color-fondo);
+}
+
+.subir-logo {
+  height: 32px;
+}
+
+
+
+
+.subir-asset-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-texto);
+  margin: 0;
 }
 
 .subir-asset-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
   width: 100%;
-  max-width: 1000px;
+  display: flex;
+  gap: 40px;
+  background-color: var(--color-menu);
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde-input);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
 }
 
 .subir-columna {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.dropzone {
-  border: 2px dashed var(--color-principal);
-  border-radius: 10px;
-  padding: 30px;
-  text-align: center;
-  background-color: var(--color-menu);
-  color: var(--color-placeholder);
-  cursor: pointer;
-  transition: border-color var(--transicion-base);
-}
-
-.dropzone:hover {
-  border-color: var(--color-principal-hover);
-}
-
 label {
   font-weight: 600;
   color: var(--color-principal);
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 
 input[type="text"],
-textarea,
-select {
-  padding: var(--input-padding);
-  border-radius: var(--input-radius);
-  border: none;
-  background-color: var(--color-menu);
+select,
+textarea {
+  width: 100%;
+  background-color: #1c1c1c;
+  border: 1px solid var(--color-borde-input);
+  border-radius: 4px;
+  padding: 10px 14px;
   color: var(--color-texto);
   font-size: 14px;
   outline: none;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-principal);
 }
 
 textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
+}
+
+input[type="file"] {
+  background-color: transparent;
+  color: var(--color-texto);
 }
 
 input[type="checkbox"] {
@@ -74,81 +99,42 @@ input[type="checkbox"] {
 }
 
 .subir-asset-boton {
-  background-color: var(--color-principal);
-  color: var(--color-fondo);
-  font-weight: bold;
+  background: linear-gradient(90deg, #38ef7d, #11998e);
+  color: white;
+  font-weight: 600;
   padding: 12px 30px;
-  border-radius: 8px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color var(--transicion-base);
+  font-size: 15px;
+  transition: background 0.3s ease;
 }
 
 .subir-asset-boton:hover {
-  background-color: var(--color-principal-hover);
-}
-
-.formato-info {
-  font-size: 12px;
-  color: var(--color-texto-secundario);
-  margin-top: 10px;
+  background: #11998e;
 }
 
 .campo-obligatorio {
   font-size: 12px;
   color: var(--color-placeholder);
-  margin-top: 10px;
+  margin-top: 12px;
 }
-/* Media Queries para responsive design */
+
+/* Responsive */
 @media screen and (max-width: 1024px) {
   .subir-asset-form {
-    grid-template-columns: 1fr; /* Pasa a una sola columna */
-    gap: 30px;
-  }
-
-  .subir-asset-container {
-    padding: 30px;
+    flex-direction: column;
   }
 }
 
 @media screen and (max-width: 768px) {
   .subir-asset-container {
-    padding: 20px;
+    padding: 30px 20px;
   }
 
   .subir-asset-title {
     font-size: 22px;
-    gap: 10px;
     flex-direction: column;
-    text-align: center;
-  }
-
-  input[type="text"],
-  textarea,
-  select {
-    font-size: 13px;
-  }
-
-  .subir-asset-boton {
-    width: 100%;
-    padding: 12px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .subir-asset-container {
-    padding: 15px;
-  }
-
-  .subir-asset-title {
-    font-size: 20px;
-  }
-
-  .dropzone {
-    padding: 20px;
-  }
-
-  .subir-asset-boton {
-    font-size: 14px;
+    align-items: flex-start;
   }
 }
