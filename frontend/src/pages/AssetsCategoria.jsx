@@ -1,62 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-
-// Datos falsos de ejemplo
-const fakeAssets = {
-  efectos3d: [
-    { name: 'Efecto 3D 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Efecto 3D 1' },
-    { name: 'Efecto 3D 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Efecto 3D 2' },
-  ],
-  materiales: [
-    { name: 'Material 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Material 1' },
-    { name: 'Material 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Material 2' },
-  ],
-  graficos2d: [
-    { name: 'Gráfico 2D 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Gráfico 2D 1' },
-    { name: 'Gráfico 2D 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Gráfico 2D 2' },
-  ],
-  modelos3d: [
-    { name: 'Modelo 3D 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Modelo 3D 1' },
-    { name: 'Modelo 3D 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Modelo 3D 2' },
-  ],
-  audio: [
-    { name: 'Sonido 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Sonido 1' },
-    { name: 'Sonido 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Sonido 2' },
-  ],
-  scripts: [
-    { name: 'Script 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Script 1' },
-    { name: 'Script 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Script 2' },
-  ],
-  ia: [
-    { name: 'Modelo IA 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Modelo IA 1' },
-    { name: 'Modelo IA 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Modelo IA 2' },
-  ],
-  paquetes: [
-    { name: 'Paquete 1', image: 'https://via.placeholder.com/150', description: 'Descripción del Paquete 1' },
-    { name: 'Paquete 2', image: 'https://via.placeholder.com/150', description: 'Descripción del Paquete 2' },
-  ]
-};
+import { useParams, useNavigate } from 'react-router-dom';
+import '../styles/assetsCategoria.css';
 
 const AssetsCategoria = () => {
-  const { categoria } = useParams(); // Obtenemos el parámetro 'categoria' de la URL
+  const { categoria } = useParams();
+  const navigate = useNavigate();
   const [assets, setAssets] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Mapa para convertir el slug a nombre de categoría
+  const convertirSlugANombre = (slug) => {
+    const mapa = {
+      modelos3d: "MODELOS 3D",
+      graficos2d: "GRÁFICOS 2D",
+      audio: "AUDIO",
+      scripts: "SCRIPTS",
+      ia: "IA",
+      efectos3d: "EFECTOS 3D",
+      materiales: "MATERIALES",
+      paquetes: "PAQUETES"
+    };
+    return mapa[slug] || slug;
+  };
+
+  const dropboxToRaw = (url) => {
+    return url?.replace("dl=0", "raw=1");
+  };
+
+  const handleVerAsset = (id) => {
+    navigate(`/asset/${id}`);
+  };
 
   useEffect(() => {
-    // Aquí se cargan los assets de la categoría desde los datos falsos
-    setAssets(fakeAssets[categoria]);
-  }, [categoria]); // Dependencia en 'categoria', para recargar los assets cuando cambia la categoría
+    const nombreCategoria = convertirSlugANombre(categoria);
+
+    const obtenerAssets = async () => {
+      try {
+        setCargando(true);
+        const response = await fetch(`http://localhost:5000/api/asset/buscar?categoria=${encodeURIComponent(nombreCategoria)}`);
+        if (!response.ok) throw new Error('Error al obtener los assets del servidor.');
+        const data = await response.json();
+        setAssets(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    obtenerAssets();
+  }, [categoria]);
+
+  if (cargando) return <p>Cargando assets de la categoría "{categoria}"...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
-    <div>
-      <h1>Categoría: {categoria}</h1>
-      <div className="asset-list">
-        {assets.map((asset, index) => (
-          <div key={index} className="asset-item">
-            <h2>{asset.name}</h2>
-            <img src={asset.image} alt={asset.name} />
-            <p>{asset.description}</p>
-          </div>
-        ))}
+    <div className="categoria-container">
+      <h1 className="categoria-title">Categoría: {convertirSlugANombre(categoria)}</h1>
+      <div className="asset-grid">
+        {assets.length > 0 ? (
+          assets.map((asset) => (
+            <div key={asset._id} className="asset-card" onClick={() => handleVerAsset(asset._id)}>
+              <img
+                src={dropboxToRaw(asset.imagenPrincipal) || 'https://via.placeholder.com/150'}
+                alt={asset.titulo}
+                className="asset-image"
+              />
+              <div className="asset-title">{asset.titulo}</div>
+              <div className="asset-subtext">{asset.numero_descargas} descargas</div>
+              <div className="asset-description">{asset.descripcion}</div>
+            </div>
+          ))
+        ) : (
+          <p>No hay assets disponibles en esta categoría.</p>
+        )}
       </div>
     </div>
   );
