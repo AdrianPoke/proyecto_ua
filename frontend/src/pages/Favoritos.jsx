@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import SidebarPerfil from '../Components/SidebarPerfil';
 import axios from 'axios';
-import '../styles/home.css'; // ⬅️ Usa el estilo de Home
+import defaultFoto from '../icons/default.jpg';
+import '../styles/home.css';
 
 const Favoritos = () => {
   const [usuario, setUsuario] = useState(null);
@@ -11,38 +12,44 @@ const Favoritos = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsuarioYFavoritos = async () => {
+    const fetchDatos = async () => {
       try {
-        const usuarioEjemplo = {
-          nombre: "Andrew C. Curtis",
-          email: "andrew@gmail.com",
-          foto_perfil: "https://randomuser.me/api/portraits/men/32.jpg",
-          enlace_twitter: "https://x.com/andrew",
-          enlace_instagram: "https://instagram.com/andrew",
-          enlace_linkedin: "https://linkedin.com/in/andrew",
-        };
-        setUsuario(usuarioEjemplo);
+        const token = localStorage.getItem('authToken');
 
-        const res = await axios.get('http://localhost:5000/api/usuario/favoritos', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`
-          }
+        const resPerfil = await axios.get('http://localhost:5000/api/usuario/perfil', {
+          headers: { Authorization: `Bearer ${token}` }
         });
+        setUsuario(resPerfil.data);
 
-        setFavoritos(res.data);
+        const resFavoritos = await axios.get('http://localhost:5000/api/usuario/favoritos', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setFavoritos(resFavoritos.data);
       } catch (err) {
-        console.error("Error al obtener favoritos:", err);
+        console.error("Error al obtener datos del usuario o favoritos:", err);
       }
     };
 
-    fetchUsuarioYFavoritos();
+    fetchDatos();
   }, []);
 
   const handleVerAsset = (id) => {
     navigate(`/asset/${id}`);
   };
 
-  const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
+  const dropboxToRaw = (url) => {
+    if (!url) return "https://via.placeholder.com/300x200";
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
+
+  const normalizarFotoPerfil = (url) => {
+    if (!url) return defaultFoto;
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
 
   const obtenerUrlPrincipal = (archivos) => {
     const archivoPrincipal = archivos?.find(a => a.tipo === 'principal');
@@ -53,9 +60,11 @@ const Favoritos = () => {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
 
+  const usuarioConFoto = { ...usuario, foto_perfil: normalizarFotoPerfil(usuario.foto_perfil) };
+
   return (
     <div className="perfil-container">
-      <SidebarPerfil usuario={usuario} />
+      <SidebarPerfil usuario={usuarioConFoto} />
 
       <div className="perfil-contenido">
         <div className="descargas-header">

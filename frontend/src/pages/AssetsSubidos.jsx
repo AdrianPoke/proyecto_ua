@@ -1,157 +1,112 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUpload, FaEdit, FaTrash, FaDownload, FaStar } from 'react-icons/fa';
+import { FaUpload, FaEdit, FaTrash } from 'react-icons/fa';
 import SidebarPerfil from '../Components/SidebarPerfil';
-import '../styles/assetsSubidos.css';
+import axios from 'axios';
+import defaultFoto from '../icons/default.jpg';
+import '../styles/descargas.css';
 
 const AssetsSubidos = () => {
   const [usuario, setUsuario] = useState(null);
+  const [subidos, setSubidos] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulación de carga de usuario sin base de datos
-    const usuarioEjemplo = {
-      nombre: "Andrew C. Curtis",
-      email: "andrew@gmail.com",
-      foto_perfil: "https://randomuser.me/api/portraits/men/32.jpg",
-      enlace_twitter: "https://x.com/andrew",
-      enlace_instagram: "https://instagram.com/andrew",
-      enlace_linkedin: "https://linkedin.com/in/andrew",
+    const fetchDatos = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+
+        const resPerfil = await axios.get('http://localhost:5000/api/usuario/perfil', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsuario(resPerfil.data);
+
+        const resSubidos = await axios.get('http://localhost:5000/api/usuario/subidos', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSubidos(resSubidos.data);
+      } catch (err) {
+        console.error("Error al obtener datos del usuario o subidos:", err);
+      }
     };
 
-    setTimeout(() => setUsuario(usuarioEjemplo), 500);
+    fetchDatos();
   }, []);
-
-  const handleEditarAsset = (id) => {
-    navigate(`/asset/${id}/editar`);
-  };
 
   const handleVerAsset = (id) => {
     navigate(`/asset/${id}`);
   };
 
-  const handleEliminarAsset = (id) => {
-    // Aquí iría la lógica para eliminar el asset
-    console.log('Eliminar asset:', id);
+  const dropboxToRaw = (url) => {
+    if (!url) return "https://via.placeholder.com/300x200";
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
+
+  const normalizarFotoPerfil = (url) => {
+    if (!url) return defaultFoto;
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
+
+  const obtenerUrlPrincipal = (archivos) => {
+    const archivoPrincipal = archivos?.find(a => a.tipo === 'principal');
+    return archivoPrincipal ? dropboxToRaw(archivoPrincipal.url) : "https://via.placeholder.com/300x200";
   };
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
 
+  const usuarioConFoto = { ...usuario, foto_perfil: normalizarFotoPerfil(usuario.foto_perfil) };
+
   return (
     <div className="perfil-container">
-      {/* Panel izquierdo */}
-      <SidebarPerfil usuario={usuario} />
+      <SidebarPerfil usuario={usuarioConFoto} />
 
-      {/* Contenido principal */}
       <div className="perfil-contenido">
-        <div className="assets-subidos-header">
-          <h1 className="assets-subidos-title">
+        <div className="descargas-header">
+          <h1 className="descargas-title">
             <FaUpload className="title-icon" /> Mis Assets Subidos
           </h1>
-          <div className="assets-subidos-stats">
+          <div className="descargas-stats">
             <div className="stat-item">
-              <span className="stat-value">8</span>
-              <span className="stat-label">Total Assets</span>
+              <span className="stat-value">{subidos.length}</span>
+              <span className="stat-label">Total Subidos</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value">3.2k</span>
-              <span className="stat-label">Descargas Totales</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-value">4.6</span>
-              <span className="stat-label">Rating Promedio</span>
+              <span className="stat-value">
+                {[...new Set(subidos.map(a => a.categoria))].length}
+              </span>
+              <span className="stat-label">Categorías</span>
             </div>
           </div>
         </div>
 
-        <div className="assets-subidos-filters">
-          <select className="filter-select" defaultValue="">
-            <option value="">Todas las categorías</option>
-            <option value="3d">Modelos 3D</option>
-            <option value="texturas">Texturas</option>
-            <option value="audio">Audio</option>
-          </select>
-          <select className="filter-select" defaultValue="reciente">
-            <option value="reciente">Más reciente</option>
-            <option value="descargas">Más descargados</option>
-            <option value="rating">Mejor rating</option>
-          </select>
-        </div>
-
-        <div className="assets-subidos-grid">
-          {/* Datos de ejemplo */}
-          {[
-            {
-              id: 1,
-              nombre: "Modelo 3D - Guerrero Medieval",
-              categoria: "Modelos 3D",
-              formato: ".blend",
-              fecha: "2024-03-15",
-              descargas: 850,
-              rating: 4.8,
-              imagen: "/assets/warrior.webp"
-            },
-            {
-              id: 2,
-              nombre: "Pack de Texturas - Castillo",
-              categoria: "Texturas",
-              formato: ".png",
-              fecha: "2024-03-10",
-              descargas: 620,
-              rating: 4.5,
-              imagen: "/assets/pac1.jpg"
-            },
-            {
-              id: 3,
-              nombre: "Efectos de Sonido - Batalla",
-              categoria: "Audio",
-              formato: ".wav",
-              fecha: "2024-03-05",
-              descargas: 430,
-              rating: 4.7,
-              imagen: "/assets/scr.jpg"
-            }
-          ].map((asset) => (
-            <div key={asset.id} className="asset-card">
-              <div className="asset-imagen" onClick={() => handleVerAsset(asset.id)}>
-                <img src={asset.imagen} alt={asset.nombre} />
+        <div className="assets-grid">
+          {subidos.map((asset) => (
+            <div key={asset._id} className="asset-card">
+              <div className="asset-imagen-container">
+                <img
+                  src={obtenerUrlPrincipal(asset.archivos)}
+                  alt={asset.titulo}
+                  className="asset-image"
+                  onClick={() => handleVerAsset(asset._id)}
+                />
                 <div className="asset-actions">
-                  <button 
-                    className="action-button edit"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditarAsset(asset.id);
-                    }}
-                  >
+                  <button className="action-button edit">
                     <FaEdit />
                   </button>
-                  <button 
-                    className="action-button delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEliminarAsset(asset.id);
-                    }}
-                  >
+                  <button className="action-button delete">
                     <FaTrash />
                   </button>
                 </div>
               </div>
-              <div className="asset-info">
-                <h3 className="asset-nombre" onClick={() => handleVerAsset(asset.id)}>
-                  {asset.nombre}
-                </h3>
-                <p className="asset-categoria">{asset.categoria} <span className="asset-formato">{asset.formato}</span></p>
-                <p className="asset-fecha">Subido: {asset.fecha}</p>
-                <div className="asset-stats">
-                  <span className="stat">
-                    <FaDownload /> {asset.descargas}
-                  </span>
-                  <span className="stat">
-                    <FaStar /> {asset.rating}
-                  </span>
-                </div>
+              <div className="asset-title">{asset.titulo}</div>
+              <div className="asset-subtext">
+                {asset.categoria} {asset.formatos_disponibles?.[0] && `(${asset.formatos_disponibles[0]})`}
               </div>
             </div>
           ))}
