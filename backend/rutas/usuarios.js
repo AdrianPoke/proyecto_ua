@@ -6,7 +6,8 @@ const {
     actualizarPerfil,
     obtenerAssetsSubidos,
     añadirAFavoritos,
-    obtenerFavoritos
+    obtenerFavoritos,
+    obtenerPerfil
   } = require('../controllers/usuarioController');
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
@@ -16,6 +17,9 @@ router.get('/descargas', verificarToken, obtenerAssetsDescargados);
 router.put('/perfil', verificarToken, upload.fields([
     { name: "foto_perfil", maxCount: 1 }
   ]), actualizarPerfil);
+
+router.get('/perfil', verificarToken, obtenerPerfil);
+
 
 router.get('/subidos', verificarToken, obtenerAssetsSubidos);
 router.post('/favoritos/:assetId', verificarToken, añadirAFavoritos);

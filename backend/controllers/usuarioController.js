@@ -21,25 +21,30 @@ const actualizarPerfil = async (req, res) => {
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
-    // 🔁 Actualizar nombre si se proporciona
-    if (nombre) {
-      usuario.nombre = nombre;
-    }
+    if (nombre) usuario.nombre = nombre;
 
-    // 🔐 Actualizar contraseña si se proporciona
     if (contraseña) {
       const hash = await bcrypt.hash(contraseña, 10);
       usuario.contraseña = hash;
     }
 
-    // 🌐 Actualizar enlaces si se proporcionan
     if (enlace_twitter !== undefined) usuario.enlace_twitter = enlace_twitter;
     if (enlace_instagram !== undefined) usuario.enlace_instagram = enlace_instagram;
     if (enlace_linkedin !== undefined) usuario.enlace_linkedin = enlace_linkedin;
 
-    // 🖼️ Subir nueva foto de perfil si se adjunta
     const nuevaFoto = req.files?.foto_perfil?.[0];
     if (nuevaFoto) {
+      // Validaciones
+      const mimeValido = nuevaFoto.mimetype.startsWith("image/");
+      const tamañoValido = nuevaFoto.size <= 2 * 1024 * 1024; // 2MB
+
+      if (!mimeValido) {
+        return res.status(400).json({ mensaje: "El archivo debe ser una imagen válida" });
+      }
+      if (!tamañoValido) {
+        return res.status(400).json({ mensaje: "La imagen no debe superar los 2MB" });
+      }
+
       const ext = nuevaFoto.originalname.split('.').pop();
       const nombreArchivo = `perfil_${usuarioId}.${ext}`;
       const url = await subirArchivo(nombreArchivo, nuevaFoto.buffer);
@@ -47,11 +52,24 @@ const actualizarPerfil = async (req, res) => {
     }
 
     await usuario.save();
-
     res.status(200).json({ mensaje: "Perfil actualizado correctamente", usuario });
   } catch (error) {
     console.error("❌ Error al actualizar el perfil:", error);
     res.status(500).json({ mensaje: "Error al actualizar el perfil" });
+  }
+};
+
+
+const obtenerPerfil = async (req, res) => {
+  try {
+    const usuario = await User.findById(req.usuarioId).select('-contraseña');
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+    res.status(200).json(usuario);
+  } catch (error) {
+    console.error("❌ Error al obtener el perfil:", error);
+    res.status(500).json({ mensaje: "Error al obtener el perfil" });
   }
 };
 
@@ -136,4 +154,4 @@ const obtenerFavoritos = async (req, res) => {
 
 
 
-module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos, añadirAFavoritos, obtenerFavoritos };
+module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos, obtenerPerfil, añadirAFavoritos, obtenerFavoritos };
