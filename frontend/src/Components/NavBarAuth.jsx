@@ -3,16 +3,39 @@ import { Link } from "react-router-dom";
 import { FaSearch, FaPlusCircle } from "react-icons/fa";
 import "../styles/NavBarAuth.css";
 import logo from "../logo.png";
-import pr from "../icons/profile.png";
+import defaultFoto from "../icons/profile.png"; // tu imagen por defecto
+import axios from "axios";
 
 function NavBarAuth() {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
+    const fetchPerfil = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await axios.get("http://localhost:5000/api/usuario/perfil", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsuario(res.data);
+      } catch (err) {
+        console.error("Error al obtener el perfil:", err);
+      }
+    };
+
+    fetchPerfil();
+
     const cerrar = () => setMenuAbierto(false);
     window.addEventListener("scroll", cerrar);
     return () => window.removeEventListener("scroll", cerrar);
   }, []);
+
+  const normalizarFotoPerfil = (url) => {
+    if (!url) return defaultFoto;
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
 
   return (
     <>
@@ -29,7 +52,7 @@ function NavBarAuth() {
           </div>
         </div>
 
-        {/* Menú horizontal (escritorio) */}
+        {/* Menú horizontal */}
         <div className="navbar-right">
           <Link to="/" className="nav-link">Inicio</Link>
           <Link to="/subir-assets" className="nav-link">
@@ -38,17 +61,17 @@ function NavBarAuth() {
           <Link to="/categorias" className="nav-link">Categorías</Link>
           <Link to="/busqueda-avanzada" className="nav-link">Búsqueda Avanzada</Link>
           <Link to="/perfil" className="profile-icon">
-            <img src={pr} alt="Perfil" />
+            <img src={normalizarFotoPerfil(usuario?.foto_perfil)} alt="Perfil" />
           </Link>
         </div>
 
-        {/* Botón hamburguesa (solo móvil) */}
+        {/* Botón hamburguesa */}
         <button className="hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰
         </button>
       </nav>
 
-      {/* Sidebar lateral (móvil) */}
+      {/* Sidebar móvil */}
       <div className={`sidebar ${menuAbierto ? "activo" : ""}`}>
         <Link to="/" onClick={() => setMenuAbierto(false)}>Inicio</Link>
         <Link to="/subir-assets" onClick={() => setMenuAbierto(false)}>Subir Assets</Link>
@@ -57,7 +80,7 @@ function NavBarAuth() {
         <Link to="/perfil" onClick={() => setMenuAbierto(false)}>Perfil</Link>
       </div>
 
-      {/* Fondo que cierra menú al hacer clic */}
+      {/* Cierre lateral al hacer clic */}
       {menuAbierto && <div className="sidebar-overlay" onClick={() => setMenuAbierto(false)} />}
     </>
   );

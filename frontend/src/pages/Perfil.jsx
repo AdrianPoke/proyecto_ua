@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/perfil.css";
+import defaultFoto from "../icons/profile.png";
 
 function Perfil() {
   const [usuario, setUsuario] = useState(null);
@@ -8,18 +10,27 @@ function Perfil() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulación de carga de usuario sin base de datos
-    const usuarioEjemplo = {
-      nombre: "Andrew C. Curtis",
-      email: "andrew@gmail.com",
-      foto_perfil: "https://randomuser.me/api/portraits/men/32.jpg",
-      enlace_twitter: "https://x.com/andrew",
-      enlace_instagram: "https://instagram.com/andrew",
-      enlace_linkedin: "https://linkedin.com/in/andrew",
+    const fetchPerfil = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await axios.get("http://localhost:5000/api/usuario/perfil", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsuario(res.data);
+      } catch (err) {
+        console.error("Error al obtener perfil:", err);
+      }
     };
 
-    setTimeout(() => setUsuario(usuarioEjemplo), 500); // Simula carga
+    fetchPerfil();
   }, []);
+
+  const normalizarFoto = (url) => {
+    if (!url) return defaultFoto;
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
@@ -30,7 +41,7 @@ function Perfil() {
       {/* Panel izquierdo */}
       <div className="perfil-sidebar">
         <img
-          src={usuario.foto_perfil}
+          src={normalizarFoto(usuario.foto_perfil)}
           alt="Perfil"
           className="perfil-foto"
         />
@@ -49,7 +60,6 @@ function Perfil() {
           </a>
         </div>
 
-        {/* Botón hamburguesa solo visible en móvil */}
         <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰ Opciones
         </button>

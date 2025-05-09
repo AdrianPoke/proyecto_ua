@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCog, FaBell, FaLock, FaGlobe, FaPalette } from 'react-icons/fa';
+import axios from 'axios';
 import '../styles/configuracion.css';
+import defaultFoto from '../icons/profile.png';
 
 const Configuracion = () => {
   const [usuario, setUsuario] = useState(null);
@@ -9,18 +11,27 @@ const Configuracion = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulación de carga de usuario sin base de datos
-    const usuarioEjemplo = {
-      nombre: "Andrew C. Curtis",
-      email: "andrew@gmail.com",
-      foto_perfil: "https://randomuser.me/api/portraits/men/32.jpg",
-      enlace_twitter: "https://x.com/andrew",
-      enlace_instagram: "https://instagram.com/andrew",
-      enlace_linkedin: "https://linkedin.com/in/andrew",
+    const fetchPerfil = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await axios.get("http://localhost:5000/api/usuario/perfil", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsuario(res.data);
+      } catch (err) {
+        console.error("Error al obtener perfil:", err);
+      }
     };
 
-    setTimeout(() => setUsuario(usuarioEjemplo), 500);
+    fetchPerfil();
   }, []);
+
+  const normalizarFoto = (url) => {
+    if (!url) return defaultFoto;
+    return url.includes("dropbox.com")
+      ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+      : url;
+  };
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
@@ -31,7 +42,7 @@ const Configuracion = () => {
       {/* Panel izquierdo */}
       <div className="perfil-sidebar">
         <img
-          src={usuario.foto_perfil}
+          src={normalizarFoto(usuario.foto_perfil)}
           alt="Perfil"
           className="perfil-foto"
         />
