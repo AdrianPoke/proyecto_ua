@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaDownload, FaHeart, FaShare, FaUser, FaCalendar, FaTag, FaFileAlt } from 'react-icons/fa';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import '../styles/verAsset.css';
 
 const VerAsset = () => {
@@ -8,7 +11,6 @@ const VerAsset = () => {
   const navigate = useNavigate();
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [previewIndex, setPreviewIndex] = useState(0);
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
@@ -81,25 +83,24 @@ const VerAsset = () => {
     );
   }
 
-  // Imagen principal
   const principal = asset.archivos.find((a) => a.tipo === 'principal');
   const imagenPrincipal = dropboxToRaw(principal?.url);
 
-  // Imágenes previas
   const previas = asset.archivos
     .filter((a) => a.tipo === 'previa')
     .map((a) => dropboxToRaw(a.url));
 
-  // Todas las imágenes del carrusel (principal + previas)
   const imagenes = [imagenPrincipal, ...previas];
 
-  const handleNext = () => {
-    setPreviewIndex((prev) => (prev + 1) % imagenes.length);
-  };
-
-  const handlePrev = () => {
-    setPreviewIndex((prev) => (prev - 1 + imagenes.length) % imagenes.length);
-  };
+  const sliderSettings = {
+  dots: imagenes.length > 1,
+  infinite: imagenes.length > 1,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  arrows: imagenes.length > 1,
+  className: "asset-slider"
+};
 
   return (
     <div className="ver-asset-container">
@@ -115,23 +116,13 @@ const VerAsset = () => {
 
       <div className="asset-content">
         <div className="asset-gallery">
-          <img
-            src={imagenes[previewIndex]}
-            alt={`Vista ${previewIndex + 1}`}
-            className="main-image"
-          />
-
-          {imagenes.length > 1 && (
-            <div className="carousel-container">
-              <button className="carousel-btn" onClick={handlePrev}>⟨</button>
-              <img
-                src={imagenes[previewIndex]}
-                alt={`Vista previa ${previewIndex + 1}`}
-                className="carousel-image"
-              />
-              <button className="carousel-btn" onClick={handleNext}>⟩</button>
-            </div>
-          )}
+          <Slider {...sliderSettings}>
+            {imagenes.map((img, index) => (
+              <div key={index}>
+                <img src={img} alt={`Vista ${index + 1}`} className="main-image" />
+              </div>
+            ))}
+          </Slider>
         </div>
 
         <div className="asset-info">
@@ -169,8 +160,8 @@ const VerAsset = () => {
           <div className="info-section">
             <h2>Etiquetas</h2>
             <div className="tags-container">
-              {asset.etiquetas?.map((tag, i) => (
-                tag && <span key={i} className="tag">{tag}</span>
+              {asset.etiquetas?.map((tag, i) => tag && (
+                <span key={i} className="tag">{tag}</span>
               ))}
             </div>
           </div>
@@ -180,19 +171,7 @@ const VerAsset = () => {
             <p>{asset.es_sensible ? "Este asset se considera sensible." : "No es un contenido sensible."}</p>
           </div>
 
-          <div className="info-section">
-            <h2>Archivos incluidos</h2>
-            <ul>
-              {asset.archivos?.map((file, i) => (
-                <li key={i}>
-                  <a href={dropboxToRaw(file.url)} target="_blank" rel="noopener noreferrer">
-                    {file.nombre} ({file.tipo})
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
+        
           <div className="action-buttons">
             <button className="btn-download" onClick={handleDescargar}>
               <FaDownload /> Descargar
