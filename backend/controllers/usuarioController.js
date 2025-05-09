@@ -58,14 +58,14 @@ const actualizarPerfil = async (req, res) => {
 const obtenerAssetsDescargados = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
-    
+
     const usuario = await User.findById(usuarioId)
-    .populate("assets_descargados"); 
-    
+      .populate("assets_descargados");
+
     if (!usuario) {
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
-    
+
     res.json(usuario.assets_descargados);
   } catch (error) {
     console.error(error);
