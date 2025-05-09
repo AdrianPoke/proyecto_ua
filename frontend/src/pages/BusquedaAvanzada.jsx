@@ -1,32 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/busquedaAvanzada.css";
-
-// Array de assets compartidos
-const assets = [
-  { id: 1, title: "Cyborg Model 3D", image: "/assets/warrior.webp" },
-  { id: 2, title: "Tileset Taberna 3D", image: "/assets/pac1.jpg" },
-  { id: 3, title: "Tavern Assets", image: "/assets/pac2.webp" },
-  { id: 4, title: "Fantasy Pack", image: "/assets/pac3.webp" },
-  { id: 5, title: "Retro Arcade Pack", image: "/assets/pac4.webp" },
-  { id: 6, title: "Pack of Monsters", image: "/assets/pac5.png" },
-  { id: 7, title: "Space Invaders Pack", image: "/assets/pac6.png" },
-  { id: 8, title: "Zombie Cenital Tileset", image: "/assets/pac7.webp" },
-  { id: 9, title: "JavaScripts", image: "/assets/scr.jpg" },
-  { id: 10, title: "Movimiento de Salto 2D", image: "/assets/scr1.jpg" },
-  { id: 11, title: "Text Script Example", image: "/assets/scr2.png" },
-  { id: 12, title: "Message Script", image: "/assets/SCR3.jpg" },
-  { id: 13, title: "Movement TOP-DOWN", image: "/assets/scr4.png" },
-  { id: 14, title: "Factory Package", image: "/assets/titpac.jpg" },
-];
 
 function BusquedaAvanzada() {
   const [busqueda, setBusqueda] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [formato, setFormato] = useState("");
+  const [orden, setOrden] = useState("recientes");
+  const [assetsDB, setAssetsDB] = useState([]);
+  const [formatosDisponibles, setFormatosDisponibles] = useState([]);
+
   const navigate = useNavigate();
 
-  const assetsFiltrados = assets.filter((asset) =>
-    asset.title.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const dropboxToRaw = (url) => {
+    return url?.replace("dl=0", "raw=1");
+  };
+
+  // Obtener assets según filtros
+  useEffect(() => {
+    const fetchAssets = async () => {
+      try {
+        const params = new URLSearchParams();
+
+        if (busqueda) params.append("titulo", busqueda);
+        if (categoria) params.append("categoria", categoria);
+        if (formato) params.append("formatos", formato);
+        if (orden === "populares") params.append("orden", "populares");
+
+        const res = await axios.get(`http://localhost:5000/api/asset/buscar?${params.toString()}`, {
+          headers: {
+            Authorization: 'Bearer TU_TOKEN_AQUI' // Reemplaza con tu token real
+          }
+        });
+
+        setAssetsDB(res.data);
+      } catch (err) {
+        console.error("Error al buscar assets:", err);
+      }
+    };
+
+    fetchAssets();
+  }, [busqueda, categoria, formato, orden]);
+
+  // Obtener formatos cuando cambia la categoría
+  useEffect(() => {
+    const fetchFormatos = async () => {
+      if (!categoria) {
+        setFormatosDisponibles([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`http://localhost:5000/api/categoria/${categoria}/formatos`);
+        setFormatosDisponibles(res.data.formatos_permitidos || []);
+      } catch (err) {
+        console.error("Error al obtener formatos:", err);
+        setFormatosDisponibles([]);
+      }
+    };
+
+    fetchFormatos();
+  }, [categoria]);
 
   const handleVerAsset = (id) => {
     navigate(`/asset/${id}`);
@@ -43,43 +78,35 @@ function BusquedaAvanzada() {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
-        <button className="boton-buscar">🔍</button>
       </div>
 
       <div className="filtros">
         <div className="filtro">
           <label>Categoría</label>
-          <select>
-            <option>Seleccione</option>
-            <option>Modelos 3D</option>
-            <option>Gráficos 2D</option>
-            <option>Audio</option>
-            <option>IA</option>
-            <option>Efectos 3D</option>
-            <option>Materiales</option>
-            <option>Scripts</option>
-            <option>Paquetes</option>
-          </select>
-        </div>
-
-        <div className="filtro">
-          <label>Licencia</label>
-          <select>
-            <option>Seleccione</option>
-            <option>CC0</option>
-            <option>CC BY</option>
-            <option>Uso interno</option>
+          <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+            <option value="">Seleccione</option>
+            <option value="Modelos 3D">Modelos 3D</option>
+            <option value="Gráficos 2D">Gráficos 2D</option>
+            <option value="Audio">Audio</option>
+            <option value="IA">IA</option>
+            <option value="Efectos 3D">Efectos 3D</option>
+            <option value="Materiales">Materiales</option>
+            <option value="Scripts">Scripts</option>
+            <option value="Paquetes">Paquetes</option>
           </select>
         </div>
 
         <div className="filtro">
           <label>Formato</label>
-          <select>
-            <option>Seleccione</option>
-            <option>PNG</option>
-            <option>FBX</option>
-            <option>OBJ</option>
-            <option>MP3</option>
+          <select value={formato} onChange={(e) => setFormato(e.target.value)}>
+            <option value="">Seleccione</option>
+            {formatosDisponibles.length > 0 ? (
+              formatosDisponibles.map((f, index) => (
+                <option key={index} value={f}>{f}</option>
+              ))
+            ) : (
+              <option disabled>No hay formatos disponibles</option>
+            )}
           </select>
         </div>
 
@@ -87,27 +114,40 @@ function BusquedaAvanzada() {
           <label>Ordenar por:</label>
           <div>
             <label>
-              <input type="checkbox" defaultChecked /> Recientes
+              <input
+                type="radio"
+                checked={orden === "recientes"}
+                onChange={() => setOrden("recientes")}
+              />
+              Recientes
             </label>
             <label>
-              <input type="checkbox" /> Lo más descargado
+              <input
+                type="radio"
+                checked={orden === "populares"}
+                onChange={() => setOrden("populares")}
+              />
+              Lo más descargado
             </label>
           </div>
         </div>
       </div>
 
-      <h3 className="resultados-titulo">Resultados ({assetsFiltrados.length})</h3>
+      <h3 className="resultados-titulo">Resultados ({assetsDB.length})</h3>
       <div className="resultados-grid">
-        {assetsFiltrados.map((asset) => (
-          <div 
-            className="resultado-card" 
-            key={asset.id}
-            onClick={() => handleVerAsset(asset.id)}
+        {assetsDB.map((asset) => (
+          <div
+            className="resultado-card"
+            key={asset._id}
+            onClick={() => handleVerAsset(asset._id)}
           >
             <div className="resultado-imagen">
-              <img src={asset.image} alt={asset.title} />
+              <img
+                src={dropboxToRaw(asset.imagenPrincipal) || "/assets/default.jpg"}
+                alt={asset.titulo}
+              />
             </div>
-            <p className="resultado-titulo">{asset.title}</p>
+            <p className="resultado-titulo">{asset.titulo}</p>
           </div>
         ))}
       </div>
