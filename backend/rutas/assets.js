@@ -6,7 +6,8 @@ const {
   buscarAssets,
   descargarAsset,
   obtenerAssetsRecientes,
-  obtenerAssetsPopulares
+  obtenerAssetsPopulares,
+  obtenerEtiquetasUnicas
 } = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
@@ -19,6 +20,9 @@ router.get('/recientes', obtenerAssetsRecientes);
 
 // 1.2. Obtener assets más populares
 router.get('/populares', obtenerAssetsPopulares);
+
+// 1.3. Obtener todas las etiquetas únicas
+router.get('/etiquetas', obtenerEtiquetasUnicas);
 
 // 2. Obtener asset por ID
 router.get("/:id", verificarToken, obtenerAssetPorId);

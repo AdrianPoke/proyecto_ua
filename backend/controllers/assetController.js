@@ -331,6 +331,24 @@ const descargarAsset = async (req, res) => {
   }
 };
 
+const obtenerEtiquetasUnicas = async (req, res) => {
+  try {
+    const etiquetas = await Asset.distinct("etiquetas");
+    const filtradas = etiquetas.filter(e => e && e.trim() !== "").sort();
+    res.json(filtradas);
+  } catch (error) {
+    console.error("❌ Error al obtener etiquetas:", error);
+    res.status(500).json({ mensaje: "Error al obtener etiquetas" });
+  }
+};
 
 
-module.exports = { crearAsset, obtenerAssetPorId, buscarAssets, descargarAsset, obtenerAssetsRecientes, obtenerAssetsPopulares };
+module.exports = {
+  crearAsset,
+  obtenerAssetPorId,
+  buscarAssets,
+  descargarAsset,
+  obtenerAssetsRecientes,
+  obtenerAssetsPopulares,
+  obtenerEtiquetasUnicas
+};
