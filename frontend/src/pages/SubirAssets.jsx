@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../styles/subirAsset.css";
 import logo from "../logo.png";
+import { unzipSync } from "fflate";
 
 function SubirAssets() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,30 @@ function SubirAssets() {
     const { name, value, type, checked } = e.target;
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
+
+  const handleAssetFiles = async (e) => {
+  const files = [...e.target.files];
+  const extracted = [];
+
+  for (const file of files) {
+    if (file.name.endsWith(".zip")) {
+      const arrayBuffer = await file.arrayBuffer();
+      const zipContents = unzipSync(new Uint8Array(arrayBuffer));
+      
+      for (const [filename, data] of Object.entries(zipContents)) {
+        if (!filename.endsWith("/")) {
+          const blob = new Blob([data], { type: "application/octet-stream" });
+          const fileFromZip = new File([blob], filename);
+          extracted.push(fileFromZip);
+        }
+      }
+    } else {
+      extracted.push(file);
+    }
+  }
+
+  setArchivosAsset(extracted);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,8 +90,14 @@ function SubirAssets() {
           <label>Imágenes Previas</label>
           <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
 
-          <label>Archivos del Asset</label>
-          <input type="file" multiple onChange={(e) => setArchivosAsset([...e.target.files])} />
+          <label>Archivos del Asset (ZIP o múltiples archivos)</label>
+          <input
+            type="file"
+            accept=".zip,application/zip,*"
+            multiple
+            onChange={handleAssetFiles}
+          />
+
 
           <label>Etiquetas</label>
           <input type="text" name="etiquetas" value={formData.etiquetas} onChange={handleChange} placeholder="Naturaleza, Audio, Ambiente..." />
