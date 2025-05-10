@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/perfil.css";
 import defaultFoto from "../icons/profile.png";
+import x from "../icons/x.png";
+import ig from "../icons/instagram.png";
+import linkedin from "../icons/linkedin.webp";
 
 function Perfil() {
   const [usuario, setUsuario] = useState(null);
@@ -49,16 +52,17 @@ function Perfil() {
         <p className="perfil-email">{usuario.email}</p>
 
         <div className="perfil-redes">
-          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-x-twitter"></i>
-          </a>
-          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-instagram"></i>
-          </a>
-          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-        </div>
+  <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
+    <img src={x} alt="Twitter" className="social-icon" />
+  </a>
+  <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
+    <img src={ig} alt="Instagram" className="social-icon" />
+  </a>
+  <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+    <img src={linkedin} alt="LinkedIn" className="social-icon" />
+  </a>
+</div>
+
 
         <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰ Opciones

@@ -34,6 +34,12 @@ nav {
   padding: 15px;
 }
 
+.layout-container {
+  background-color: var(--color-fondo);
+  min-height: 100vh;
+}
+
+
 button {
   background-color: var(--color-principal);
   color: var(--color-fondo);
