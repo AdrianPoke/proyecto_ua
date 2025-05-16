@@ -7,7 +7,8 @@ const {
     obtenerAssetsSubidos,
     añadirAFavoritos,
     obtenerFavoritos,
-    obtenerPerfil
+    obtenerPerfil,
+    quitarDeFavoritos
   } = require('../controllers/usuarioController');
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
@@ -24,5 +25,6 @@ router.get('/perfil', verificarToken, obtenerPerfil);
 router.get('/subidos', verificarToken, obtenerAssetsSubidos);
 router.post('/favoritos/:assetId', verificarToken, añadirAFavoritos);
 router.get('/favoritos', verificarToken, obtenerFavoritos);
+router.delete('/favoritos/:assetId', verificarToken, quitarDeFavoritos);
 
 module.exports = router;
