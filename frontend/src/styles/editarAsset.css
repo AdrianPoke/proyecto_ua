@@ -173,6 +173,53 @@ body {
   background-color: var(--color-principal-hover);
 }
 
+.archivos-actuales {
+  margin-top: 20px;
+}
+
+.archivos-actuales p {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--color-texto-secundario);
+}
+
+.archivos-actuales ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.archivos-actuales li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  background-color: #1f1f1f;
+  padding: 10px 12px;
+  border-radius: 5px;
+}
+
+.archivos-actuales a {
+  color: var(--color-principal);
+  text-decoration: none;
+  word-break: break-word;
+  max-width: 90%;
+}
+
+.eliminar-archivo {
+  background-color: transparent;
+  border: none;
+  color: #ff4c4c;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.eliminar-archivo:hover {
+  transform: scale(1.2);
+}
+
+
 /* Media Queries */
 @media screen and (max-width: 768px) {
   .editar-asset-container {

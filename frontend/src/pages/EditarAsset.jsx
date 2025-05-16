@@ -79,12 +79,21 @@ const EditarAsset = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const yaTienePrincipal = archivosActuales.some(a => a.tipo === "principal");
+
+    if (!imagenPrincipal && !yaTienePrincipal) {
+      alert("Debes proporcionar una imagen principal para el asset.");
+      return;
+    }
+
     const data = new FormData();
     data.append("titulo", formData.titulo);
     data.append("descripcion", formData.descripcion);
     data.append("categoria", formData.categoria);
     data.append("es_sensible", formData.es_sensible);
     formData.etiquetas.split(",").map((t) => t.trim()).forEach((t) => data.append("etiquetas", t));
+
     if (imagenPrincipal) data.append("imagen_principal", imagenPrincipal);
     imagenesPrevias.forEach((f) => data.append("imagenes_previas", f));
     archivosAsset.forEach((f) => data.append("archivo_asset", f));
@@ -104,6 +113,7 @@ const EditarAsset = () => {
       alert("No se pudo actualizar el asset");
     }
   };
+
 
   const handleEliminarArchivo = async (nombre) => {
   const confirmado = window.confirm(`¿Eliminar el archivo "${nombre}"?`);
