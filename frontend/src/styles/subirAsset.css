@@ -138,3 +138,18 @@ input[type="checkbox"] {
     align-items: flex-start;
   }
 }
+.aviso-categoria {
+  color: #b00020;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.formatos-info {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background-color: #e0f7fa;
+  color: #00796b;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  border: 1px solid #b2dfdb;
+}
