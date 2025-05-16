@@ -44,6 +44,28 @@ const AssetsSubidos = () => {
       : url;
   };
 
+  const handleEliminarAsset = async (id) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    const confirmado = window.confirm("¿Seguro que quieres eliminar este asset?");
+
+    if (!confirmado) return;
+
+    await axios.delete(`http://localhost:5000/api/asset/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    // Elimina el asset de la lista en frontend
+    setSubidos(prev => prev.filter(asset => asset._id !== id));
+  } catch (err) {
+    console.error("Error al eliminar asset:", err);
+    alert("No se pudo eliminar el asset.");
+  }
+};
+
+
   const normalizarFotoPerfil = (url) => {
     if (!url) return defaultFoto;
     return url.includes("dropbox.com")
@@ -99,9 +121,9 @@ const AssetsSubidos = () => {
                   <button className="action-button edit">
                     <FaEdit />
                   </button>
-                  <button className="action-button delete">
-                    <FaTrash />
-                  </button>
+                    <button className="action-button delete" onClick={() => handleEliminarAsset(asset._id)}>
+                  <FaTrash />
+                </button>
                 </div>
               </div>
               <div className="asset-title">{asset.titulo}</div>

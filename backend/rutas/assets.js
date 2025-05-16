@@ -7,7 +7,8 @@ const {
   descargarAsset,
   obtenerAssetsRecientes,
   obtenerAssetsPopulares,
-  obtenerEtiquetasUnicas
+  obtenerEtiquetasUnicas,
+  eliminarAsset
 } = require("../controllers/assetController");
 const verificarToken = require("../middlewares/verificarToken");
 const upload = require("../middlewares/upload");
@@ -41,5 +42,8 @@ router.post(
   ]),
   crearAsset
 );
+
+// 5. Eliminar asset
+router.delete("/:id", verificarToken, eliminarAsset);
 
 module.exports = router;

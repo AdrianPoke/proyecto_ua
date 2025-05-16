@@ -342,6 +342,28 @@ const obtenerEtiquetasUnicas = async (req, res) => {
   }
 };
 
+const eliminarAsset = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioId = req.usuarioId;
+
+    const asset = await Asset.findById(id);
+    if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
+
+    if (asset.autor.toString() !== usuarioId) {
+      return res.status(403).json({ mensaje: "No tienes permiso para eliminar este asset" });
+    }
+
+    await Asset.findByIdAndDelete(id);
+    await Usuario.findByIdAndUpdate(usuarioId, { $pull: { assets_subidos: id } });
+
+    res.json({ mensaje: "Asset eliminado correctamente" });
+  } catch (error) {
+    console.error("❌ Error al eliminar asset:", error);
+    res.status(500).json({ mensaje: "Error al eliminar el asset" });
+  }
+};
+
 
 module.exports = {
   crearAsset,
@@ -350,5 +372,6 @@ module.exports = {
   descargarAsset,
   obtenerAssetsRecientes,
   obtenerAssetsPopulares,
-  obtenerEtiquetasUnicas
+  obtenerEtiquetasUnicas,
+  eliminarAsset
 };
