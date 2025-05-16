@@ -1,192 +1,201 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaEdit } from 'react-icons/fa';
+import axios from 'axios';
 import '../styles/editarAsset.css';
+import { FaEdit } from 'react-icons/fa';
+import { unzipSync } from "fflate";
 
 const EditarAsset = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    nombre: '',
+    titulo: '',
     descripcion: '',
     categoria: '',
-    licencia: '',
-    precio: '0',
-    archivos: null,
-    imagenes: null
+    etiquetas: '',
+    es_sensible: false,
   });
 
-  useEffect(() => {
-    // Simulación de carga de datos del asset
-    const assetEjemplo = {
-      id: 1,
-      nombre: "Modelo 3D - Guerrero Medieval",
-      descripcion: "Modelo 3D detallado de un guerrero medieval con armadura completa, ideal para juegos de rol y fantasía.",
-      categoria: "Modelos 3D",
-      licencia: "Estándar",
-      precio: "15",
-      imagen: "/assets/warrior.webp"
-    };
+  const [imagenPrincipal, setImagenPrincipal] = useState(null);
+  const [imagenesPrevias, setImagenesPrevias] = useState([]);
+  const [archivosAsset, setArchivosAsset] = useState([]);
+  const [archivosActuales, setArchivosActuales] = useState([]);
 
-    setFormData({
-      ...assetEjemplo,
-      archivos: null,
-      imagenes: null
-    });
+  useEffect(() => {
+    const fetchAsset = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const res = await axios.get(`http://localhost:5000/api/asset/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const asset = res.data;
+
+        setFormData({
+          titulo: asset.titulo || '',
+          descripcion: asset.descripcion || '',
+          categoria: asset.categoria || '',
+          etiquetas: asset.etiquetas?.join(', ') || '',
+          es_sensible: asset.es_sensible || false,
+        });
+
+        setArchivosActuales(asset.archivos || []);
+      } catch (error) {
+        console.error("Error al obtener asset:", error);
+        alert("No se pudo cargar el asset.");
+      }
+    };
+    fetchAsset();
   }, [id]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files
-    }));
+  const handleAssetFiles = async (e) => {
+    const files = [...e.target.files];
+    const extracted = [];
+
+    for (const file of files) {
+      if (file.name.endsWith(".zip")) {
+        const arrayBuffer = await file.arrayBuffer();
+        const zipContents = unzipSync(new Uint8Array(arrayBuffer));
+
+        for (const [filename, data] of Object.entries(zipContents)) {
+          if (!filename.endsWith("/")) {
+            const blob = new Blob([data], { type: "application/octet-stream" });
+            const fileFromZip = new File([blob], filename);
+            extracted.push(fileFromZip);
+          }
+        }
+      } else {
+        extracted.push(file);
+      }
+    }
+
+    setArchivosAsset(extracted);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para actualizar el asset
-    console.log('Asset actualizado:', formData);
-    navigate('/perfil/assets-subidos');
+    const data = new FormData();
+    data.append("titulo", formData.titulo);
+    data.append("descripcion", formData.descripcion);
+    data.append("categoria", formData.categoria);
+    data.append("es_sensible", formData.es_sensible);
+    formData.etiquetas.split(",").map((t) => t.trim()).forEach((t) => data.append("etiquetas", t));
+    if (imagenPrincipal) data.append("imagen_principal", imagenPrincipal);
+    imagenesPrevias.forEach((f) => data.append("imagenes_previas", f));
+    archivosAsset.forEach((f) => data.append("archivo_asset", f));
+
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.put(`http://localhost:5000/api/asset/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("✅ Asset actualizado correctamente");
+      navigate('/perfil/assets-subidos');
+    } catch (error) {
+      console.error("❌ Error al actualizar asset:", error);
+      alert("No se pudo actualizar el asset");
+    }
   };
+
+  const handleEliminarArchivo = async (nombre) => {
+  const confirmado = window.confirm(`¿Eliminar el archivo "${nombre}"?`);
+  if (!confirmado) return;
+
+  try {
+    const token = localStorage.getItem("authToken");
+    await axios.delete(`http://localhost:5000/api/asset/${id}/archivo`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { nombre }
+    });
+
+    setArchivosActuales(prev => prev.filter(a => a.nombre !== nombre));
+  } catch (err) {
+    console.error("Error al eliminar archivo:", err);
+    alert("No se pudo eliminar el archivo.");
+  }
+};
+
 
   return (
-    <div className="editar-asset-container">
-      <div className="editar-asset-header">
-        <h1><FaEdit /> Editar Asset</h1>
+    <div className="subir-asset-container">
+      <div className="subir-asset-header">
+        <h2 className="subir-asset-title"><FaEdit /> Editar Asset</h2>
       </div>
 
-      <form className="editar-asset-form" onSubmit={handleSubmit}>
-        <div className="form-preview">
-          <img src={formData.imagen} alt="Preview" className="asset-preview" />
+      <form className="subir-asset-form" onSubmit={handleSubmit} encType="multipart/form-data">
+        <div className="subir-columna">
+          <label>Imagen Principal *</label>
+          <input type="file" accept="image/*" onChange={(e) => setImagenPrincipal(e.target.files[0])} />
+
+          <label>Imágenes Previas</label>
+          <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
+
+          <label>Archivos del Asset (ZIP o múltiples archivos)</label>
+          <input type="file" accept=".zip,application/zip,*" multiple onChange={handleAssetFiles} />
+
+          {archivosActuales.length > 0 && (
+            <div className="archivos-actuales">
+              <p>Archivos actuales:</p>
+              <ul>
+                {archivosActuales.map((a, i) => (
+                  <li key={i}>
+                    <a href={a.url} target="_blank" rel="noreferrer">{a.nombre}</a>
+                    <button
+                      type="button"
+                      className="eliminar-archivo"
+                      onClick={() => handleEliminarArchivo(a.nombre)}
+                    >
+                      ❌
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <label>Etiquetas</label>
+          <input type="text" name="etiquetas" value={formData.etiquetas} onChange={handleChange} placeholder="Naturaleza, Audio, Ambiente..." />
+
+          <label className="checkbox-label">
+            <input type="checkbox" name="es_sensible" checked={formData.es_sensible} onChange={handleChange} />
+            Contenido sensible
+          </label>
         </div>
 
-        <div className="form-section">
-          <h2>Información Básica</h2>
-          
-          <div className="form-group">
-            <label htmlFor="nombre">Nombre del Asset:</label>
-            <input
-              type="text"
-              id="nombre"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+        <div className="subir-columna">
+          <label>Título *</label>
+          <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required />
 
-          <div className="form-group">
-            <label htmlFor="descripcion">Descripción:</label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
+          <label>Descripción *</label>
+          <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required />
 
-          <div className="form-group">
-            <label htmlFor="categoria">Categoría:</label>
-            <select
-              id="categoria"
-              name="categoria"
-              value={formData.categoria}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Selecciona una categoría</option>
-              <option value="Modelos 3D">Modelos 3D</option>
-              <option value="Texturas">Texturas</option>
-              <option value="Audio">Audio</option>
-              <option value="Scripts">Scripts</option>
-            </select>
-          </div>
-        </div>
+          <label>Categoría *</label>
+          <select name="categoria" value={formData.categoria} onChange={handleChange} required>
+            <option value="">Seleccione una categoría</option>
+            <option value="Modelos 3D">Modelos 3D</option>
+            <option value="Gráficos 2D">Gráficos 2D</option>
+            <option value="Audio">Audio</option>
+            <option value="Scripts">Scripts</option>
+            <option value="Efectos 3D">Efectos 3D</option>
+            <option value="Materiales">Materiales</option>
+            <option value="IA">IA</option>
+            <option value="Paquetes">Paquetes</option>
+          </select>
 
-        <div className="form-section">
-          <h2>Archivos y Recursos</h2>
-          
-          <div className="form-group">
-            <label htmlFor="archivos">Actualizar Archivos:</label>
-            <input
-              type="file"
-              id="archivos"
-              name="archivos"
-              onChange={handleFileChange}
-              multiple
-            />
-            <small>Archivos actuales: asset_v1.blend, texturas.zip</small>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="imagenes">Actualizar Imágenes:</label>
-            <input
-              type="file"
-              id="imagenes"
-              name="imagenes"
-              onChange={handleFileChange}
-              accept="image/*"
-              multiple
-            />
-            <small>Imágenes actuales: preview.jpg, detail1.jpg, detail2.jpg</small>
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2>Licencia y Precio</h2>
-          
-          <div className="form-group">
-            <label htmlFor="licencia">Tipo de Licencia:</label>
-            <select
-              id="licencia"
-              name="licencia"
-              value={formData.licencia}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Selecciona una licencia</option>
-              <option value="Estándar">Estándar</option>
-              <option value="Premium">Premium</option>
-              <option value="Extendida">Extendida</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="precio">Precio (€):</label>
-            <input
-              type="number"
-              id="precio"
-              name="precio"
-              value={formData.precio}
-              onChange={handleInputChange}
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-actions">
-          <button type="button" className="btn-cancelar" onClick={() => navigate('/perfil/assets-subidos')}>
-            Cancelar
-          </button>
-          <button type="submit" className="btn-guardar">
-            Guardar Cambios
-          </button>
+          <button className="subir-asset-boton" type="submit">Guardar Cambios</button>
+          <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>
     </div>
   );
 };
 
-export default EditarAsset; 
+export default EditarAsset;

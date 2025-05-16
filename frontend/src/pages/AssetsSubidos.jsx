@@ -37,6 +37,10 @@ const AssetsSubidos = () => {
     navigate(`/asset/${id}`);
   };
 
+  const handleEditarAsset = (id) => {
+    navigate(`/asset/${id}/editar`);
+  };
+
   const dropboxToRaw = (url) => {
     if (!url) return "https://via.placeholder.com/300x200";
     return url.includes("dropbox.com")
@@ -64,7 +68,6 @@ const AssetsSubidos = () => {
     alert("No se pudo eliminar el asset.");
   }
 };
-
 
   const normalizarFotoPerfil = (url) => {
     if (!url) return defaultFoto;
@@ -118,7 +121,7 @@ const AssetsSubidos = () => {
                   onClick={() => handleVerAsset(asset._id)}
                 />
                 <div className="asset-actions">
-                  <button className="action-button edit">
+                  <button className="action-button edit" onClick={() => handleEditarAsset(asset._id)}>
                     <FaEdit />
                   </button>
                     <button className="action-button delete" onClick={() => handleEliminarAsset(asset._id)}>

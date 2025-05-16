@@ -364,6 +364,110 @@ const eliminarAsset = async (req, res) => {
   }
 };
 
+const actualizarAsset = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioId = req.usuarioId;
+
+    const asset = await Asset.findById(id);
+    if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
+
+    if (asset.autor.toString() !== usuarioId) {
+      return res.status(403).json({ mensaje: "No autorizado para modificar este asset" });
+    }
+
+    const {
+      titulo,
+      descripcion,
+      categoria,
+      licencia,
+      precio,
+      etiquetas,
+      es_sensible
+    } = req.body;
+
+    if (titulo) asset.titulo = titulo;
+    if (descripcion) asset.descripcion = descripcion;
+    if (categoria) asset.categoria = categoria;
+    if (licencia) asset.licencia = licencia;
+    if (precio !== undefined) asset.precio = parseFloat(precio);
+    if (es_sensible !== undefined) asset.es_sensible = es_sensible === 'true' || es_sensible === true;
+
+    if (etiquetas) {
+      if (Array.isArray(etiquetas)) {
+        asset.etiquetas = etiquetas.map(e => e.trim());
+      } else if (typeof etiquetas === 'string') {
+        asset.etiquetas = etiquetas.split(',').map(e => e.trim());
+      }
+    }
+
+    // ✅ Archivos
+    const nuevosArchivos = [];
+
+    const subir = async (tipoCampo, tipoNombre) => {
+      const files = req.files?.[tipoCampo] || [];
+      for (let i = 0; i < files.length; i++) {
+        const ext = files[i].originalname.split('.').pop();
+        const nombre = `${asset._id}_${tipoCampo}_${i + 1}.${ext}`;
+        const url = await subirArchivo(nombre, files[i].buffer);
+        nuevosArchivos.push({ tipo: tipoNombre, nombre, url });
+      }
+    };
+
+    await subir("imagen_principal", "principal");
+    await subir("imagenes_previas", "previa");
+    await subir("archivo_asset", "asset");
+
+    if (nuevosArchivos.length > 0) {
+      const tiposNuevos = nuevosArchivos.map(a => a.tipo);
+
+      asset.archivos = asset.archivos.filter(a => !tiposNuevos.includes(a.tipo));
+
+      asset.archivos.push(...nuevosArchivos);
+    }
+
+
+    await asset.save();
+
+    res.json({ mensaje: "Asset actualizado correctamente", asset });
+  } catch (error) {
+    console.error("❌ Error al actualizar asset:", error);
+    res.status(500).json({ mensaje: "Error al actualizar asset" });
+  }
+};
+
+const eliminarArchivoDeAsset = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre } = req.query;
+    const usuarioId = req.usuarioId;
+
+    if (!nombre) {
+      return res.status(400).json({ mensaje: "Debe proporcionar el nombre del archivo" });
+    }
+
+    const asset = await Asset.findById(id);
+    if (!asset) return res.status(404).json({ mensaje: "Asset no encontrado" });
+
+    if (asset.autor.toString() !== usuarioId) {
+      return res.status(403).json({ mensaje: "No autorizado para modificar este asset" });
+    }
+
+    const archivosAntes = asset.archivos.length;
+    asset.archivos = asset.archivos.filter(a => a.nombre !== nombre);
+
+    if (asset.archivos.length === archivosAntes) {
+      return res.status(404).json({ mensaje: "Archivo no encontrado en el asset" });
+    }
+
+    await asset.save();
+    res.json({ mensaje: "Archivo eliminado correctamente", archivos: asset.archivos });
+  } catch (error) {
+    console.error("❌ Error al eliminar archivo:", error);
+    res.status(500).json({ mensaje: "Error al eliminar archivo del asset" });
+  }
+};
+
 
 module.exports = {
   crearAsset,
@@ -373,5 +477,7 @@ module.exports = {
   obtenerAssetsRecientes,
   obtenerAssetsPopulares,
   obtenerEtiquetasUnicas,
-  eliminarAsset
+  eliminarAsset,
+  actualizarAsset,
+  eliminarArchivoDeAsset
 };
