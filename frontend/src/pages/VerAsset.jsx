@@ -6,6 +6,8 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import '../styles/verAsset.css';
 
+
+
 const VerAsset = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,8 +16,32 @@ const VerAsset = () => {
   const [comentarios, setComentarios] = useState([]);
   const [usuarioActual, setUsuarioActual] = useState(null);
   const [nuevoComentario, setNuevoComentario] = useState("");
+  const [esFavorito, setEsFavorito] = useState(false);
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
+const handleFavorito = async () => {
+  try {
+    const metodo = esFavorito ? "DELETE" : "POST";
+    const res = await fetch(`http://localhost:5000/api/usuario/favoritos/${id}`, {
+      method: metodo,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.mensaje || "Error al actualizar favoritos");
+    }
+
+    setEsFavorito(!esFavorito);
+    alert(esFavorito ? "❌ Asset eliminado de favoritos" : "✅ Asset añadido a favoritos");
+  } catch (error) {
+    console.error("❌ Error al actualizar favoritos:", error);
+    alert(error.message);
+  }
+};
 
   useEffect(() => {
     const fetchAsset = async () => {
@@ -54,20 +80,25 @@ const VerAsset = () => {
     };
 
     const fetchUsuario = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/usuario/perfil`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUsuarioActual(data);
-        }
-      } catch (error) {
-        console.error("❌ Error al cargar perfil de usuario:", error);
+  try {
+    const res = await fetch(`http://localhost:5000/api/usuario/perfil`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setUsuarioActual(data);
+
+      // ✅ Mueve esta comprobación aquí
+      if (data.assets_favoritos?.includes(id)) {
+        setEsFavorito(true);
       }
-    };
+    }
+  } catch (error) {
+    console.error("❌ Error al cargar perfil de usuario:", error);
+  }
+};
 
     fetchAsset();
     fetchComentarios();
@@ -238,11 +269,8 @@ const VerAsset = () => {
             <button className="btn-download" onClick={handleDescargar}>
               <FaDownload /> Descargar
             </button>
-            <button className="btn-favorite">
-              <FaHeart /> Favorito
-            </button>
-            <button className="btn-share">
-              <FaShare /> Compartir
+            <button className="btn-favorite" onClick={handleFavorito}>
+              <FaHeart /> {esFavorito ? "Quitar Favorito" : "Favorito"}
             </button>
           </div>
         </div>
@@ -271,7 +299,7 @@ const VerAsset = () => {
             </div>
           </div>
         )}
-
+ 
         {/* Lista de comentarios */}
         {comentarios.length === 0 ? (
           <p>No hay comentarios aún.</p>

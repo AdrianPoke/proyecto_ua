@@ -107,7 +107,7 @@ const obtenerAssetsSubidos = async (req, res) => {
     console.error("❌ Error al obtener los assets subidos:", error);
     res.status(500).json({ mensaje: "Error al obtener los assets subidos" });
   }
-};
+}; 
 
 const añadirAFavoritos = async (req, res) => {
   try {
@@ -152,6 +152,29 @@ const obtenerFavoritos = async (req, res) => {
   }
 };
 
+const quitarDeFavoritos = async (req, res) => {
+  try {
+    const usuarioId = req.usuarioId;
+    const { assetId } = req.params;
+
+    const usuario = await User.findById(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    // Eliminar el asset si está en favoritos
+    usuario.assets_favoritos = usuario.assets_favoritos.filter(
+      (id) => id.toString() !== assetId
+    );
+
+    await usuario.save();
+
+    res.status(200).json({ mensaje: "Asset eliminado de favoritos" });
+  } catch (error) {
+    console.error("❌ Error al quitar de favoritos:", error);
+    res.status(500).json({ mensaje: "Error al quitar el asset de favoritos" });
+  }
+};
 
 
-module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos, obtenerPerfil, añadirAFavoritos, obtenerFavoritos };
+module.exports = { obtenerUsuarios, obtenerAssetsDescargados, actualizarPerfil, obtenerAssetsSubidos, obtenerPerfil, añadirAFavoritos, obtenerFavoritos,  quitarDeFavoritos  };
