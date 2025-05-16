@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/datos.css";
 import defaultFoto from "../icons/default.jpg";
+import x from "../icons/x.png";
+import ig from "../icons/instagram.png";
+import linkedin from "../icons/linkedin.webp";
+const normalizarFoto = (url) => {
+  if (!url) return defaultFoto;
+  return url.includes("dropbox.com")
+    ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
+    : url;
+};
 
 function Datos() {
   const [usuario, setUsuario] = useState(null);
@@ -92,21 +101,25 @@ function Datos() {
   return (
     <div className="perfil-container">
       <aside className="perfil-sidebar">
-        <img src={fotoPerfil} alt="Perfil" className="perfil-foto" />
-        <h3 className="perfil-nombre">{usuario.nombre}</h3>
-        <p className="perfil-email">{usuario.email}</p>
+        <div className="perfil-info">
+<img src={normalizarFoto(usuario.foto_perfil)} alt="Perfil" className="perfil-foto" />
 
-        <div className="perfil-redes">
-          <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-x-twitter"></i>
-          </a>
-          <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-instagram"></i>
-          </a>
-          <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-        </div>
+  <h3 className="perfil-nombre">{usuario.nombre}</h3>
+  <p className="perfil-email">{usuario.email}</p>
+
+  <div className="perfil-redes">
+    <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
+      <img src={x} alt="Twitter" className="social-icon" />
+    </a>
+    <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
+      <img src={ig} alt="Instagram" className="social-icon" />
+    </a>
+    <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+      <img src={linkedin} alt="LinkedIn" className="social-icon" />
+    </a>
+  </div>
+</div>
+
 
         <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰ Opciones
@@ -117,7 +130,6 @@ function Datos() {
           <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
           <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
           <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
-          <button onClick={() => navigate("/perfil/configuracion")}>⚙️ Configuración</button>
           <button onClick={() => { localStorage.removeItem("authToken"); navigate("/login"); }}>
             🚪 Cerrar Sesión
           </button>

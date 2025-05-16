@@ -1,5 +1,6 @@
 @import url('./variables.css');
 
+/* Estilo base */
 .perfil-sidebar {
   width: 250px;
   background-color: var(--color-menu);
@@ -73,12 +74,33 @@
   gap: 8px;
 }
 
+.social-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+
 .perfil-menu button:hover {
   background-color: var(--color-principal);
   color: white;
 }
 
-/* Media Queries */
+/* Botón hamburguesa (oculto por defecto) */
+.perfil-hamburguesa {
+  display: none;
+  width: 100%;
+  margin-bottom: 15px;
+  background-color: var(--color-principal);
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Media Query para tablets (<=1024px) */
 @media screen and (max-width: 1024px) {
   .perfil-sidebar {
     width: 220px;
@@ -91,57 +113,41 @@
   }
 }
 
+/* Media Query para móviles (<=768px) */
 @media screen and (max-width: 768px) {
+  .perfil-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .perfil-sidebar {
     width: 100%;
     margin-right: 0;
     margin-bottom: 30px;
+    padding: 15px;
   }
-} 
 
+  .perfil-hamburguesa {
+    display: block;
+  }
 
-/* Botón hamburguesa solo en móvil */
-.perfil-hamburguesa {
-display: none;
-width: 100%;
-margin-bottom: 15px;
-background-color: var(--color-principal);
-color: white;
-border: none;
-padding: 10px;
-font-size: 16px;
-border-radius: 5px;
-cursor: pointer;
-}
+  .perfil-menu {
+    display: none;
+  }
 
-/* Responsive: hamburguesa y menú plegable */
-@media screen and (max-width: 768px) {
-.perfil-sidebar {
-  width: 100%;
-  margin-right: 0;
-  padding: 10px;
-}
-
-.perfil-hamburguesa {
-  display: block;
-}
-
-.perfil-menu {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.perfil-menu.activo {
+  .perfil-menu.activo {
+    display: flex;
+  }
+.perfil-info {
   display: flex;
-}
-
-.perfil-container {
   flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
-.perfil-contenido {
-  padding-top: 20px;
-}
+  .perfil-contenido {
+    padding-top: 20px;
+  }
 }
