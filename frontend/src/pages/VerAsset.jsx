@@ -12,6 +12,8 @@ const VerAsset = () => {
   const [asset, setAsset] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comentarios, setComentarios] = useState([]);
+  const [usuarioActual, setUsuarioActual] = useState(null);
+  const [nuevoComentario, setNuevoComentario] = useState("");
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
@@ -34,25 +36,42 @@ const VerAsset = () => {
     };
 
     const fetchComentarios = async () => {
-  try {
-    const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      try {
+        const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setComentarios(data);
+        } else {
+          setComentarios([]);
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar comentarios:", error);
       }
-    });
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      setComentarios(data);
-    } else {
-      setComentarios([]);
-    }
-  } catch (error) {
-    console.error("❌ Error al cargar comentarios:", error);
-  }
-};
+    };
+
+    const fetchUsuario = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/usuario/perfil`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUsuarioActual(data);
+        }
+      } catch (error) {
+        console.error("❌ Error al cargar perfil de usuario:", error);
+      }
+    };
 
     fetchAsset();
     fetchComentarios();
+    fetchUsuario();
   }, [id]);
 
   const handleDescargar = async () => {
@@ -82,6 +101,30 @@ const VerAsset = () => {
     } catch (error) {
       console.error("❌ Error en la descarga:", error);
       alert("Hubo un error al intentar descargar el asset.");
+    }
+  };
+
+  const handleComentar = async () => {
+    if (!nuevoComentario.trim()) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({ contenido: nuevoComentario }),
+      });
+
+      if (!res.ok) throw new Error("No se pudo enviar el comentario");
+
+      const data = await res.json();
+      setComentarios((prev) => [data.comentario, ...prev]);
+      setNuevoComentario("");
+    } catch (error) {
+      console.error("❌ Error al enviar comentario:", error);
+      alert("Error al publicar el comentario.");
     }
   };
 
@@ -205,9 +248,31 @@ const VerAsset = () => {
         </div>
       </div>
 
-      {/* Contenedor de Comentarios */}
+      {/* Comentarios */}
       <div className="comentarios-container">
         <h2>Comentarios</h2>
+
+        {/* Caja de nuevo comentario */}
+        {usuarioActual && (
+          <div className="nueva-caja-comentario">
+            <img
+              src={dropboxToRaw(usuarioActual.foto_perfil)}
+              alt="usuario"
+              className="comentario-avatar"
+            />
+            <div className="caja-comentario-input">
+              <textarea
+                rows="3"
+                placeholder="Escribe un comentario..."
+                value={nuevoComentario}
+                onChange={(e) => setNuevoComentario(e.target.value)}
+              />
+              <button onClick={handleComentar}>Comentar</button>
+            </div>
+          </div>
+        )}
+
+        {/* Lista de comentarios */}
         {comentarios.length === 0 ? (
           <p>No hay comentarios aún.</p>
         ) : (
