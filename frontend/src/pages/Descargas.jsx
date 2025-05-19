@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaDownload } from 'react-icons/fa';
 import SidebarPerfil from '../Components/SidebarPerfil';
+import AssetCard from '../Components/AssetCard';
 import axios from 'axios';
 import defaultFoto from '../icons/default.jpg';
 import '../styles/descargas.css';
+import '../styles/assetCard.css';
 
 const Descargas = () => {
   const [usuario, setUsuario] = useState(null);
@@ -51,16 +53,11 @@ const Descargas = () => {
       : url;
   };
 
-  const obtenerUrlPrincipal = (archivos) => {
-    const archivoPrincipal = archivos?.find(a => a.tipo === 'principal');
-    return archivoPrincipal ? dropboxToRaw(archivoPrincipal.url) : "https://via.placeholder.com/300x200";
-  };
+  const usuarioConFoto = { ...usuario, foto_perfil: normalizarFotoPerfil(usuario?.foto_perfil) };
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
-
-  const usuarioConFoto = { ...usuario, foto_perfil: normalizarFotoPerfil(usuario.foto_perfil) };
 
   return (
     <div className="perfil-container">
@@ -85,21 +82,23 @@ const Descargas = () => {
           </div>
         </div>
 
-        <div className="assets-grid">
-          {descargas.map((asset) => (
-            <div key={asset._id} className="asset-card" onClick={() => handleVerAsset(asset._id)}>
-              <img
-                src={obtenerUrlPrincipal(asset.archivos)}
-                alt={asset.titulo}
-                className="asset-image"
+        <div className="descargas-grid">
+          {descargas.map((asset) => {
+            const archivoPrincipal = asset.archivos?.find(a => a.tipo === 'principal');
+            const imagenPrincipal = archivoPrincipal ? dropboxToRaw(archivoPrincipal.url) : '';
+
+            return (
+              <AssetCard
+                key={asset._id}
+                asset={{ ...asset, imagenPrincipal }}
+                onClick={() => handleVerAsset(asset._id)}
+                mostrarDescargas={false}
               />
-              <div className="asset-title">{asset.titulo}</div>
-              <div className="asset-subtext">
-                {asset.categoria} {asset.formatos_disponibles?.[0] && `(${asset.formatos_disponibles[0]})`}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+
+
       </div>
     </div>
   );

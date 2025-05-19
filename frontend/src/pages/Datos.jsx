@@ -128,7 +128,7 @@ function Datos() {
         <nav className={`perfil-menu ${menuAbierto ? "activo" : ""}`}>
           <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
           <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
-          <button onClick={() => navigate("/perfil/subidos")}>📤 Assets Subidos</button>
+          <button onClick={() => navigate("/perfil/assets-subidos")}>📤 Assets Subidos</button>
           <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
           <button onClick={() => { localStorage.removeItem("authToken"); navigate("/login"); }}>
             🚪 Cerrar Sesión
