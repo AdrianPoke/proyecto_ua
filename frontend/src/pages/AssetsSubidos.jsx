@@ -5,6 +5,7 @@ import SidebarPerfil from '../Components/SidebarPerfil';
 import axios from 'axios';
 import defaultFoto from '../icons/default.jpg';
 import '../styles/descargas.css';
+import '../styles/assetCard.css';
 
 const AssetsSubidos = () => {
   const [usuario, setUsuario] = useState(null);
@@ -41,33 +42,29 @@ const AssetsSubidos = () => {
     navigate(`/asset/${id}/editar`);
   };
 
+  const handleEliminarAsset = async (id) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const confirmado = window.confirm("¿Seguro que quieres eliminar este asset?");
+      if (!confirmado) return;
+
+      await axios.delete(`http://localhost:5000/api/asset/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setSubidos(prev => prev.filter(asset => asset._id !== id));
+    } catch (err) {
+      console.error("Error al eliminar asset:", err);
+      alert("No se pudo eliminar el asset.");
+    }
+  };
+
   const dropboxToRaw = (url) => {
     if (!url) return "https://via.placeholder.com/300x200";
     return url.includes("dropbox.com")
       ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
       : url;
   };
-
-  const handleEliminarAsset = async (id) => {
-  try {
-    const token = localStorage.getItem("authToken");
-    const confirmado = window.confirm("¿Seguro que quieres eliminar este asset?");
-
-    if (!confirmado) return;
-
-    await axios.delete(`http://localhost:5000/api/asset/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    // Elimina el asset de la lista en frontend
-    setSubidos(prev => prev.filter(asset => asset._id !== id));
-  } catch (err) {
-    console.error("Error al eliminar asset:", err);
-    alert("No se pudo eliminar el asset.");
-  }
-};
 
   const normalizarFotoPerfil = (url) => {
     if (!url) return defaultFoto;
@@ -110,27 +107,27 @@ const AssetsSubidos = () => {
           </div>
         </div>
 
-        <div className="assets-grid">
+        <div className="descargas-grid">
           {subidos.map((asset) => (
             <div key={asset._id} className="asset-card">
-              <div className="asset-imagen-container">
+              <div className="asset-image-wrapper">
                 <img
                   src={obtenerUrlPrincipal(asset.archivos)}
                   alt={asset.titulo}
                   className="asset-image"
                   onClick={() => handleVerAsset(asset._id)}
                 />
-                <div className="asset-actions">
+                <div className="asset-descargas asset-actions">
                   <button className="action-button edit" onClick={() => handleEditarAsset(asset._id)}>
                     <FaEdit />
                   </button>
-                    <button className="action-button delete" onClick={() => handleEliminarAsset(asset._id)}>
-                  <FaTrash />
-                </button>
+                  <button className="action-button delete" onClick={() => handleEliminarAsset(asset._id)}>
+                    <FaTrash />
+                  </button>
                 </div>
               </div>
               <div className="asset-title">{asset.titulo}</div>
-              <div className="asset-subtext">
+              <div className="asset-formats">
                 {asset.categoria} {asset.formatos_disponibles?.[0] && `(${asset.formatos_disponibles[0]})`}
               </div>
             </div>
