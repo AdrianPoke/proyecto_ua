@@ -67,6 +67,11 @@ function Datos() {
   };
 
   const handleSubmit = async (e) => {
+    if (formData.contraseña && formData.contraseña.length < 10) {
+      alert("La nueva contraseña debe tener al menos 10 caracteres.");
+      return;
+    }
+
     e.preventDefault();
     try {
       const token = localStorage.getItem("authToken");
@@ -147,13 +152,32 @@ function Datos() {
             <input type="file" accept="image/*" onChange={handleFileChange} />
 
             <label>X / Twitter:</label>
-            <input type="url" name="enlace_twitter" value={formData.enlace_twitter} onChange={handleChange} />
+            <input
+              type="url"
+              name="enlace_twitter"
+              value={formData.enlace_twitter}
+              onChange={handleChange}
+              placeholder="https://twitter.com/tu_usuario"
+            />
 
             <label>Instagram:</label>
-            <input type="url" name="enlace_instagram" value={formData.enlace_instagram} onChange={handleChange} />
+            <input
+              type="url"
+              name="enlace_instagram"
+              value={formData.enlace_instagram}
+              onChange={handleChange}
+              placeholder="https://instagram.com/tu_usuario"
+            />
 
             <label>LinkedIn:</label>
-            <input type="url" name="enlace_linkedin" value={formData.enlace_linkedin} onChange={handleChange} />
+            <input
+              type="url"
+              name="enlace_linkedin"
+              value={formData.enlace_linkedin}
+              onChange={handleChange}
+              placeholder="https://linkedin.com/in/tu_usuario"
+            />
+
           </div>
 
           <div className="subir-columna">

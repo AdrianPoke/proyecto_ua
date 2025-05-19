@@ -12,40 +12,46 @@ function Registro() {
   const navigate = useNavigate();
 
   const handleRegistro = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!nombre || !email || !contraseña || !repetirContraseña) {
-      alert("Por favor, completa todos los campos.");
-      return;
+  if (!nombre || !email || !contraseña || !repetirContraseña) {
+    alert("Por favor, completa todos los campos.");
+    return;
+  }
+
+  if (contraseña.length < 10) {
+    alert("La contraseña debe tener al menos 10 caracteres.");
+    return;
+  }
+
+  if (contraseña !== repetirContraseña) {
+    alert("Las contraseñas no coinciden.");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/api/registro", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nombre, email, contraseña }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Registro exitoso. Inicia sesión.");
+      navigate("/login");
+    } else {
+      alert(data.mensaje || "Error al registrarse.");
     }
+  } catch (error) {
+    console.error("Error al registrar:", error);
+    alert("Error del servidor.");
+  }
+};
 
-    if (contraseña !== repetirContraseña) {
-      alert("Las contraseñas no coinciden.");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:5000/api/registro", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nombre, email, contraseña }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Registro exitoso. Inicia sesión.");
-        navigate("/login");
-      } else {
-        alert(data.mensaje || "Error al registrarse.");
-      }
-    } catch (error) {
-      console.error("Error al registrar:", error);
-      alert("Error del servidor.");
-    }
-  };
 
   return (
     <div className="login-page">
