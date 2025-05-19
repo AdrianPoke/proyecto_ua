@@ -1,0 +1,61 @@
+.asset-card {
+  background-color: var(--color-menu);
+  border: 1px solid var(--color-principal);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(62, 230, 118, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 300px;
+}
+
+.asset-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(62, 230, 118, 0.4);
+}
+
+.asset-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: #111;
+}
+
+.asset-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.asset-descargas {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--color-principal);
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.asset-title {
+  text-align: center;
+  font-size: 14px;
+  padding: 8px;
+  background-color: #000;
+  color: var(--color-texto);
+}
+
+.asset-formats {
+  font-size: 12px;
+  text-align: center;
+  color: var(--color-principal);
+  background-color: #0f0f0f;
+  padding: 4px 8px;
+  margin: 4px 8px 8px 8px;
+  border-radius: 3px;
+}

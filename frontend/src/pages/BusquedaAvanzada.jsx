@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Select from "react-select";
+import AssetCard from "../Components/AssetCard";
 import "../styles/busquedaAvanzada.css";
 
 function BusquedaAvanzada() {
@@ -21,19 +22,16 @@ function BusquedaAvanzada() {
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
-  // Cargar etiquetas disponibles
   useEffect(() => {
     axios.get("http://localhost:5000/api/asset/etiquetas")
       .then(res => setEtiquetasDisponibles(res.data))
       .catch(err => console.error("Error al obtener etiquetas:", err));
   }, []);
 
-  // Buscar assets cuando cambian filtros
   useEffect(() => {
     const fetchAssets = async () => {
       try {
         const params = new URLSearchParams();
-
         if (busqueda) params.append("titulo", busqueda);
         if (categoria) params.append("categoria", categoria);
         if (formato) params.append("formatos", formato);
@@ -49,11 +47,9 @@ function BusquedaAvanzada() {
         console.error("Error al buscar assets:", err);
       }
     };
-
     fetchAssets();
   }, [busqueda, categoria, formato, orden, etiquetasSeleccionadas]);
 
-  // Actualizar formatos disponibles al cambiar de categoría
   useEffect(() => {
     if (!categoria) return setFormatosDisponibles([]);
     axios.get(`http://localhost:5000/api/categoria/${categoria}/formatos`)
@@ -61,7 +57,6 @@ function BusquedaAvanzada() {
       .catch(() => setFormatosDisponibles([]));
   }, [categoria]);
 
-  // Detectar cambios en la URL (por ejemplo, cuando se accede con otro q=)
   useEffect(() => {
     const nuevaBusqueda = new URLSearchParams(location.search).get("q") || "";
     setBusqueda(nuevaBusqueda);
@@ -154,21 +149,9 @@ function BusquedaAvanzada() {
       </button>
 
       <h3 className="resultados-titulo">Resultados ({assetsDB.length})</h3>
-      <div className="resultados-grid">
+      <div className="assets-grid">
         {assetsDB.map((asset) => (
-          <div
-            className="resultado-card"
-            key={asset._id}
-            onClick={() => handleVerAsset(asset._id)}
-          >
-            <div className="resultado-imagen">
-              <img
-                src={dropboxToRaw(asset.imagenPrincipal) || "/assets/default.jpg"}
-                alt={asset.titulo}
-              />
-            </div>
-            <p className="resultado-titulo">{asset.titulo}</p>
-          </div>
+          <AssetCard key={asset._id} asset={asset} onClick={() => handleVerAsset(asset._id)} />
         ))}
       </div>
     </div>

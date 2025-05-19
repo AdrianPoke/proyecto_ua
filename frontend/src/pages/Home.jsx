@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AssetCard from '../Components/AssetCard';
 import '../styles/home.css';
 
 function Home() {
@@ -28,29 +29,25 @@ function Home() {
     navigate(`/asset/${id}`);
   };
 
-  // Función auxiliar para convertir imagen de Dropbox a raw
-  const dropboxToRaw = (url) => {
-    return url?.replace('dl=0', 'raw=1');
-  };
-
   return (
     <div className="home-container">
       <h2 className="home-title">Página Principal</h2>
 
-      <div className="section-title">
-        <span className="clock-icon">🕒</span> Assets Recientes
+      <div className="section-divider">
+        <span>Assets Recientes</span>
       </div>
       <div className="assets-grid">
         {assets.map((asset) => (
-          <div key={asset._id} className="asset-card" onClick={() => handleVerAsset(asset._id)}>
-            <img src={dropboxToRaw(asset.imagenPrincipal)} alt={asset.titulo} className="asset-image" />
-            <div className="asset-title">{asset.titulo}</div>
-          </div>
+          <AssetCard
+            key={asset._id}
+            asset={asset}
+            onClick={() => handleVerAsset(asset._id)}
+          />
         ))}
       </div>
 
-      <div className="section-title" style={{ marginTop: '40px' }}>
-        Assets más descargados ⬇️
+      <div className="section-divider">
+        <span>Assets más descargados</span>
       </div>
       <div className="assets-grid">
         {assets
@@ -58,11 +55,12 @@ function Home() {
           .sort((a, b) => b.numero_descargas - a.numero_descargas)
           .slice(0, 6)
           .map((asset) => (
-            <div key={`desc-${asset._id}`} className="asset-card" onClick={() => handleVerAsset(asset._id)}>
-              <img src={dropboxToRaw(asset.imagenPrincipal)} alt={asset.titulo} className="asset-image" />
-              <div className="asset-title">{asset.titulo}</div>
-              <div className="asset-subtext">{asset.numero_descargas} descargas</div>
-            </div>
+            <AssetCard
+              key={`desc-${asset._id}`}
+              asset={asset}
+              onClick={() => handleVerAsset(asset._id)}
+              mostrarDescargas={true}
+            />
           ))}
       </div>
     </div>
