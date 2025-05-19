@@ -40,11 +40,15 @@ function SubirAssets() {
   };
 
   const handleAssetFiles = async (e) => {
-    const files = [...e.target.files];
-    const extracted = [];
+  const files = [...e.target.files];
+  const extracted = [];
 
-    for (const file of files) {
-      if (file.name.endsWith(".zip")) {
+  // 🔄 Siempre reinicia el estado antes de procesar nuevos archivos
+  setArchivosAsset([]);
+
+  for (const file of files) {
+    if (file.name.endsWith(".zip")) {
+      try {
         const arrayBuffer = await file.arrayBuffer();
         const zipContents = unzipSync(new Uint8Array(arrayBuffer));
 
@@ -60,22 +64,27 @@ function SubirAssets() {
             extracted.push(fileFromZip);
           }
         }
-      } else {
-        const ext = file.name.split(".").pop().toLowerCase();
-        if (!formatosPermitidos.includes(ext)) {
-          console.warn(`⛔ Archivo ignorado por formato no permitido: .${ext}`);
-          continue;
-        }
-        extracted.push(file);
+      } catch (err) {
+        console.error("❌ Error al descomprimir el ZIP:", err);
+        alert("Error al descomprimir el archivo ZIP. Asegúrate de que esté bien formado.");
       }
+    } else {
+      const ext = file.name.split(".").pop().toLowerCase();
+      if (!formatosPermitidos.includes(ext)) {
+        console.warn(`⛔ Archivo ignorado por formato no permitido: .${ext}`);
+        continue;
+      }
+      extracted.push(file);
     }
+  }
 
-    if (extracted.length === 0) {
-      alert("❌ Ningún archivo válido fue agregado.");
-    }
+  if (extracted.length === 0) {
+    alert("❌ Ningún archivo válido fue agregado.");
+  } else {
+    setArchivosAsset(extracted); // ✅ Solo si hay archivos válidos
+  }
+};
 
-    setArchivosAsset(extracted);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -136,28 +136,28 @@ const handleFavorito = async () => {
   };
 
   const handleComentar = async () => {
-    if (!nuevoComentario.trim()) return;
+  if (!nuevoComentario.trim()) return;
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({ contenido: nuevoComentario }),
-      });
+  try {
+    const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+      body: JSON.stringify({ contenido: nuevoComentario }),
+    });
 
-      if (!res.ok) throw new Error("No se pudo enviar el comentario");
+    if (!res.ok) throw new Error("No se pudo enviar el comentario");
 
-      const data = await res.json();
-      setComentarios((prev) => [data.comentario, ...prev]);
-      setNuevoComentario("");
-    } catch (error) {
-      console.error("❌ Error al enviar comentario:", error);
-      alert("Error al publicar el comentario.");
-    }
-  };
+    // Refrescar la página por completo
+    window.location.reload();
+  } catch (error) {
+    console.error("❌ Error al enviar comentario:", error);
+    alert("Error al publicar el comentario.");
+  }
+};
+
 
   if (loading) {
     return (

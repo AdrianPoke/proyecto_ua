@@ -6,8 +6,22 @@ import "../styles/assetCard.css";
 function AssetCard({ asset, onClick, mostrarDescargas = false }) {
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <div className="asset-card" onClick={onClick}>
+    <div
+      className="asset-card"
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0} 
+      role="button" 
+      aria-label={`Abrir asset: ${asset.titulo}`}
+    >
       <div className="asset-image-wrapper">
         <img
           src={dropboxToRaw(asset.imagenPrincipal)}

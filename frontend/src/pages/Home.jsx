@@ -45,7 +45,7 @@ function Home() {
           />
         ))}
       </div>
-
+        <br></br><br></br>
       <div className="section-divider">
         <span>Assets más descargados</span>
       </div>
