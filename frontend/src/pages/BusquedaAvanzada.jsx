@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Select from "react-select";
 import "../styles/busquedaAvanzada.css";
 
 function BusquedaAvanzada() {
-  const [busqueda, setBusqueda] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const valorInicialBusqueda = queryParams.get("q") || "";
+
+  const [busqueda, setBusqueda] = useState(valorInicialBusqueda);
   const [categoria, setCategoria] = useState("");
   const [formato, setFormato] = useState("");
   const [orden, setOrden] = useState("recientes");
@@ -14,15 +19,16 @@ function BusquedaAvanzada() {
   const [assetsDB, setAssetsDB] = useState([]);
   const [formatosDisponibles, setFormatosDisponibles] = useState([]);
 
-  const navigate = useNavigate();
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
+  // Cargar etiquetas disponibles
   useEffect(() => {
     axios.get("http://localhost:5000/api/asset/etiquetas")
       .then(res => setEtiquetasDisponibles(res.data))
       .catch(err => console.error("Error al obtener etiquetas:", err));
   }, []);
 
+  // Buscar assets cuando cambian filtros
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -43,15 +49,23 @@ function BusquedaAvanzada() {
         console.error("Error al buscar assets:", err);
       }
     };
+
     fetchAssets();
   }, [busqueda, categoria, formato, orden, etiquetasSeleccionadas]);
 
+  // Actualizar formatos disponibles al cambiar de categoría
   useEffect(() => {
     if (!categoria) return setFormatosDisponibles([]);
     axios.get(`http://localhost:5000/api/categoria/${categoria}/formatos`)
       .then(res => setFormatosDisponibles(res.data.formatos_permitidos || []))
       .catch(() => setFormatosDisponibles([]));
   }, [categoria]);
+
+  // Detectar cambios en la URL (por ejemplo, cuando se accede con otro q=)
+  useEffect(() => {
+    const nuevaBusqueda = new URLSearchParams(location.search).get("q") || "";
+    setBusqueda(nuevaBusqueda);
+  }, [location.search]);
 
   const handleVerAsset = (id) => navigate(`/asset/${id}`);
 

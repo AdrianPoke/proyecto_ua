@@ -10,9 +10,9 @@ function Home() {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/asset/recientes?limite=12', {
+        const res = await axios.get('http://localhost:5000/api/asset/recientes?limite=10', {
           headers: {
-            Authorization: 'Bearer TU_TOKEN_AQUI' // Reemplaza con tu token real
+            Authorization: 'Bearer TU_TOKEN_AQUI'
           }
         });
         setAssets(res.data);

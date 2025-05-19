@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import "../styles/NavBarAuth.css";
 import logo from "../logo.png";
 
 function NavBarDefault() {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const navigate = useNavigate();
 
   // Cerrar menú al hacer scroll
   useEffect(() => {
@@ -13,6 +15,13 @@ function NavBarDefault() {
     window.addEventListener("scroll", cerrar);
     return () => window.removeEventListener("scroll", cerrar);
   }, []);
+
+  const realizarBusqueda = () => {
+    if (busqueda.trim() !== "") {
+      navigate(`/busqueda-avanzada?q=${encodeURIComponent(busqueda.trim())}`);
+      setBusqueda("");
+    }
+  };
 
   return (
     <>
@@ -22,8 +31,16 @@ function NavBarDefault() {
             <img src={logo} alt="Logo" />
           </Link>
           <div className="search-bar">
-            <input type="text" placeholder="Inserte palabras clave ..." />
-            <button className="search-button">
+            <input
+              type="text"
+              placeholder="Inserte palabras clave ..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") realizarBusqueda();
+              }}
+            />
+            <button className="search-button" onClick={realizarBusqueda}>
               <FaSearch />
             </button>
           </div>

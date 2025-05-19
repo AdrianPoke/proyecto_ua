@@ -25,7 +25,7 @@
 .search-bar {
   display: flex;
   align-items: center;
-  background-color: var(--color-fondo);
+  background-color: var(--color-menu);
   padding: 8px;
   margin-left: 35px;
   border-radius: 5px;
@@ -33,7 +33,7 @@
 }
 
 .search-bar input {
-  background: transparent;
+  background-color: var(--color-menu);
   border: none;
   color: var(--color-texto);
   outline: none;
@@ -69,8 +69,8 @@
 }
 
 .profile-icon img {
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   cursor: pointer;
   margin-right: 30px;
@@ -124,10 +124,9 @@
 
 .navbar-right a:hover,
 .sidebar a:hover {
-  background-color: var(--color-principal);
-  color: var(--color-texto);
+
+  color: var(--color-principal);
   border-radius: 4px;
-  padding: 0.25rem 0.5rem;
   transition: background-color 0.2s ease;
 }
 

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaSearch, FaPlusCircle } from "react-icons/fa";
 import "../styles/NavBarAuth.css";
 import logo from "../logo.png";
-import defaultFoto from "../icons/profile.png"; // tu imagen por defecto
+import defaultFoto from "../icons/profile.png";
 import axios from "axios";
 
 function NavBarAuth() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [usuario, setUsuario] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -37,6 +39,13 @@ function NavBarAuth() {
       : url;
   };
 
+  const realizarBusqueda = () => {
+    if (busqueda.trim() !== "") {
+      navigate(`/busqueda-avanzada?q=${encodeURIComponent(busqueda.trim())}`);
+      setBusqueda("");
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -45,8 +54,16 @@ function NavBarAuth() {
             <img src={logo} alt="Logo" />
           </Link>
           <div className="search-bar">
-            <input type="text" placeholder="Inserte palabras clave ..." />
-            <button className="search-button">
+            <input
+              type="text"
+              placeholder="Inserte palabras clave ..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") realizarBusqueda();
+              }}
+            />
+            <button className="search-button" onClick={realizarBusqueda}>
               <FaSearch />
             </button>
           </div>
