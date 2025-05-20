@@ -18,7 +18,7 @@ const AssetsCategoria = () => {
       graficos2d: "GRÁFICOS 2D",
       audio: "AUDIO",
       scripts: "SCRIPTS",
-      ia: "INTELIGENCIA ARTIFICIAL",
+      ia: "IA",
       efectos3d: "EFECTOS 3D",
       materiales: "MATERIALES",
       paquetes: "PAQUETES"
