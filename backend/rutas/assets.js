@@ -40,7 +40,7 @@ router.post(
   upload.fields([
     { name: "imagen_principal", maxCount: 1 },
     { name: "imagenes_previas", maxCount: 5 },
-    { name: "archivo_asset", maxCount: 10 } 
+    { name: "archivo_asset", maxCount: 15 } 
   ]),
   crearAsset
 );

@@ -18,6 +18,8 @@ function SubirAssets() {
   const [imagenesPrevias, setImagenesPrevias] = useState([]);
   const [archivosAsset, setArchivosAsset] = useState([]);
   const [errores, setErrores] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     axios
@@ -50,23 +52,35 @@ function SubirAssets() {
   };
 
   const handleAssetFiles = (e) => {
-    const files = [...e.target.files];
-    const extensionesInvalidas = files.filter((file) => {
-      const ext = file.name.split(".").pop().toLowerCase();
-      return !formatosPermitidos.includes(ext);
-    });
+  const files = [...e.target.files];
+  const maxArchivos = 15;
 
-    if (extensionesInvalidas.length > 0) {
-      setErrores((prev) => ({
-        ...prev,
-        archivosAsset: `Los siguientes archivos tienen formato inválido: ${extensionesInvalidas.map(f => f.name).join(", ")}`
-      }));
-      setArchivosAsset([]);
-    } else {
-      setErrores((prev) => ({ ...prev, archivosAsset: "" }));
-      setArchivosAsset(files);
-    }
-  };
+  if (files.length > maxArchivos) {
+    setErrores((prev) => ({
+      ...prev,
+      archivosAsset: `Solo se permiten hasta ${maxArchivos} archivos.`,
+    }));
+    setArchivosAsset([]);
+    return;
+  }
+
+  const extensionesInvalidas = files.filter((file) => {
+    const ext = file.name.split(".").pop().toLowerCase();
+    return !formatosPermitidos.includes(ext);
+  });
+
+  if (extensionesInvalidas.length > 0) {
+    setErrores((prev) => ({
+      ...prev,
+      archivosAsset: `Los siguientes archivos tienen formato inválido: ${extensionesInvalidas.map(f => f.name).join(", ")}`,
+    }));
+    setArchivosAsset([]);
+  } else {
+    setErrores((prev) => ({ ...prev, archivosAsset: "" }));
+    setArchivosAsset(files);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,18 +104,22 @@ function SubirAssets() {
     archivosAsset.forEach((f) => data.append("archivo_asset", f));
 
     try {
-      const token = localStorage.getItem("authToken");
-      await axios.post("http://localhost:5000/api/asset", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      alert("✅ Asset subido con éxito");
-    } catch (error) {
-      console.error(error);
-      alert("❌ Error al subir el asset");
-    }
+        setIsLoading(true);
+        const token = localStorage.getItem("authToken");
+        await axios.post("http://localhost:5000/api/asset", data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setIsLoading(false);
+        alert("✅ Asset subido con éxito");
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+        alert("❌ Error al subir el asset");
+      }
+
   };
 
   return (
@@ -117,13 +135,48 @@ function SubirAssets() {
             Imagen Principal *
             {errores.imagenPrincipal && <span className="error"> — {errores.imagenPrincipal}</span>}
           </label>
-          <input type="file" accept="image/*" onChange={(e) => setImagenPrincipal(e.target.files[0])} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              setImagenPrincipal(file);
+              if (file) {
+                setErrores((prev) => ({ ...prev, imagenPrincipal: "" }));
+              }
+            }}
+          />
 
-          <label>Imágenes Previas</label>
-          <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
 
           <label>
-            Archivos del Asset (1 o múltiples archivos)
+            Imágenes Previas [máximo: 5]
+            {errores.imagenesPrevias && <span className="error"> — {errores.imagenesPrevias}</span>}
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = [...e.target.files];
+              const maxPrevias = 5;
+
+              if (files.length > maxPrevias) {
+                setErrores((prev) => ({
+                  ...prev,
+                  imagenesPrevias: `Solo se permiten hasta ${maxPrevias} imágenes previas.`,
+                }));
+                setImagenesPrevias([]);
+              } else {
+                setErrores((prev) => ({ ...prev, imagenesPrevias: "" }));
+                setImagenesPrevias(files);
+              }
+            }}
+          />
+
+
+
+          <label>
+            Archivos del Asset * [máximo: 15]
             {errores.archivosAsset && <span className="error"> — {errores.archivosAsset}</span>}
           </label>
           <input
@@ -203,6 +256,12 @@ function SubirAssets() {
           <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>
+      {isLoading && (
+        <div className="overlay-carga">
+          <div className="spinner"></div>
+          <p className="mensaje-carga">Subiendo asset, por favor espera...</p>
+        </div>
+      )}
     </div>
   );
 }
