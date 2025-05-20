@@ -153,3 +153,9 @@ input[type="checkbox"] {
   border-radius: 5px;
   border: 1px solid #b2dfdb;
 }
+
+.error {
+  color: #ff5252;
+  font-size: 0.85em;
+  margin-top: 3px;
+}

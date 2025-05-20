@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/subirAsset.css";
 import logo from "../logo.png";
-import { unzipSync } from "fflate";
 
 function SubirAssets() {
   const [formData, setFormData] = useState({
@@ -18,6 +17,7 @@ function SubirAssets() {
   const [imagenPrincipal, setImagenPrincipal] = useState(null);
   const [imagenesPrevias, setImagenesPrevias] = useState([]);
   const [archivosAsset, setArchivosAsset] = useState([]);
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     axios
@@ -34,83 +34,70 @@ function SubirAssets() {
       .catch(() => setFormatosPermitidos([]));
   }, [formData.categoria]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+  const validarCampo = (name, value) => {
+    let error = "";
+    if (name === "titulo" && !value.trim()) error = "El título es obligatorio.";
+    if (name === "descripcion" && !value.trim()) error = "La descripción es obligatoria.";
+    if (name === "categoria" && !value) error = "Debes seleccionar una categoría.";
+    setErrores((prev) => ({ ...prev, [name]: error }));
   };
 
-  const handleAssetFiles = async (e) => {
-  const files = [...e.target.files];
-  const extracted = [];
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === "checkbox" ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: val }));
+    validarCampo(name, val);
+  };
 
-  // 🔄 Siempre reinicia el estado antes de procesar nuevos archivos
-  setArchivosAsset([]);
-
-  for (const file of files) {
-    if (file.name.endsWith(".zip")) {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const zipContents = unzipSync(new Uint8Array(arrayBuffer));
-
-        for (const [filename, data] of Object.entries(zipContents)) {
-          if (!filename.endsWith("/")) {
-            const ext = filename.split(".").pop().toLowerCase();
-            if (!formatosPermitidos.includes(ext)) {
-              console.warn(`⛔ Archivo ignorado por formato no permitido: .${ext}`);
-              continue;
-            }
-            const blob = new Blob([data], { type: "application/octet-stream" });
-            const fileFromZip = new File([blob], filename);
-            extracted.push(fileFromZip);
-          }
-        }
-      } catch (err) {
-        console.error("❌ Error al descomprimir el ZIP:", err);
-        alert("Error al descomprimir el archivo ZIP. Asegúrate de que esté bien formado.");
-      }
-    } else {
+  const handleAssetFiles = (e) => {
+    const files = [...e.target.files];
+    const extensionesInvalidas = files.filter((file) => {
       const ext = file.name.split(".").pop().toLowerCase();
-      if (!formatosPermitidos.includes(ext)) {
-        console.warn(`⛔ Archivo ignorado por formato no permitido: .${ext}`);
-        continue;
-      }
-      extracted.push(file);
+      return !formatosPermitidos.includes(ext);
+    });
+
+    if (extensionesInvalidas.length > 0) {
+      setErrores((prev) => ({
+        ...prev,
+        archivosAsset: `Los siguientes archivos tienen formato inválido: ${extensionesInvalidas.map(f => f.name).join(", ")}`
+      }));
+      setArchivosAsset([]);
+    } else {
+      setErrores((prev) => ({ ...prev, archivosAsset: "" }));
+      setArchivosAsset(files);
     }
-  }
-
-  if (extracted.length === 0) {
-    alert("❌ Ningún archivo válido fue agregado.");
-  } else {
-    setArchivosAsset(extracted); // ✅ Solo si hay archivos válidos
-  }
-};
-
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const nuevosErrores = {};
+    if (!formData.titulo.trim()) nuevosErrores.titulo = "El título es obligatorio.";
+    if (!formData.descripcion.trim()) nuevosErrores.descripcion = "La descripción es obligatoria.";
+    if (!formData.categoria) nuevosErrores.categoria = "Debes seleccionar una categoría.";
+    if (!imagenPrincipal) nuevosErrores.imagenPrincipal = "La imagen principal es obligatoria.";
+    if (archivosAsset.length === 0) nuevosErrores.archivosAsset = "Debes subir al menos un archivo válido.";
+    setErrores(nuevosErrores);
+    if (Object.keys(nuevosErrores).length > 0) return;
+
     const data = new FormData();
     data.append("titulo", formData.titulo);
     data.append("descripcion", formData.descripcion);
     data.append("categoria", formData.categoria);
     data.append("es_sensible", formData.es_sensible);
-    formData.etiquetas
-      .split(",")
-      .map((t) => t.trim())
-      .forEach((t) => data.append("etiquetas", t));
+    formData.etiquetas.split(",").map((t) => t.trim()).forEach((t) => data.append("etiquetas", t));
     if (imagenPrincipal) data.append("imagen_principal", imagenPrincipal);
     imagenesPrevias.forEach((f) => data.append("imagenes_previas", f));
     archivosAsset.forEach((f) => data.append("archivo_asset", f));
 
     try {
       const token = localStorage.getItem("authToken");
-      const res = await axios.post("http://localhost:5000/api/asset", data, {
+      await axios.post("http://localhost:5000/api/asset", data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
       alert("✅ Asset subido con éxito");
-      console.log(res.data);
     } catch (error) {
       console.error(error);
       alert("❌ Error al subir el asset");
@@ -126,41 +113,32 @@ function SubirAssets() {
 
       <form className="subir-asset-form" onSubmit={handleSubmit} encType="multipart/form-data">
         <div className="subir-columna">
-          <label>Imagen Principal *</label>
-          <input
-            type="file"
-            accept="image/*"
-            required
-            onChange={(e) => setImagenPrincipal(e.target.files[0])}
-          />
+          <label>
+            Imagen Principal *
+            {errores.imagenPrincipal && <span className="error"> — {errores.imagenPrincipal}</span>}
+          </label>
+          <input type="file" accept="image/*" onChange={(e) => setImagenPrincipal(e.target.files[0])} />
 
           <label>Imágenes Previas</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setImagenesPrevias([...e.target.files])}
-          />
+          <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
 
-          <label>Archivos del Asset (ZIP o múltiples archivos)</label>
+          <label>
+            Archivos del Asset
+            {errores.archivosAsset && <span className="error"> — {errores.archivosAsset}</span>}
+          </label>
           <input
             type="file"
-            accept=".zip,application/zip,*"
             multiple
             disabled={!formData.categoria}
+            accept={formatosPermitidos.map(ext => `.${ext}`).join(',')}
             onClick={(e) => {
               if (!formData.categoria) {
                 e.preventDefault();
-                alert("Primero debes seleccionar una categoría para conocer los formatos permitidos.");
+                alert("Selecciona una categoría primero.");
               }
             }}
             onChange={handleAssetFiles}
           />
-          {!formData.categoria && (
-            <p className="aviso-categoria">
-              Selecciona una categoría para poder subir archivos.
-            </p>
-          )}
 
           <label>Etiquetas</label>
           <input
@@ -183,19 +161,26 @@ function SubirAssets() {
         </div>
 
         <div className="subir-columna">
-          <label>Título *</label>
-          <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required />
+          <label>
+            Título *
+            {errores.titulo && <span className="error"> — {errores.titulo}</span>}
+          </label>
+          <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} />
 
-          <label>Descripción *</label>
-          <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required />
+          <label>
+            Descripción *
+            {errores.descripcion && <span className="error"> — {errores.descripcion}</span>}
+          </label>
+          <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} />
 
-          <label>Categoría *</label>
-          <select name="categoria" value={formData.categoria} onChange={handleChange} required>
+          <label>
+            Categoría *
+            {errores.categoria && <span className="error"> — {errores.categoria}</span>}
+          </label>
+          <select name="categoria" value={formData.categoria} onChange={handleChange}>
             <option value="">Seleccione una categoría</option>
             {categorias.map((cat) => (
-              <option key={cat._id} value={cat.nombre}>
-                {cat.nombre}
-              </option>
+              <option key={cat._id} value={cat.nombre}>{cat.nombre}</option>
             ))}
           </select>
 
@@ -205,9 +190,7 @@ function SubirAssets() {
             </p>
           )}
 
-          <button className="subir-asset-boton" type="submit">
-            Subir Asset
-          </button>
+          <button className="subir-asset-boton" type="submit">Subir Asset</button>
           <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>

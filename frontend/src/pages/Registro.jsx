@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Global.css";
-import "../styles/login.css"; // Reutilizamos el mismo CSS
+import "../styles/login.css";
 import logo from "../logo.png";
 
 function Registro() {
@@ -9,49 +9,60 @@ function Registro() {
   const [email, setEmail] = useState("");
   const [contraseña, setContraseña] = useState("");
   const [repetirContraseña, setRepetirContraseña] = useState("");
+  const [errores, setErrores] = useState({});
   const navigate = useNavigate();
 
+  const validarCampo = (campo, valor) => {
+    let error = "";
+
+    if (!valor.trim()) error = "Este campo es obligatorio.";
+    if (campo === "contraseña" && valor && valor.length < 10)
+      error = "La contraseña debe tener al menos 10 caracteres.";
+    if (campo === "repetirContraseña" && valor !== contraseña)
+      error = "Las contraseñas no coinciden.";
+
+    setErrores((prev) => ({ ...prev, [campo]: error }));
+  };
+
   const handleRegistro = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    const nuevosErrores = {};
 
-  if (!nombre || !email || !contraseña || !repetirContraseña) {
-    alert("Por favor, completa todos los campos.");
-    return;
-  }
+    if (!nombre.trim()) nuevosErrores.nombre = "Este campo es obligatorio.";
+    if (!email.trim()) nuevosErrores.email = "Este campo es obligatorio.";
+    if (!contraseña) nuevosErrores.contraseña = "Este campo es obligatorio.";
+    else if (contraseña.length < 10)
+      nuevosErrores.contraseña = "La contraseña debe tener al menos 10 caracteres.";
+    if (!repetirContraseña)
+      nuevosErrores.repetirContraseña = "Este campo es obligatorio.";
+    else if (repetirContraseña !== contraseña)
+      nuevosErrores.repetirContraseña = "Las contraseñas no coinciden.";
 
-  if (contraseña.length < 10) {
-    alert("La contraseña debe tener al menos 10 caracteres.");
-    return;
-  }
+    setErrores(nuevosErrores);
+    if (Object.keys(nuevosErrores).length > 0) return;
 
-  if (contraseña !== repetirContraseña) {
-    alert("Las contraseñas no coinciden.");
-    return;
-  }
+    try {
+      const res = await fetch("http://localhost:5000/api/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nombre, email, contraseña }),
+      });
 
-  try {
-    const res = await fetch("http://localhost:5000/api/registro", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nombre, email, contraseña }),
-    });
+      const data = await res.json();
 
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Registro exitoso. Inicia sesión.");
-      navigate("/login");
-    } else {
-      alert(data.mensaje || "Error al registrarse.");
+      if (res.ok) {
+        alert("Registro exitoso. Inicia sesión.");
+        navigate("/login");
+      } else {
+        alert(data.mensaje || "Error al registrarse.");
+      }
+    } catch (error) {
+      console.error("Error al registrar:", error);
+      alert("Error del servidor.");
     }
-  } catch (error) {
-    console.error("Error al registrar:", error);
-    alert("Error del servidor.");
-  }
-};
-
+  };
 
   return (
     <div className="login-page">
@@ -62,47 +73,68 @@ function Registro() {
         </div>
 
         <form className="login-form" onSubmit={handleRegistro}>
-          <label>Nombre Real de Usuario:</label>
+          <label>
+            Nombre Real de Usuario:
+            {errores.nombre && <span className="error"> — {errores.nombre}</span>}
+          </label>
           <input
             type="text"
             value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            onChange={(e) => {
+              setNombre(e.target.value);
+              validarCampo("nombre", e.target.value);
+            }}
             placeholder="Nombre completo"
-            required
           />
 
-          <label>Email:</label>
+          <label>
+            Email:
+            {errores.email && <span className="error"> — {errores.email}</span>}
+          </label>
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              validarCampo("email", e.target.value);
+            }}
             placeholder="Ingrese su correo"
-            required
           />
 
-          <label>Contraseña:</label>
+          <label>
+            Contraseña:
+            {errores.contraseña && <span className="error"> — {errores.contraseña}</span>}
+          </label>
           <input
             type="password"
             value={contraseña}
-            onChange={(e) => setContraseña(e.target.value)}
+            onChange={(e) => {
+              setContraseña(e.target.value);
+              validarCampo("contraseña", e.target.value);
+            }}
             placeholder="Mínimo 10 caracteres"
-            required
           />
 
-          <label>Repetir Contraseña:</label>
+          <label>
+            Repetir Contraseña:
+            {errores.repetirContraseña && (
+              <span className="error"> — {errores.repetirContraseña}</span>
+            )}
+          </label>
           <input
             type="password"
             value={repetirContraseña}
-            onChange={(e) => setRepetirContraseña(e.target.value)}
+            onChange={(e) => {
+              setRepetirContraseña(e.target.value);
+              validarCampo("repetirContraseña", e.target.value);
+            }}
             placeholder="Confirma tu contraseña"
-            required
           />
 
           <button type="submit">Registrarse</button>
 
           <p>
-            ¿Ya tienes una cuenta?{" "}
-            <a href="/login">Inicia sesión aquí</a>
+            ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
           </p>
         </form>
       </div>

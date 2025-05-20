@@ -152,6 +152,11 @@
 .subir-asset-boton:hover {
   background-color: var(--color-principal-hover, #0070c0);
 }
+.error-text {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
 
 /* Indicaciones */
 .recomendacion {

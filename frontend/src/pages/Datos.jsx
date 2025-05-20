@@ -6,6 +6,7 @@ import defaultFoto from "../icons/default.jpg";
 import x from "../icons/x.png";
 import ig from "../icons/instagram.png";
 import linkedin from "../icons/linkedin.webp";
+
 const normalizarFoto = (url) => {
   if (!url) return defaultFoto;
   return url.includes("dropbox.com")
@@ -23,6 +24,7 @@ function Datos() {
     enlace_linkedin: "",
     foto_perfil: null,
   });
+  const [errores, setErrores] = useState({});
   const [menuAbierto, setMenuAbierto] = useState(false);
   const navigate = useNavigate();
 
@@ -49,30 +51,55 @@ function Datos() {
     fetchUsuario();
   }, []);
 
-  const normalizarUrlDropbox = (url) => {
-    if (!url) return defaultFoto;
-    if (url.includes("dropbox.com")) {
-      return url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "");
+  const validarCampo = (name, value) => {
+    let msg = "";
+
+    if (name === "nombre" && !value.trim()) msg = "El nombre no puede estar vacío.";
+    if (name === "contraseña" && value && value.length < 10)
+      msg = "La contraseña debe tener al menos 10 caracteres.";
+    if (["enlace_twitter", "enlace_instagram", "enlace_linkedin"].includes(name)) {
+      if (value && !/^https?:\/\/.+\..+/.test(value)) {
+        msg = "Debe ser una URL válida.";
+      }
     }
-    return url;
+
+    setErrores((prev) => ({ ...prev, [name]: msg }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    validarCampo(name, value);
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, foto_perfil: e.target.files[0] }));
+    const archivo = e.target.files[0];
+    if (archivo && archivo.size > 5 * 1024 * 1024) {
+      setErrores((prev) => ({
+        ...prev,
+        foto_perfil: "La imagen no puede superar los 5MB.",
+      }));
+    } else {
+      setErrores((prev) => ({ ...prev, foto_perfil: "" }));
+    }
+    setFormData((prev) => ({ ...prev, foto_perfil: archivo }));
   };
 
   const handleSubmit = async (e) => {
-    if (formData.contraseña && formData.contraseña.length < 10) {
-      alert("La nueva contraseña debe tener al menos 10 caracteres.");
+    e.preventDefault();
+
+    // Validación final antes de enviar
+    let hayErrores = false;
+    Object.entries(formData).forEach(([key, val]) => {
+      validarCampo(key, val);
+      if (errores[key]) hayErrores = true;
+    });
+
+    if (hayErrores) {
+      alert("Corrige los errores antes de enviar.");
       return;
     }
 
-    e.preventDefault();
     try {
       const token = localStorage.getItem("authToken");
       const data = new FormData();
@@ -91,6 +118,7 @@ function Datos() {
       });
 
       alert("✅ Perfil actualizado correctamente");
+      window.location.reload();
     } catch (error) {
       console.error("❌ Error al actualizar el perfil", error);
       alert("❌ Error al actualizar el perfil");
@@ -101,43 +129,34 @@ function Datos() {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
   }
 
-  const fotoPerfil = normalizarUrlDropbox(usuario.foto_perfil);
+  const fotoPerfil = normalizarFoto(usuario.foto_perfil);
 
   return (
     <div className="perfil-container">
       <aside className="perfil-sidebar">
         <div className="perfil-info">
-<img src={normalizarFoto(usuario.foto_perfil)} alt="Perfil" className="perfil-foto" />
-
-  <h3 className="perfil-nombre">{usuario.nombre}</h3>
-  <p className="perfil-email">{usuario.email}</p>
-
-  <div className="perfil-redes">
-    <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
-      <img src={x} alt="Twitter" className="social-icon" />
-    </a>
-    <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
-      <img src={ig} alt="Instagram" className="social-icon" />
-    </a>
-    <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-      <img src={linkedin} alt="LinkedIn" className="social-icon" />
-    </a>
-  </div>
-</div>
-
-
-        <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
-          ☰ Opciones
-        </button>
-
+          <img src={fotoPerfil} alt="Perfil" className="perfil-foto" />
+          <h3 className="perfil-nombre">{usuario.nombre}</h3>
+          <p className="perfil-email">{usuario.email}</p>
+          <div className="perfil-redes">
+            <a href={usuario.enlace_twitter} target="_blank" rel="noreferrer">
+              <img src={x} alt="Twitter" className="social-icon" />
+            </a>
+            <a href={usuario.enlace_instagram} target="_blank" rel="noreferrer">
+              <img src={ig} alt="Instagram" className="social-icon" />
+            </a>
+            <a href={usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+              <img src={linkedin} alt="LinkedIn" className="social-icon" />
+            </a>
+          </div>
+        </div>
+        <button className="perfil-hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>☰ Opciones</button>
         <nav className={`perfil-menu ${menuAbierto ? "activo" : ""}`}>
           <button onClick={() => navigate("/perfil/descargas")}>📥 Tus Descargas</button>
           <button onClick={() => navigate("/perfil/datos")}>📝 Modificar Datos</button>
           <button onClick={() => navigate("/perfil/assets-subidos")}>📤 Assets Subidos</button>
           <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
-          <button onClick={() => { localStorage.removeItem("authToken"); navigate("/login"); }}>
-            🚪 Cerrar Sesión
-          </button>
+          <button onClick={() => { localStorage.removeItem("authToken"); navigate("/login"); }}>🚪 Cerrar Sesión</button>
         </nav>
       </aside>
 
@@ -148,43 +167,60 @@ function Datos() {
 
         <form className="subir-asset-form" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="subir-columna">
-            <label>Foto de Perfil <span className="recomendacion">(JPG, PNG o GIF - máx. 5MB)</span></label>
+            <label>
+              Foto de Perfil <span className="recomendacion">(JPG, PNG o GIF - máx. 5MB)</span>
+              {errores.foto_perfil && <span className="error-text"> – {errores.foto_perfil}</span>}
+            </label>
             <input type="file" accept="image/*" onChange={handleFileChange} />
 
-            <label>X / Twitter:</label>
+            <label>
+              Tu perfil de X:
+              {errores.enlace_twitter && <span className="error-text"> – {errores.enlace_twitter}</span>}
+            </label>
             <input
               type="url"
               name="enlace_twitter"
               value={formData.enlace_twitter}
               onChange={handleChange}
-              placeholder="https://twitter.com/tu_usuario"
+              placeholder="https://twitter.com/usuario"
             />
 
-            <label>Instagram:</label>
+            <label>
+              Tu perfil de Instagram:
+              {errores.enlace_instagram && <span className="error-text"> – {errores.enlace_instagram}</span>}
+            </label>
             <input
               type="url"
               name="enlace_instagram"
               value={formData.enlace_instagram}
               onChange={handleChange}
-              placeholder="https://instagram.com/tu_usuario"
+              placeholder="https://instagram.com/usuario"
             />
 
-            <label>LinkedIn:</label>
+            <label>
+              Tu perfil de LinkedIn:
+              {errores.enlace_linkedin && <span className="error-text"> – {errores.enlace_linkedin}</span>}
+            </label>
             <input
               type="url"
               name="enlace_linkedin"
               value={formData.enlace_linkedin}
               onChange={handleChange}
-              placeholder="https://linkedin.com/in/tu_usuario"
+              placeholder="https://linkedin.com/in/usuario"
             />
-
           </div>
 
           <div className="subir-columna">
-            <label>Nombre y Apellidos:</label>
+            <label>
+              Nombre y Apellidos:
+              {errores.nombre && <span className="error-text"> – {errores.nombre}</span>}
+            </label>
             <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
 
-            <label>Nueva Contraseña</label>
+            <label>
+              Nueva Contraseña:
+              {errores.contraseña && <span className="error-text"> – {errores.contraseña}</span>}
+            </label>
             <input type="password" name="contraseña" placeholder="Mínimo 10 caracteres" onChange={handleChange} />
 
             <button type="submit" className="subir-asset-boton">Modificar</button>
