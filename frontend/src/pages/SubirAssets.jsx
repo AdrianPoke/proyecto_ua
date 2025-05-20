@@ -123,7 +123,7 @@ function SubirAssets() {
           <input type="file" accept="image/*" multiple onChange={(e) => setImagenesPrevias([...e.target.files])} />
 
           <label>
-            Archivos del Asset
+            Archivos del Asset (1 o múltiples archivos)
             {errores.archivosAsset && <span className="error"> — {errores.archivosAsset}</span>}
           </label>
           <input
@@ -139,6 +139,15 @@ function SubirAssets() {
             }}
             onChange={handleAssetFiles}
           />
+
+          {errores.archivosAsset &&
+            (errores.archivosAsset.includes(".zip") ||
+             errores.archivosAsset.includes(".rar") ||
+             errores.archivosAsset.includes(".7z")) && (
+              <p className="error">
+                No se pueden subir archivos comprimidos como <strong>.zip</strong>, <strong>.rar</strong> o <strong>.7z</strong>. Los assets deben subirse como archivos sueltos.
+              </p>
+          )}
 
           <label>Etiquetas</label>
           <input
