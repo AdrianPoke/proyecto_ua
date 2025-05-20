@@ -5,24 +5,26 @@ import AssetCard from '../Components/AssetCard';
 import '../styles/home.css';
 
 function Home() {
-  const [assets, setAssets] = useState([]);
+  const [assetsRecientes, setAssetsRecientes] = useState([]);
+  const [assetsPopulares, setAssetsPopulares] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAssets = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/asset/recientes?limite=10', {
-          headers: {
-            Authorization: 'Bearer TU_TOKEN_AQUI'
-          }
-        });
-        setAssets(res.data);
+        // Recientes
+        const resRecientes = await axios.get('http://localhost:5000/api/asset/recientes?limite=10');
+        setAssetsRecientes(resRecientes.data);
+
+        // Populares
+        const resPopulares = await axios.get('http://localhost:5000/api/asset/populares?limite=7');
+        setAssetsPopulares(resPopulares.data);
       } catch (error) {
-        console.error('Error al obtener assets recientes:', error);
+        console.error('Error al obtener assets:', error);
       }
     };
 
-    fetchAssets();
+    fetchData();
   }, []);
 
   const handleVerAsset = (id) => {
@@ -37,7 +39,7 @@ function Home() {
         <span>Assets Recientes</span>
       </div>
       <div className="assets-grid">
-        {assets.map((asset) => (
+        {assetsRecientes.map((asset) => (
           <AssetCard
             key={asset._id}
             asset={asset}
@@ -45,23 +47,21 @@ function Home() {
           />
         ))}
       </div>
-        <br></br><br></br>
+
+      <br /><br />
+
       <div className="section-divider">
         <span>Assets más descargados</span>
       </div>
       <div className="assets-grid">
-        {assets
-          .slice()
-          .sort((a, b) => b.numero_descargas - a.numero_descargas)
-          .slice(0, 6)
-          .map((asset) => (
-            <AssetCard
-              key={`desc-${asset._id}`}
-              asset={asset}
-              onClick={() => handleVerAsset(asset._id)}
-              mostrarDescargas={true}
-            />
-          ))}
+        {assetsPopulares.map((asset) => (
+          <AssetCard
+            key={`desc-${asset._id}`}
+            asset={asset}
+            onClick={() => handleVerAsset(asset._id)}
+            mostrarDescargas={true}
+          />
+        ))}
       </div>
     </div>
   );

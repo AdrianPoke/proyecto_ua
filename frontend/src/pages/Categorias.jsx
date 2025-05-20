@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/categorias.css';
+import '../styles/categoriasGlobal.css';
 
 // Imágenes importadas (ajusta según tus archivos)
 import iconAudio from '../icons/audio.jpg';
@@ -64,17 +64,16 @@ const Categorias = () => {
           const slug = crearSlug(cat.nombre);
           const imagen = imagenesPorCategoria[slug];
 
-          // Opción: si no hay imagen, podrías mostrar una de fallback
-          if (!imagen) return null;
+          if (!imagen) return null; // Si no hay imagen, no renderiza
 
           return (
-            <Link key={index} to={`/categorias/${slug}`} className="categoria-card">
+            <Link key={index} to={`/categorias/${slug}`} className="tarjeta-categoria">
               <img
                 src={imagen}
                 alt={cat.nombre}
-                className="categoria-imagen"
+                className="tarjeta-categoria-imagen"
               />
-              <div className="categoria-nombre">{cat.nombre}</div>
+              <div className="tarjeta-categoria-nombre">{cat.nombre}</div>
             </Link>
           );
         })}

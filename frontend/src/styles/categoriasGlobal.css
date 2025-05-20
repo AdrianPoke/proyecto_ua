@@ -1,0 +1,148 @@
+/* === CONTENEDOR GENERAL === */
+.categorias-container,
+.categoria-container {
+  background-color: var(--color-fondo);
+  padding-top: 20px ;
+  padding-left: 20px ;
+  padding-right: 20px ;
+  padding-bottom: 60px ;
+  color: var(--color-texto);
+  min-height: 100vh;
+}
+
+/* === TÍTULOS GENERALES === */
+.categorias-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-principal);
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+
+.categoria-nombre-header {
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: var(--color-principal);
+  text-align: center;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.categoria-descripcion {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #bbb;
+  margin: 0 auto;
+  padding-bottom: 10px;
+  max-width: 800px;
+}
+
+.categoria-cabecera-mockup {
+  width: 100vw;
+  margin-left: calc(-1 * (100vw - 100%) / 2);
+  padding: 30px 20px;
+  background-color: var(--color-menu);
+}
+
+/* === GRID DE TARJETAS === */
+.categorias-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+/* === TARJETAS DE CATEGORÍA (Mockup style) === */
+.tarjeta-categoria {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  background-color: #000;
+}
+
+.tarjeta-categoria:hover {
+  transform: scale(1.03);
+}
+
+.tarjeta-categoria-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.40);
+  transition: filter 0.3s ease;
+}
+
+.tarjeta-categoria:hover .tarjeta-categoria-imagen {
+  filter: brightness(0.60);
+}
+
+.tarjeta-categoria-nombre {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 2;
+  text-align: center;
+  padding: 0 10px;
+}
+
+/* === MENSAJES Y ESTADOS === */
+.categoria-loading,
+.categoria-error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--color-principal);
+}
+
+/* === RESPONSIVE === */
+@media screen and (max-width: 768px) {
+  .categorias-container,
+  .categoria-container {
+    padding: 20px;
+  }
+
+  .categorias-title,
+  .categoria-nombre-header {
+    font-size: 2rem;
+  }
+
+  .categoria-descripcion {
+    font-size: 1rem;
+  }
+
+  .categorias-grid,
+  .assets-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .tarjeta-categoria-nombre {
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .categorias-title,
+  .categoria-nombre-header {
+    font-size: 1.5rem;
+  }
+
+  .categoria-descripcion {
+    font-size: 0.9rem;
+  }
+
+  .tarjeta-categoria-nombre {
+    font-size: 0.9rem;
+  }
+}
