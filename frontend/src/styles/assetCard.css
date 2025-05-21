@@ -1,9 +1,9 @@
 .asset-card {
   
   background-color: var(--color-menu);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
-  box-shadow: 0 0 18px rgba(62, 230, 118, 0.2);
+  box-shadow: 0 0 38px rgba(62, 230, 118, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   max-width: 300px;
@@ -90,15 +90,15 @@
   font-size: 14px;
   padding: 8px;
   background-color: #000;
-  color: var(--color-texto);
+  color: var(--color-principal);
 }
 
 .asset-formats {
   font-size: 12px;
   text-align: center;
-  color: var(--color-principal);
+  color: white;
   background-color: #0f0f0f;
-  padding: 4px 8px;
-  margin: 4px 8px 8px 8px;
   border-radius: 3px;
+  padding-bottom: 8px;
+  padding-top: 4px;
 }
