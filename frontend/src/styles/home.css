@@ -18,7 +18,7 @@
 /* Sección dividida con título centrado y línea */
 .section-divider {
   margin: 60px 0 30px 0;
-  border-top: 1px solid var(--color-principal);
+  border-top: 2px solid var(--color-secundario);
   text-align: center;
   position: relative;
 }
