@@ -22,6 +22,7 @@ function SubirAssets() {
   const [archivosAsset, setArchivosAsset] = useState([]);
   const [errores, setErrores] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
 
 
