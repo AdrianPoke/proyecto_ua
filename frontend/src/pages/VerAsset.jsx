@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaDownload, FaHeart, FaShare, FaUser, FaCalendar, FaTag, FaFileAlt } from 'react-icons/fa';
+import { FaDownload, FaHeart, FaUser, FaCalendar, FaTag, FaFileAlt } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import '../styles/verAsset.css';
 
-
+const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
 const VerAsset = () => {
   const { id } = useParams();
@@ -19,92 +21,68 @@ const VerAsset = () => {
   const [esFavorito, setEsFavorito] = useState(false);
   const [cooldowns, setCooldowns] = useState({});
 
+  const handleFavorito = async () => {
+    try {
+      const metodo = esFavorito ? "DELETE" : "POST";
+      const res = await fetch(`http://localhost:5000/api/usuario/favoritos/${id}`, {
+        method: metodo,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
 
-  const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
-const handleFavorito = async () => {
-  try {
-    const metodo = esFavorito ? "DELETE" : "POST";
-    const res = await fetch(`http://localhost:5000/api/usuario/favoritos/${id}`, {
-      method: metodo,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.mensaje || "Error al actualizar favoritos");
       }
-    });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.mensaje || "Error al actualizar favoritos");
+      setEsFavorito(!esFavorito);
+      toast.success(esFavorito ? "Asset eliminado de favoritos" : "Asset añadido a favoritos");
+    } catch (error) {
+      console.error("Error al actualizar favoritos:", error);
+      toast.error(error.message);
     }
-
-    setEsFavorito(!esFavorito);
-    alert(esFavorito ? "❌ Asset eliminado de favoritos" : "✅ Asset añadido a favoritos");
-  } catch (error) {
-    console.error("❌ Error al actualizar favoritos:", error);
-    alert(error.message);
-  }
-};
+  };
 
   useEffect(() => {
-    const fetchAsset = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/asset/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        const [assetRes, comentariosRes, usuarioRes] = await Promise.all([
+          fetch(`http://localhost:5000/api/asset/${id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+          }),
+          fetch(`http://localhost:5000/api/comentario/${id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
+          }),
+          fetch(`http://localhost:5000/api/usuario/perfil`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }
+          })
+        ]);
+
+        if (!assetRes.ok) throw new Error("Error al obtener el asset");
+        const assetData = await assetRes.json();
+        setAsset(assetData);
+
+        const comentariosData = await comentariosRes.json();
+        setComentarios(Array.isArray(comentariosData) ? comentariosData : []);
+
+        if (usuarioRes.ok) {
+          const usuarioData = await usuarioRes.json();
+          setUsuarioActual(usuarioData);
+          if (usuarioData.assets_favoritos?.includes(id)) {
+            setEsFavorito(true);
           }
-        });
-        if (!res.ok) throw new Error("Error al obtener el asset");
-        const data = await res.json();
-        setAsset(data);
+        }
       } catch (error) {
-        console.error("❌ Error al cargar asset:", error);
+        console.error("Error en la carga de datos:", error);
+        toast.error("Error al cargar datos del asset.");
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchComentarios = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`
-          }
-        });
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setComentarios(data);
-        } else {
-          setComentarios([]);
-        }
-      } catch (error) {
-        console.error("❌ Error al cargar comentarios:", error);
-      }
-    };
-
-    const fetchUsuario = async () => {
-  try {
-    const res = await fetch(`http://localhost:5000/api/usuario/perfil`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setUsuarioActual(data);
-
-      // ✅ Mueve esta comprobación aquí
-      if (data.assets_favoritos?.includes(id)) {
-        setEsFavorito(true);
-      }
-    }
-  } catch (error) {
-    console.error("❌ Error al cargar perfil de usuario:", error);
-  }
-};
-
-    fetchAsset();
-    fetchComentarios();
-    fetchUsuario();
+    fetchData();
   }, [id]);
 
   const handleDescargar = async () => {
@@ -132,34 +110,32 @@ const handleFavorito = async () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("❌ Error en la descarga:", error);
-      alert("Hubo un error al intentar descargar el asset.");
+      console.error("Error en la descarga:", error);
+      toast.error("Hubo un error al intentar descargar el asset.");
     }
   };
 
   const handleComentar = async () => {
-  if (!nuevoComentario.trim()) return;
+    if (!nuevoComentario.trim()) return;
 
-  try {
-    const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-      body: JSON.stringify({ contenido: nuevoComentario }),
-    });
+    try {
+      const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({ contenido: nuevoComentario }),
+      });
 
-    if (!res.ok) throw new Error("No se pudo enviar el comentario");
+      if (!res.ok) throw new Error("No se pudo enviar el comentario");
 
-    // Refrescar la página por completo
-    window.location.reload();
-  } catch (error) {
-    console.error("❌ Error al enviar comentario:", error);
-    alert("Error al publicar el comentario.");
-  }
-};
-
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al enviar comentario:", error);
+      toast.error("Error al publicar el comentario.");
+    }
+  };
 
   if (loading) {
     return (
@@ -181,11 +157,7 @@ const handleFavorito = async () => {
 
   const principal = asset.archivos.find((a) => a.tipo === 'principal');
   const imagenPrincipal = dropboxToRaw(principal?.url);
-
-  const previas = asset.archivos
-    .filter((a) => a.tipo === 'previa')
-    .map((a) => dropboxToRaw(a.url));
-
+  const previas = asset.archivos.filter((a) => a.tipo === 'previa').map((a) => dropboxToRaw(a.url));
   const imagenes = [imagenPrincipal, ...previas];
 
   const sliderSettings = {
@@ -235,7 +207,6 @@ const handleFavorito = async () => {
                 />
                 <strong>{asset.autor?.nombre || "Desconocido"}</strong>
               </div>
-
               <div className="info-item">
                 <FaCalendar className="icon" />
                 <span>Fecha:</span>
@@ -283,18 +254,14 @@ const handleFavorito = async () => {
           </div>
         </div>
       </div>
+
       {/* Comentarios */}
       <div className="comentarios-container">
         <h2>Comentarios</h2>
 
-        {/* Caja de nuevo comentario */}
         {usuarioActual && (
           <div className="nueva-caja-comentario">
-            <img
-              src={dropboxToRaw(usuarioActual.foto_perfil)}
-              alt="usuario"
-              className="comentario-avatar"
-            />
+            <img src={dropboxToRaw(usuarioActual.foto_perfil)} alt="usuario" className="comentario-avatar" />
             <div className="caja-comentario-input">
               <textarea
                 rows="3"
@@ -307,7 +274,6 @@ const handleFavorito = async () => {
           </div>
         )}
 
-        {/* Lista de comentarios */}
         {comentarios.length === 0 ? (
           <p>No hay comentarios aún.</p>
         ) : (
@@ -318,7 +284,6 @@ const handleFavorito = async () => {
             const toggleLike = async () => {
               if (estaEnCooldown) return;
 
-              // Establecer cooldown
               setCooldowns(prev => ({ ...prev, [comentario._id]: true }));
 
               try {
@@ -345,16 +310,14 @@ const handleFavorito = async () => {
                   })
                 );
               } catch (error) {
-                console.error("❌ Error al cambiar el like:", error);
-                alert("Hubo un error al cambiar el like.");
+                console.error("Error al cambiar el like:", error);
+                toast.error("Hubo un error al cambiar el like.");
               } finally {
-                // Quitar cooldown después de 1 segundo
                 setTimeout(() => {
                   setCooldowns(prev => ({ ...prev, [comentario._id]: false }));
                 }, 1000);
               }
             };
-
 
             return (
               <div key={comentario._id} className="comentario-item">
@@ -363,12 +326,7 @@ const handleFavorito = async () => {
                   <strong>{comentario.usuario.nombre}</strong>
                   <p>{comentario.contenido}</p>
                   <button onClick={toggleLike} className="like-button">
-                    <FaHeart
-                      style={{
-                        color: haDadoLike ? 'red' : 'gray',
-                        marginRight: '6px'
-                      }}
-                    />
+                    <FaHeart style={{ color: haDadoLike ? 'red' : 'gray', marginRight: '6px' }} />
                     {comentario.likes}
                   </button>
                 </div>
@@ -377,6 +335,9 @@ const handleFavorito = async () => {
           })
         )}
       </div>
+
+      {/* Toast notifications */}
+      <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
 };
