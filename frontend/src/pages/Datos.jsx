@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 import "../styles/datos.css";
 import defaultFoto from "../icons/default.jpg";
@@ -16,14 +17,17 @@ const normalizarFoto = (url) => {
 
 function Datos() {
   const [usuario, setUsuario] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    nombre: "",
-    contraseña: "",
-    enlace_twitter: "",
-    enlace_instagram: "",
-    enlace_linkedin: "",
-    foto_perfil: null,
-  });
+  nombre: "",
+  contraseña: "",
+  usuario_twitter: "",
+  usuario_instagram: "",
+  usuario_linkedin: "",
+  foto_perfil: null,
+});
+
   const [errores, setErrores] = useState({});
   const [menuAbierto, setMenuAbierto] = useState(false);
   const navigate = useNavigate();
@@ -37,13 +41,13 @@ function Datos() {
         });
         setUsuario(res.data);
         setFormData({
-          nombre: res.data.nombre,
-          contraseña: "",
-          enlace_twitter: res.data.enlace_twitter || "",
-          enlace_instagram: res.data.enlace_instagram || "",
-          enlace_linkedin: res.data.enlace_linkedin || "",
-          foto_perfil: null,
-        });
+        nombre: res.data.nombre,
+        contraseña: "",
+        usuario_twitter: res.data.enlace_twitter?.split("/").pop() || "",
+        usuario_instagram: res.data.enlace_instagram?.split("/").pop() || "",
+        usuario_linkedin: res.data.enlace_linkedin?.split("/").pop() || "",
+        foto_perfil: null,
+      });
       } catch (error) {
         console.error("Error al obtener perfil:", error);
       }
@@ -54,17 +58,23 @@ function Datos() {
   const validarCampo = (name, value) => {
     let msg = "";
 
-    if (name === "nombre" && !value.trim()) msg = "El nombre no puede estar vacío.";
-    if (name === "contraseña" && value && value.length < 10)
+    if (name === "nombre" && !value.trim()) {
+      msg = "El nombre no puede estar vacío.";
+    }
+
+    if (name === "contraseña" && value && value.length < 10) {
       msg = "La contraseña debe tener al menos 10 caracteres.";
-    if (["enlace_twitter", "enlace_instagram", "enlace_linkedin"].includes(name)) {
-      if (value && !/^https?:\/\/.+\..+/.test(value)) {
-        msg = "Debe ser una URL válida.";
+    }
+
+    if (["usuario_twitter", "usuario_instagram", "usuario_linkedin"].includes(name)) {
+      if (/\s/.test(value)) {
+        msg = "El nombre de usuario no debe contener espacios.";
       }
     }
 
     setErrores((prev) => ({ ...prev, [name]: msg }));
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,45 +95,66 @@ function Datos() {
     setFormData((prev) => ({ ...prev, foto_perfil: archivo }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // Validación final antes de enviar
-    let hayErrores = false;
-    Object.entries(formData).forEach(([key, val]) => {
-      validarCampo(key, val);
-      if (errores[key]) hayErrores = true;
+  let nuevosErrores = {};
+  Object.entries(formData).forEach(([key, val]) => {
+    let msg = "";
+
+    if (key === "nombre" && !val.trim()) msg = "El nombre no puede estar vacío.";
+    if (key === "contraseña" && val && val.length < 10)
+      msg = "La contraseña debe tener al menos 10 caracteres.";
+    if (
+      ["enlace_twitter", "enlace_instagram", "enlace_linkedin"].includes(key) &&
+      val &&
+      !/^https?:\/\/.+\..+/.test(val)
+    ) {
+      msg = "Debe ser una URL válida.";
+    }
+    if (key === "foto_perfil" && formData.foto_perfil?.size > 5 * 1024 * 1024) {
+      msg = "La imagen no puede superar los 5MB.";
+    }
+
+    if (msg) nuevosErrores[key] = msg;
+  });
+
+  setErrores(nuevosErrores);
+
+  const hayErrores = Object.keys(nuevosErrores).length > 0;
+  if (hayErrores) return;
+
+  try {
+    setIsLoading(true); // 🟡 Mostrar overlay
+
+    const token = localStorage.getItem("authToken");
+    const data = new FormData();
+    data.append("nombre", formData.nombre);
+    if (formData.contraseña) data.append("contraseña", formData.contraseña);
+    data.append("enlace_twitter", formData.usuario_twitter ? `https://twitter.com/${formData.usuario_twitter}` : "");
+    data.append("enlace_instagram", formData.usuario_instagram ? `https://instagram.com/${formData.usuario_instagram}` : "");
+    data.append("enlace_linkedin", formData.usuario_linkedin ? `https://linkedin.com/in/${formData.usuario_linkedin}` : "");
+
+    if (formData.foto_perfil) data.append("foto_perfil", formData.foto_perfil);
+
+    await axios.put("http://localhost:5000/api/usuario/perfil", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
     });
 
-    if (hayErrores) {
-      alert("Corrige los errores antes de enviar.");
-      return;
-    }
+    setIsLoading(false); 
+    
+    window.location.reload();
+  } catch (error) {
+    console.error("❌ Error al actualizar el perfil", error);
+    setIsLoading(false); // ❌ Ocultar overlay también tras error
+    
+  }
+};
 
-    try {
-      const token = localStorage.getItem("authToken");
-      const data = new FormData();
-      data.append("nombre", formData.nombre);
-      if (formData.contraseña) data.append("contraseña", formData.contraseña);
-      data.append("enlace_twitter", formData.enlace_twitter);
-      data.append("enlace_instagram", formData.enlace_instagram);
-      data.append("enlace_linkedin", formData.enlace_linkedin);
-      if (formData.foto_perfil) data.append("foto_perfil", formData.foto_perfil);
 
-      await axios.put("http://localhost:5000/api/usuario/perfil", data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      alert("✅ Perfil actualizado correctamente");
-      window.location.reload();
-    } catch (error) {
-      console.error("❌ Error al actualizar el perfil", error);
-      alert("❌ Error al actualizar el perfil");
-    }
-  };
 
   if (!usuario) {
     return <p style={{ color: "white", padding: "20px" }}>Cargando perfil...</p>;
@@ -174,40 +205,41 @@ function Datos() {
             <input type="file" accept="image/*" onChange={handleFileChange} />
 
             <label>
-              Tu perfil de X:
-              {errores.enlace_twitter && <span className="error-text"> – {errores.enlace_twitter}</span>}
+              Tu usuario de X:
+              {errores.usuario_twitter && <span className="error-text"> – {errores.usuario_twitter}</span>}
             </label>
             <input
-              type="url"
-              name="enlace_twitter"
-              value={formData.enlace_twitter}
+              type="text"
+              name="usuario_twitter"
+              value={formData.usuario_twitter}
               onChange={handleChange}
-              placeholder="https://twitter.com/usuario"
+              placeholder="<usuario>"
             />
 
             <label>
-              Tu perfil de Instagram:
-              {errores.enlace_instagram && <span className="error-text"> – {errores.enlace_instagram}</span>}
+              Tu usuario de Instagram:
+              {errores.usuario_instagram && <span className="error-text"> – {errores.usuario_instagram}</span>}
             </label>
             <input
-              type="url"
-              name="enlace_instagram"
-              value={formData.enlace_instagram}
+              type="text"
+              name="usuario_instagram"
+              value={formData.usuario_instagram}
               onChange={handleChange}
-              placeholder="https://instagram.com/usuario"
+              placeholder="<usuario>"
             />
 
             <label>
-              Tu perfil de LinkedIn:
-              {errores.enlace_linkedin && <span className="error-text"> – {errores.enlace_linkedin}</span>}
+              Tu usuario de LinkedIn:
+              {errores.usuario_linkedin && <span className="error-text"> – {errores.usuario_linkedin}</span>}
             </label>
             <input
-              type="url"
-              name="enlace_linkedin"
-              value={formData.enlace_linkedin}
+              type="text"
+              name="usuario_linkedin"
+              value={formData.usuario_linkedin}
               onChange={handleChange}
-              placeholder="https://linkedin.com/in/usuario"
+              placeholder="<usuario>"
             />
+
           </div>
 
           <div className="subir-columna">
@@ -224,9 +256,20 @@ function Datos() {
             <input type="password" name="contraseña" placeholder="Mínimo 10 caracteres" onChange={handleChange} />
 
             <button type="submit" className="subir-asset-boton">Modificar</button>
+            <p className="instrucciones">
+              Si por ejemplo tu usuario es <strong>@maria_123</strong>, en los campos de X, instagram y Linkedin debes escribir solamente <strong>maria_123</strong>.
+            </p>
           </div>
         </form>
+        {isLoading && (
+          <div className="overlay-carga">
+            <div className="spinner"></div>
+            <p className="mensaje-carga">Guardando cambios, por favor espera...</p>
+          </div>
+        )}
+
       </main>
+      
     </div>
   );
 }

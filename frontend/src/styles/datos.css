@@ -137,6 +137,14 @@
   font-size: 14px;
 }
 
+.subir-columna input:focus,
+.subir-columna textarea:focus,
+.subir-columna select:focus {
+  border-color: var(--color-principal);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 160, 80, 0.3); /* efecto visual opcional */
+}
+
 .subir-asset-boton {
   margin-top: 10px;
   padding: 10px 20px;
@@ -164,6 +172,13 @@
   color: var(--color-placeholder);
   margin-left: 6px;
 }
+
+.instrucciones {
+  font-size: 13px;
+  color: var(--color-placeholder);
+  margin-top: 8px;
+}
+
 
 /* Responsive */
 @media screen and (max-width: 1000px) {
@@ -210,4 +225,39 @@
   .subir-asset-form {
     flex-direction: column;
   }
+}
+
+.overlay-carga {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ddd;
+  border-top: 6px solid var(--color-principal);
+  border-radius: 50%;
+  animation: girar 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes girar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.mensaje-carga {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
 }
