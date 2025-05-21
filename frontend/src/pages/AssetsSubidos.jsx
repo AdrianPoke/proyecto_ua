@@ -6,11 +6,16 @@ import axios from 'axios';
 import defaultFoto from '../icons/default.jpg';
 import '../styles/descargas.css';
 import '../styles/assetCard.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const AssetsSubidos = () => {
   const [usuario, setUsuario] = useState(null);
   const [subidos, setSubidos] = useState([]);
   const navigate = useNavigate();
+  const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
     const fetchDatos = async () => {
@@ -42,22 +47,47 @@ const AssetsSubidos = () => {
     navigate(`/asset/${id}/editar`);
   };
 
-  const handleEliminarAsset = async (id) => {
+  const handleEliminarAsset = (asset) => {
+    confirmAlert({
+      customUI: ({ onClose }) => (
+        <div className="react-confirm-alert-body">
+          <h1>¿Eliminar este asset?</h1>
+          <p>Estás a punto de eliminar <strong>{asset.titulo}</strong>.<br />Esta acción no se puede deshacer.</p>
+          <div className="react-confirm-alert-button-group">
+            <button
+              onClick={async () => {
+                onClose();
+                await eliminarAsset(asset._id);
+              }}
+            >
+              Sí, eliminar
+            </button>
+            <button onClick={onClose}>Cancelar</button>
+          </div>
+        </div>
+      )
+    });
+  };
+
+  const eliminarAsset = async (id) => {
     try {
+      setCargando(true);
       const token = localStorage.getItem("authToken");
-      const confirmado = window.confirm("¿Seguro que quieres eliminar este asset?");
-      if (!confirmado) return;
 
       await axios.delete(`http://localhost:5000/api/asset/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       setSubidos(prev => prev.filter(asset => asset._id !== id));
+      toast.success("✅ Asset eliminado correctamente");
     } catch (err) {
       console.error("Error al eliminar asset:", err);
-      alert("No se pudo eliminar el asset.");
+      toast.error("❌ No se pudo eliminar el asset.");
+    } finally {
+      setCargando(false);
     }
   };
+
 
   const dropboxToRaw = (url) => {
     if (!url) return "https://via.placeholder.com/300x200";
@@ -121,7 +151,7 @@ const AssetsSubidos = () => {
                   <button className="action-button edit" onClick={() => handleEditarAsset(asset._id)}>
                     <FaEdit />
                   </button>
-                  <button className="action-button delete" onClick={() => handleEliminarAsset(asset._id)}>
+                  <button className="action-button delete" onClick={() => handleEliminarAsset(asset)}>
                     <FaTrash />
                   </button>
                 </div>
@@ -134,6 +164,14 @@ const AssetsSubidos = () => {
           ))}
         </div>
       </div>
+      {cargando && (
+        <div className="overlay-carga">
+          <div className="spinner"></div>
+          <p className="mensaje-carga">Eliminando asset...</p>
+        </div>
+      )}
+
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 };
