@@ -275,7 +275,16 @@ function SubirAssets() {
             </p>
           )}
 
-          <button className="subir-asset-boton" type="submit">Subir Asset</button>
+          <div className="botones-formulario">
+            <button
+              type="button"
+              className="btn-cancelar"
+              onClick={() => window.location.href = "/"}
+            >
+              Cancelar
+            </button>
+            <button type="submit" className="subir-asset-boton">Subir Asset</button>
+          </div>
           <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>
