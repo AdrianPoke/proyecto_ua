@@ -200,7 +200,16 @@ const EditarAsset = () => {
             <option value="Paquetes">Paquetes</option>
           </select>
 
-          <button className="subir-asset-boton" type="submit">Guardar Cambios</button>
+          <div className="botones-formulario">
+            <button
+              type="button"
+              className="btn-cancelar"
+              onClick={() => navigate('/perfil/assets-subidos')}
+            >
+              Cancelar
+            </button>
+            <button type="submit" className="subir-asset-boton">Guardar Cambios</button>
+          </div>
           <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>
