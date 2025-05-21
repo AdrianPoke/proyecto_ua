@@ -17,6 +17,8 @@ const VerAsset = () => {
   const [usuarioActual, setUsuarioActual] = useState(null);
   const [nuevoComentario, setNuevoComentario] = useState("");
   const [esFavorito, setEsFavorito] = useState(false);
+  const [cooldowns, setCooldowns] = useState({});
+
 
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 const handleFavorito = async () => {
@@ -223,11 +225,17 @@ const handleFavorito = async () => {
           <div className="info-section">
             <h2>Información del Asset</h2>
             <div className="info-grid">
-              <div className="info-item">
+              <div className="info-item autor-item">
                 <FaUser className="icon" />
                 <span>Autor:</span>
+                <img
+                  src={dropboxToRaw(asset.autor?.foto_perfil)}
+                  alt="Foto del autor"
+                  className="autor-avatar"
+                />
                 <strong>{asset.autor?.nombre || "Desconocido"}</strong>
               </div>
+
               <div className="info-item">
                 <FaCalendar className="icon" />
                 <span>Fecha:</span>
@@ -275,7 +283,6 @@ const handleFavorito = async () => {
           </div>
         </div>
       </div>
-
       {/* Comentarios */}
       <div className="comentarios-container">
         <h2>Comentarios</h2>
@@ -299,20 +306,75 @@ const handleFavorito = async () => {
             </div>
           </div>
         )}
- 
+
         {/* Lista de comentarios */}
         {comentarios.length === 0 ? (
           <p>No hay comentarios aún.</p>
         ) : (
-          comentarios.map((comentario) => (
-            <div key={comentario._id} className="comentario-item">
-              <img src={dropboxToRaw(comentario.usuario.foto_perfil)} alt="usuario" className="comentario-avatar" />
-              <div>
-                <strong>{comentario.usuario.nombre}</strong>
-                <p>{comentario.contenido}</p>
+          comentarios.map((comentario) => {
+            const haDadoLike = comentario.usuarios_que_dieron_like?.includes(usuarioActual?._id);
+            const estaEnCooldown = cooldowns[comentario._id] === true;
+
+            const toggleLike = async () => {
+              if (estaEnCooldown) return;
+
+              // Establecer cooldown
+              setCooldowns(prev => ({ ...prev, [comentario._id]: true }));
+
+              try {
+                const metodo = haDadoLike ? 'DELETE' : 'POST';
+                const res = await fetch(`http://localhost:5000/api/comentario/${comentario._id}/like`, {
+                  method: metodo,
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('authToken')}`
+                  }
+                });
+
+                if (!res.ok) throw new Error("Error al actualizar like");
+
+                setComentarios(prev =>
+                  prev.map(c => {
+                    if (c._id === comentario._id) {
+                      const nuevosLikes = haDadoLike ? c.likes - 1 : c.likes + 1;
+                      const nuevosUsuarios = haDadoLike
+                        ? c.usuarios_que_dieron_like.filter(id => id !== usuarioActual._id)
+                        : [...c.usuarios_que_dieron_like, usuarioActual._id];
+                      return { ...c, likes: nuevosLikes, usuarios_que_dieron_like: nuevosUsuarios };
+                    }
+                    return c;
+                  })
+                );
+              } catch (error) {
+                console.error("❌ Error al cambiar el like:", error);
+                alert("Hubo un error al cambiar el like.");
+              } finally {
+                // Quitar cooldown después de 1 segundo
+                setTimeout(() => {
+                  setCooldowns(prev => ({ ...prev, [comentario._id]: false }));
+                }, 1000);
+              }
+            };
+
+
+            return (
+              <div key={comentario._id} className="comentario-item">
+                <img src={dropboxToRaw(comentario.usuario.foto_perfil)} alt="usuario" className="comentario-avatar" />
+                <div style={{ flex: 1 }}>
+                  <strong>{comentario.usuario.nombre}</strong>
+                  <p>{comentario.contenido}</p>
+                  <button onClick={toggleLike} className="like-button">
+                    <FaHeart
+                      style={{
+                        color: haDadoLike ? 'red' : 'gray',
+                        marginRight: '6px'
+                      }}
+                    />
+                    {comentario.likes}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

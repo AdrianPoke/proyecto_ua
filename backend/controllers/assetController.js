@@ -188,7 +188,7 @@ const obtenerAssetPorId = async (req, res) => {
 
   try {
     const asset = await Asset.findById(id)
-      .populate("autor", "nombre email"); // Solo se necesita poblar el autor
+      .populate("autor", "nombre email foto_perfil")
 
     if (!asset) {
       return res.status(404).json({ mensaje: "Asset no encontrado" });

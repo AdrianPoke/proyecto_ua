@@ -5,7 +5,8 @@ const ComentarioSchema = new mongoose.Schema({
   asset: { type: mongoose.Schema.Types.ObjectId, ref: 'Asset', required: true },
   contenido: { type: String, required: true },
   fecha: { type: Date, default: Date.now },
-  likes: { type: Number, default: 0 }
+  likes: { type: Number, default: 0 },
+  usuarios_que_dieron_like: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }]
 }, {
   timestamps: true
 });

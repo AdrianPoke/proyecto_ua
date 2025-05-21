@@ -85,7 +85,7 @@
 }
 
 .perfil-menu button:hover {
-  background-color: var(--color-principal);
+  border-color: var(--color-principal);
   color: white;
 }
 
