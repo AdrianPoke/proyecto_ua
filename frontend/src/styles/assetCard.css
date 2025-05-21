@@ -1,10 +1,9 @@
 .asset-card {
   
   background-color: var(--color-menu);
-  border: 1px solid var(--color-principal);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 0 8px rgba(62, 230, 118, 0.2);
+  box-shadow: 0 0 18px rgba(62, 230, 118, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   max-width: 300px;

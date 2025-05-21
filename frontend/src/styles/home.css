@@ -36,7 +36,7 @@
 /* Grid de tarjetas reutilizable */
 .assets-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 por fila en pantallas grandes */
+  grid-template-columns: repeat(4, 1fr); /* 5 por fila en pantallas grandes */
   gap: 40px;
   justify-items: center;
 }
