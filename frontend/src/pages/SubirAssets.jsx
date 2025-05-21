@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/subirAsset.css";
 import logo from "../logo.png";
@@ -19,6 +22,8 @@ function SubirAssets() {
   const [archivosAsset, setArchivosAsset] = useState([]);
   const [errores, setErrores] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
 
 
   useEffect(() => {
@@ -82,45 +87,63 @@ function SubirAssets() {
 };
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const nuevosErrores = {};
-    if (!formData.titulo.trim()) nuevosErrores.titulo = "El título es obligatorio.";
-    if (!formData.descripcion.trim()) nuevosErrores.descripcion = "La descripción es obligatoria.";
-    if (!formData.categoria) nuevosErrores.categoria = "Debes seleccionar una categoría.";
-    if (!imagenPrincipal) nuevosErrores.imagenPrincipal = "La imagen principal es obligatoria.";
-    if (archivosAsset.length === 0) nuevosErrores.archivosAsset = "Debes subir al menos un archivo válido.";
-    setErrores(nuevosErrores);
-    if (Object.keys(nuevosErrores).length > 0) return;
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const nuevosErrores = {};
+  if (!formData.titulo.trim()) nuevosErrores.titulo = "El título es obligatorio.";
+  if (!formData.descripcion.trim()) nuevosErrores.descripcion = "La descripción es obligatoria.";
+  if (!formData.categoria) nuevosErrores.categoria = "Debes seleccionar una categoría.";
+  if (!imagenPrincipal) nuevosErrores.imagenPrincipal = "La imagen principal es obligatoria.";
+  if (archivosAsset.length === 0) nuevosErrores.archivosAsset = "Debes subir al menos un archivo válido.";
+  setErrores(nuevosErrores);
+  if (Object.keys(nuevosErrores).length > 0) return;
 
-    const data = new FormData();
-    data.append("titulo", formData.titulo);
-    data.append("descripcion", formData.descripcion);
-    data.append("categoria", formData.categoria);
-    data.append("es_sensible", formData.es_sensible);
-    formData.etiquetas.split(",").map((t) => t.trim()).forEach((t) => data.append("etiquetas", t));
-    if (imagenPrincipal) data.append("imagen_principal", imagenPrincipal);
-    imagenesPrevias.forEach((f) => data.append("imagenes_previas", f));
-    archivosAsset.forEach((f) => data.append("archivo_asset", f));
+  const data = new FormData();
+  data.append("titulo", formData.titulo);
+  data.append("descripcion", formData.descripcion);
+  data.append("categoria", formData.categoria);
+  data.append("es_sensible", formData.es_sensible);
+  formData.etiquetas.split(",").map((t) => t.trim()).forEach((t) => data.append("etiquetas", t));
+  if (imagenPrincipal) data.append("imagen_principal", imagenPrincipal);
+  imagenesPrevias.forEach((f) => data.append("imagenes_previas", f));
+  archivosAsset.forEach((f) => data.append("archivo_asset", f));
 
-    try {
-        setIsLoading(true);
-        const token = localStorage.getItem("authToken");
-        await axios.post("http://localhost:5000/api/asset", data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setIsLoading(false);
-        alert("✅ Asset subido con éxito");
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false);
-        alert("❌ Error al subir el asset");
-      }
+  try {
+    setIsLoading(true);
+    const token = localStorage.getItem("authToken");
+    const res = await axios.post("http://localhost:5000/api/asset", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    setIsLoading(false);
 
-  };
+    // Redirección con toast clicable
+    const nuevoAssetId = res.data._id;
+    toast.success("Asset subido con éxito");
+
+
+    // Limpiar formulario si quieres
+    setFormData({
+      titulo: "",
+      descripcion: "",
+      categoria: "",
+      etiquetas: "",
+      es_sensible: false,
+    });
+    setImagenPrincipal(null);
+    setImagenesPrevias([]);
+    setArchivosAsset([]);
+    setErrores({});
+
+  } catch (error) {
+    console.error(error);
+    setIsLoading(false);
+    toast.error("❌ Error al subir el asset");
+  }
+};
+
 
   return (
     <div className="subir-asset-container">
@@ -262,6 +285,9 @@ function SubirAssets() {
           <p className="mensaje-carga">Subiendo asset, por favor espera...</p>
         </div>
       )}
+
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+
     </div>
   );
 }

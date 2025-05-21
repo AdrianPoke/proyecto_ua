@@ -100,18 +100,18 @@ input[type="checkbox"] {
 
 .subir-asset-boton {
   background: linear-gradient(90deg, #38ef7d, #11998e);
-  color: white;
-  font-weight: 600;
+  color: black;
+  font-weight: 700;
   padding: 12px 30px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 15px;
-  transition: background 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
 .subir-asset-boton:hover {
-  background: #11998e;
+  transform: scale(1.03);
 }
 
 .campo-obligatorio {
