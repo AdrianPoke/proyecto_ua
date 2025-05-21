@@ -1,6 +1,6 @@
 @import url('./variables.css');
 
-/* Página de login centrada y con fondo */
+/* Fondo de la página */
 .login-page {
   background-color: var(--color-fondo);
   min-height: 100vh;
@@ -9,87 +9,148 @@
   align-items: center;
 }
 
-/* Cabecera con logo y título en línea */
+/* Contenedor general del formulario con estilo similar al de subir assets */
+.login-container {
+  width: 100%;
+  max-width: 700px;
+  padding: 40px;
+    margin: 70px; 
+  border-radius: 4px;
+  background-color: var(--color-menu);
+  border: 1px solid var(--color-principal);
+  box-shadow: 0 0 38px rgba(62, 230, 118, 0.2);
+}
+
+.boton-accion {
+  background: linear-gradient(90deg, #38ef7d, #11998e);
+  color: black;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.3s ease;
+  min-width: 160px;
+  text-align: center;
+}
+
+.boton-accion:hover {
+  transform: scale(1.01);
+}
+
+
+.subir-asset-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-texto);
+  margin: 0;
+}
+
+
+/* Estructura de columna */
+.subir-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cabecera con logo y título */
 .login-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: var(--margen-25);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .login-logo {
-  width: 50px;
-  height: 50px;
+  height: 32px;
 }
 
-.login-header h2 {
+.subir-asset-title {
+  font-size: 24px;
+  font-weight: 600;
   color: var(--color-texto);
-  font-size: 1.8rem;
-  border-left: 3px solid var(--color-principal);
-  padding-left: var(--margen-15);
   margin: 0;
-}
-
-/* Contenedor principal del formulario */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: var(--input-padding);
-  border-radius: var(--input-radius);
-  border: 1px solid var(--color-borde-input);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 /* Formulario */
 .login-form {
   display: flex;
   flex-direction: column;
-  width: var(--form-width);
+  gap: 20px;
 }
 
+/* Etiquetas */
 .login-form label {
-  color: var(--color-texto);
-  margin-bottom: 5px;
-  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-principal);
+  font-size: 14px;
 }
 
+/* Inputs */
 .login-form input {
   width: 100%;
-  background-color: var(--color-menu);
+  background-color: #1c1c1c;
   border: 1px solid var(--color-borde-input);
-  padding: var(--input-padding);
-  border-radius: var(--input-radius);
+  border-radius: 4px;
+  padding: 10px 14px;
   color: var(--color-texto);
-  margin-bottom: var(--margen-15);
-  font-size: 0.95rem;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: var(--color-principal);
 }
 
 .login-form input::placeholder {
   color: var(--color-placeholder);
 }
 
-.login-form button {
-  width: 100%;
-  background-color: var(--color-principal);
-  color: var(--color-fondo);
-  padding: var(--input-padding);
+/* Botón de login */
+.subir-asset-boton {
+  background: linear-gradient(90deg, #38ef7d, #11998e);
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: 600;
   border: none;
-  border-radius: var(--input-radius);
-  font-weight: bold;
-  font-size: 1rem;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color var(--transicion-base);
+  transition: transform 0.3s ease;
+  min-width: 160px;
+  text-align: center;
+  color: black;
 }
 
-.login-form button:hover {
-  background-color: var(--color-principal-hover);
+.subir-asset-boton:hover {
+  transform: scale(1.03);
 }
 
+/* Contenedor de botones */
+.botones-formulario {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+/* Texto de campos obligatorios */
+.campo-obligatorio {
+  font-size: 12px;
+  color: var(--color-placeholder);
+  margin-top: 8px;
+}
+
+/* Enlace a registro */
 .login-form p {
-  margin-top: 20px;
+  margin-top: 12px;
   text-align: center;
   color: var(--color-texto);
   font-size: 0.85rem;
@@ -101,63 +162,31 @@
   font-weight: bold;
 }
 
-/* Media Queries */
+/* Responsivo */
 @media screen and (max-width: 768px) {
   .login-container {
-    width: 90%;
-    max-width: 400px;
-    padding: var(--margen-15);
+    padding: 30px 20px;
   }
 
-  .login-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .login-logo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .login-form {
-    width: 100%;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .login-container {
-    width: 95%;
-    padding: var(--margen-10);
-  }
-
-  .login-header {
-    gap: 10px;
-    margin-bottom: var(--margen-15);
-  }
-
-  .login-header h2 {
-    font-size: 1.2rem;
+  .subir-asset-title {
+    font-size: 22px;
   }
 
   .login-logo {
-    width: 35px;
-    height: 35px;
+    height: 28px;
   }
 
-  .login-form label {
-    font-size: 0.9rem;
+  .subir-columna {
+    gap: 16px;
   }
 
   .login-form input {
-    padding: 8px;
-    font-size: 0.9rem;
+    font-size: 13.5px;
+    padding: 9px 12px;
   }
 
-  .login-form button {
-    padding: 10px;
-    font-size: 0.95rem;
-  }
-
-  .login-form p {
-    font-size: 0.8rem;
+  .subir-asset-boton {
+    padding: 10px 30px;
+    font-size: 15px;
   }
 }

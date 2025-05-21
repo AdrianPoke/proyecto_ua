@@ -69,7 +69,7 @@ function Registro() {
       <div className="login-container">
         <div className="login-header">
           <img src={logo} alt="Logo" className="login-logo" />
-          <h2>Formulario de Registro</h2>
+          <h2 className="subir-asset-title">Formulario de Registro</h2>
         </div>
 
         <form className="login-form" onSubmit={handleRegistro}>
@@ -131,7 +131,9 @@ function Registro() {
             placeholder="Confirma tu contraseña"
           />
 
-          <button type="submit">Registrarse</button>
+          <button type="submit" className="boton-accion">
+            Aceptar
+          </button>
 
           <p>
             ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>

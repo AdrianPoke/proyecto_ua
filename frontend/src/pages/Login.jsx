@@ -60,7 +60,8 @@ function Login() {
       <div className="login-container">
         <div className="login-header">
           <img src={logo} alt="Logo" className="login-logo" />
-          <h2>Formulario de Inicio de Sesión</h2>
+          <h2 className="subir-asset-title">Formulario de Inicio de Sesión</h2>
+
         </div>
 
         <form className="login-form" onSubmit={handleLogin}>
@@ -82,7 +83,10 @@ function Login() {
             required
           />
 
-          <button type="submit">Inicia Sesión</button>
+          <button type="submit" className="boton-accion">
+            Aceptar
+          </button>
+
 
           <p>
             ¿No tienes una cuenta creada?{" "}
