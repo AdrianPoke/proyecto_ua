@@ -4,9 +4,13 @@ import axios from 'axios';
 import '../styles/editarAsset.css';
 import { FaEdit } from 'react-icons/fa';
 import { unzipSync } from "fflate";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const EditarAsset = () => {
   const { id } = useParams();
+  const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -100,17 +104,21 @@ const EditarAsset = () => {
 
     try {
       const token = localStorage.getItem("authToken");
+      setCargando(true);
       await axios.put(`http://localhost:5000/api/asset/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
-      alert("✅ Asset actualizado correctamente");
-      navigate('/perfil/assets-subidos');
+      toast.success("✅ Asset actualizado correctamente");
+      setTimeout(() => {
+        navigate('/perfil/assets-subidos');
+      }, 2000);
     } catch (error) {
       console.error("❌ Error al actualizar asset:", error);
       alert("No se pudo actualizar el asset");
+      setCargando(false);
     }
   };
 
@@ -213,6 +221,13 @@ const EditarAsset = () => {
           <p className="campo-obligatorio">* Campos obligatorios</p>
         </div>
       </form>
+      {cargando && (
+        <div className="overlay-carga">
+          <div className="spinner"></div>
+          <p className="mensaje-carga">Actualizando asset...</p>
+        </div>
+      )}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 };
