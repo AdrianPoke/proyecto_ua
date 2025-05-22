@@ -207,16 +207,36 @@ const VerAsset = () => {
           <div className="info-section">
             <h2>Información del Asset</h2>
             <div className="info-grid">
-              <div className="info-item autor-item">
-                <FaUser className="icon" />
-                <span>Autor:</span>
-                <img
-                  src={dropboxToRaw(asset.autor?.foto_perfil)}
-                  alt="Foto del autor"
-                  className="autor-avatar"
-                />
-                <strong>{asset.autor?.nombre || "Desconocido"}</strong>
-              </div>
+<div className="info-item autor-item">
+  <FaUser className="icon" />
+  <img
+    src={dropboxToRaw(asset.autor?.foto_perfil)}
+    alt="Foto del autor"
+    className="autor-avatar"
+  />
+  <div className="autor-contenido-inline">
+    <strong>{asset.autor?.nombre || "Desconocido"}</strong>
+    <div className="autor-redes-inline">
+      {asset.autor?.enlace_twitter && (
+        <a href={asset.autor.enlace_twitter} target="_blank" rel="noreferrer">
+          <img src={xIcon} alt="Twitter" className="social-icon-inline" />
+        </a>
+      )}
+      {asset.autor?.enlace_instagram && (
+        <a href={asset.autor.enlace_instagram} target="_blank" rel="noreferrer">
+          <img src={igIcon} alt="Instagram" className="social-icon-inline" />
+        </a>
+      )}
+      {asset.autor?.enlace_linkedin && (
+        <a href={asset.autor.enlace_linkedin} target="_blank" rel="noreferrer">
+          <img src={linkedinIcon} alt="LinkedIn" className="social-icon-inline" />
+        </a>
+      )}
+    </div>
+  </div>
+</div>
+
+
               <div className="info-item">
                 <FaCalendar className="icon" />
                 <span>Fecha:</span>
