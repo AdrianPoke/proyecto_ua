@@ -7,6 +7,9 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import '../styles/verAsset.css';
+import xIcon from '../icons/x.png';
+import igIcon from '../icons/instagram.png';
+import linkedinIcon from '../icons/linkedin.webp';
 
 const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
@@ -331,7 +334,27 @@ const VerAsset = () => {
                 <img src={dropboxToRaw(comentario.usuario.foto_perfil)} alt="usuario" className="comentario-avatar" />
                 <div style={{ flex: 1 }}>
                   <strong>{comentario.usuario.nombre}</strong>
-                  <p>{comentario.contenido}</p>
+
+                    <div className="comentario-redes">
+                      {comentario.usuario.enlace_twitter && (
+                        <a href={comentario.usuario.enlace_twitter} target="_blank" rel="noreferrer">
+                          <img src={xIcon} alt="Twitter" className="social-icon" />
+                        </a>
+                      )}
+                      {comentario.usuario.enlace_instagram && (
+                        <a href={comentario.usuario.enlace_instagram} target="_blank" rel="noreferrer">
+                          <img src={igIcon} alt="Instagram" className="social-icon" />
+                        </a>
+                      )}
+                      {comentario.usuario.enlace_linkedin && (
+                        <a href={comentario.usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+                          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
+                        </a>
+                      )}
+                    </div>
+
+                    <p>{comentario.contenido}</p>
+
                   <button onClick={toggleLike} className="like-button">
                     <FaHeart style={{ color: haDadoLike ? 'red' : 'gray', marginRight: '6px' }} />
                     {comentario.likes}

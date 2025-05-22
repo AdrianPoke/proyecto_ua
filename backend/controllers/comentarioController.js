@@ -35,7 +35,8 @@ const obtenerComentarios = async (req, res) => {
 
     const comentarios = await Comentario.find({ asset: assetId })
       .sort({ createdAt: -1 }) // más recientes primero
-      .populate('usuario', 'nombre email foto_perfil');
+      .populate('usuario', 'nombre email foto_perfil enlace_twitter enlace_instagram enlace_linkedin');
+
 
     res.status(200).json(comentarios);
   } catch (error) {
