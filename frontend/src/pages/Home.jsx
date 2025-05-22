@@ -11,30 +11,44 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    const token = localStorage.getItem('authToken');
+    // Intentar cargar el perfil del usuario
+    if (token) {
       try {
-        const token = localStorage.getItem('authToken');
-
-        // Cargar usuario
         const resUsuario = await axios.get('http://localhost:5000/api/usuario/perfil', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        
         setUsuario(resUsuario.data);
-
-        // Recientes
-        const resRecientes = await axios.get('http://localhost:5000/api/asset/recientes?limite=10');
-        setAssetsRecientes(resRecientes.data);
-
-        // Populares
-        const resPopulares = await axios.get('http://localhost:5000/api/asset/populares?limite=7');
-        setAssetsPopulares(resPopulares.data);
       } catch (error) {
-        console.error('Error al obtener datos:', error);
+        console.warn("⚠️ No se pudo cargar el usuario:", error.response?.data || error.message);
       }
-    };
+    } else {
+      console.log("No hay token: usuario no logueado");
+    }
 
-    fetchData();
-  }, []);
+    // Cargar assets recientes
+    try {
+      const resRecientes = await axios.get('http://localhost:5000/api/asset/recientes?limite=10');
+      setAssetsRecientes(resRecientes.data);
+    } catch (error) {
+      console.error("❌ Error al obtener assets recientes:", error.response?.data || error.message);
+    }
+
+    // Cargar assets populares
+    try {
+
+      const resPopulares = await axios.get('http://localhost:5000/api/asset/populares?limite=7');
+
+      setAssetsPopulares(resPopulares.data);
+    } catch (error) {
+      console.error("❌ Error al obtener assets populares:", error.response?.data || error.message);
+    }
+  };
+
+  fetchData();
+}, []);
 
   const handleVerAsset = (id) => {
     navigate(`/asset/${id}`);
