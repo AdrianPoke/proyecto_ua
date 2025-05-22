@@ -419,17 +419,32 @@
   margin: 4px 0;
 }
 
-.social-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  opacity: 0.85;
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.comentario-redes-inline {
+  display: flex;
+  gap: 4px;
+}
+
+.social-icon-small-comments {
+  width: 14px;
+  height: 14px;
+  opacity: 0.75;
+  margin-left: 5px;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.social-icon:hover {
-  transform: scale(1.1);
+.social-icon-small-comments:hover {
+  transform: scale(1.15);
   opacity: 1;
 }
+
+
 
 

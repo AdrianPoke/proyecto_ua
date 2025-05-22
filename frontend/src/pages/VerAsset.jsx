@@ -333,25 +333,26 @@ const VerAsset = () => {
               <div key={comentario._id} className="comentario-item">
                 <img src={dropboxToRaw(comentario.usuario.foto_perfil)} alt="usuario" className="comentario-avatar" />
                 <div style={{ flex: 1 }}>
+                 <div className="comentario-header">
                   <strong>{comentario.usuario.nombre}</strong>
-
-                    <div className="comentario-redes">
-                      {comentario.usuario.enlace_twitter && (
-                        <a href={comentario.usuario.enlace_twitter} target="_blank" rel="noreferrer">
-                          <img src={xIcon} alt="Twitter" className="social-icon" />
-                        </a>
-                      )}
-                      {comentario.usuario.enlace_instagram && (
-                        <a href={comentario.usuario.enlace_instagram} target="_blank" rel="noreferrer">
-                          <img src={igIcon} alt="Instagram" className="social-icon" />
-                        </a>
-                      )}
-                      {comentario.usuario.enlace_linkedin && (
-                        <a href={comentario.usuario.enlace_linkedin} target="_blank" rel="noreferrer">
-                          <img src={linkedinIcon} alt="LinkedIn" className="social-icon" />
-                        </a>
-                      )}
-                    </div>
+                  <div className="comentario-redes-inline">
+                    {comentario.usuario.enlace_twitter && (
+                      <a href={comentario.usuario.enlace_twitter} target="_blank" rel="noreferrer">
+                        <img src={xIcon} alt="Twitter" className="social-icon-small-comments" />
+                      </a>
+                    )}
+                    {comentario.usuario.enlace_instagram && (
+                      <a href={comentario.usuario.enlace_instagram} target="_blank" rel="noreferrer">
+                        <img src={igIcon} alt="Instagram" className="social-icon-small-comments" />
+                      </a>
+                    )}
+                    {comentario.usuario.enlace_linkedin && (
+                      <a href={comentario.usuario.enlace_linkedin} target="_blank" rel="noreferrer">
+                        <img src={linkedinIcon} alt="LinkedIn" className="social-icon-small-comments" />
+                      </a>
+                    )}
+                  </div>
+                </div>
 
                     <p>{comentario.contenido}</p>
 
