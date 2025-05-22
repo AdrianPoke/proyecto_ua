@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅
 import "../styles/Global.css";
 import "../styles/login.css";
 import logo from "../logo.png";
@@ -11,23 +12,22 @@ function Registro() {
   const [repetircontrasenya, setRepetircontrasenya] = useState("");
   const [errores, setErrores] = useState({});
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅
 
   const validarCampo = (campo, valor) => {
     let error = "";
-
     if (!valor.trim()) error = "Este campo es obligatorio.";
     if (campo === "contrasenya" && valor && valor.length < 10)
       error = "La contraseña debe tener al menos 10 caracteres.";
     if (campo === "repetircontrasenya" && valor !== contrasenya)
       error = "Las contraseñas no coinciden.";
-
     setErrores((prev) => ({ ...prev, [campo]: error }));
   };
 
   const handleRegistro = async (e) => {
     e.preventDefault();
-    const nuevosErrores = {};
 
+    const nuevosErrores = {};
     if (!nombre.trim()) nuevosErrores.nombre = "Este campo es obligatorio.";
     if (!email.trim()) nuevosErrores.email = "Este campo es obligatorio.";
     if (!contrasenya) nuevosErrores.contrasenya = "Este campo es obligatorio.";
@@ -53,8 +53,8 @@ function Registro() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("authToken", data.token); 
-        window.location.href = "/home"; 
+        login(data.token, data.usuario); // ✅
+        navigate("/home"); // ✅
       } else {
         alert(data.mensaje || "Error al registrarse.");
       }
@@ -102,7 +102,7 @@ function Registro() {
           />
 
           <label>
-            contraseña:
+            Contraseña:
             {errores.contrasenya && <span className="error"> — {errores.contrasenya}</span>}
           </label>
           <input
