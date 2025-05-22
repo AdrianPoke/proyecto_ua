@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const registro = async (req, res) => {
-  const { nombre, email, contraseña } = req.body;
+  const { nombre, email, contrasenya } = req.body;
 
   try {
     const usuarioExistente = await User.findOne({ email });
@@ -12,12 +12,12 @@ const registro = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const contraseñaHasheada = await bcrypt.hash(contraseña, salt);
+    const contrasenyaHasheada = await bcrypt.hash(contrasenya, salt);
 
     const nuevoUsuario = new User({
       nombre,
       email,
-      contraseña: contraseñaHasheada,
+      contrasenya: contrasenyaHasheada,
       foto_perfil: "",
       enlace_twitter: "",
       enlace_instagram: "",
@@ -30,7 +30,24 @@ const registro = async (req, res) => {
     });
 
     await nuevoUsuario.save();
-    res.status(201).json({ mensaje: 'Usuario registrado correctamente.' });
+
+    // 🔑 Generar token JWT
+    const token = jwt.sign(
+      { id: nuevoUsuario._id },
+      process.env.JWT_SECRET || 'secreto_fallback',
+      { expiresIn: '2h' }
+    );
+
+    res.status(201).json({
+      mensaje: 'Usuario registrado correctamente.',
+      token, 
+      usuario: {
+        id: nuevoUsuario._id,
+        nombre: nuevoUsuario.nombre,
+        email: nuevoUsuario.email,
+        foto_perfil: nuevoUsuario.foto_perfil
+      }
+    });
 
   } catch (error) {
     console.error(error);
@@ -39,7 +56,7 @@ const registro = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, contraseña } = req.body;
+  const { email, contrasenya } = req.body;
 
   try {
     const usuario = await User.findOne({ email });
@@ -47,9 +64,9 @@ const login = async (req, res) => {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
 
-    const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
+    const esValida = await bcrypt.compare(contrasenya, usuario.contrasenya);
     if (!esValida) {
-      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
+      return res.status(401).json({ mensaje: 'contrasenya incorrecta' });
     }
 
     // Generar token con el ID del usuario

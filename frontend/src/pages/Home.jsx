@@ -5,6 +5,7 @@ import AssetCard from '../Components/AssetCard';
 import '../styles/home.css';
 
 function Home() {
+  const [usuario, setUsuario] = useState(null);
   const [assetsRecientes, setAssetsRecientes] = useState([]);
   const [assetsPopulares, setAssetsPopulares] = useState([]);
   const navigate = useNavigate();
@@ -12,6 +13,14 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('authToken');
+
+        // Cargar usuario
+        const resUsuario = await axios.get('http://localhost:5000/api/usuario/perfil', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUsuario(resUsuario.data);
+
         // Recientes
         const resRecientes = await axios.get('http://localhost:5000/api/asset/recientes?limite=10');
         setAssetsRecientes(resRecientes.data);
@@ -20,7 +29,7 @@ function Home() {
         const resPopulares = await axios.get('http://localhost:5000/api/asset/populares?limite=7');
         setAssetsPopulares(resPopulares.data);
       } catch (error) {
-        console.error('Error al obtener assets:', error);
+        console.error('Error al obtener datos:', error);
       }
     };
 
@@ -33,6 +42,12 @@ function Home() {
 
   return (
     <div className="home-container">
+      {usuario && (
+        <p className="mensaje-bienvenida">
+          Bienvenido, <strong>{usuario.nombre}</strong> 👋
+        </p>
+      )}
+
       <h2 className="home-title">Página Principal</h2>
 
       <div className="section-divider">

@@ -21,7 +21,7 @@ function Datos() {
 
   const [formData, setFormData] = useState({
   nombre: "",
-  contraseña: "",
+  contrasenya: "",
   usuario_twitter: "",
   usuario_instagram: "",
   usuario_linkedin: "",
@@ -42,7 +42,7 @@ function Datos() {
         setUsuario(res.data);
         setFormData({
         nombre: res.data.nombre,
-        contraseña: "",
+        contrasenya: "",
         usuario_twitter: res.data.enlace_twitter?.split("/").pop() || "",
         usuario_instagram: res.data.enlace_instagram?.split("/").pop() || "",
         usuario_linkedin: res.data.enlace_linkedin?.split("/").pop() || "",
@@ -62,7 +62,7 @@ function Datos() {
       msg = "El nombre no puede estar vacío.";
     }
 
-    if (name === "contraseña" && value && value.length < 10) {
+    if (name === "contrasenya" && value && value.length < 10) {
       msg = "La contraseña debe tener al menos 10 caracteres.";
     }
 
@@ -95,7 +95,7 @@ function Datos() {
     setFormData((prev) => ({ ...prev, foto_perfil: archivo }));
   };
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   let nuevosErrores = {};
@@ -103,7 +103,7 @@ function Datos() {
     let msg = "";
 
     if (key === "nombre" && !val.trim()) msg = "El nombre no puede estar vacío.";
-    if (key === "contraseña" && val && val.length < 10)
+    if (key === "contrasenya" && val && val.length < 10)
       msg = "La contraseña debe tener al menos 10 caracteres.";
     if (
       ["enlace_twitter", "enlace_instagram", "enlace_linkedin"].includes(key) &&
@@ -120,22 +120,25 @@ function Datos() {
   });
 
   setErrores(nuevosErrores);
-
-  const hayErrores = Object.keys(nuevosErrores).length > 0;
-  if (hayErrores) return;
+  if (Object.keys(nuevosErrores).length > 0) return;
 
   try {
-    setIsLoading(true); // 🟡 Mostrar overlay
+    setIsLoading(true);
 
     const token = localStorage.getItem("authToken");
     const data = new FormData();
     data.append("nombre", formData.nombre);
-    if (formData.contraseña) data.append("contraseña", formData.contraseña);
+    if (formData.contrasenya) data.append("contrasenya", formData.contrasenya);
     data.append("enlace_twitter", formData.usuario_twitter ? `https://twitter.com/${formData.usuario_twitter}` : "");
     data.append("enlace_instagram", formData.usuario_instagram ? `https://instagram.com/${formData.usuario_instagram}` : "");
     data.append("enlace_linkedin", formData.usuario_linkedin ? `https://linkedin.com/in/${formData.usuario_linkedin}` : "");
-
     if (formData.foto_perfil) data.append("foto_perfil", formData.foto_perfil);
+
+    // 🔍 LOG DEL FORM DATA
+    console.log("🔍 FormData que se va a enviar:");
+    for (let pair of data.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
 
     await axios.put("http://localhost:5000/api/usuario/perfil", data, {
       headers: {
@@ -144,15 +147,14 @@ function Datos() {
       },
     });
 
-    setIsLoading(false); 
-    
+    setIsLoading(false);
     window.location.reload();
   } catch (error) {
     console.error("❌ Error al actualizar el perfil", error);
-    setIsLoading(false); // ❌ Ocultar overlay también tras error
-    
+    setIsLoading(false);
   }
 };
+
 
 
 
@@ -199,10 +201,15 @@ function Datos() {
         <form className="subir-asset-form" onSubmit={handleSubmit} encType="multipart/form-data">
           <div className="subir-columna">
             <label>
-              Foto de Perfil <span className="recomendacion">(JPG, PNG o GIF - máx. 5MB)</span>
+              Foto de Perfil <span className="recomendacion">(JPG, PNG o avif - máx. 5MB)</span>
               {errores.foto_perfil && <span className="error-text"> – {errores.foto_perfil}</span>}
             </label>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.avif"
+              onChange={handleFileChange}
+            />
+
 
             <label>
               Tu usuario de X:
@@ -250,10 +257,10 @@ function Datos() {
             <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
 
             <label>
-              Nueva Contraseña:
-              {errores.contraseña && <span className="error-text"> – {errores.contraseña}</span>}
+              Nueva contraseña:
+              {errores.contrasenya && <span className="error-text"> – {errores.contrasenya}</span>}
             </label>
-            <input type="password" name="contraseña" placeholder="Mínimo 10 caracteres" onChange={handleChange} />
+            <input type="password" name="contrasenya" placeholder="Mínimo 10 caracteres" onChange={handleChange} />
 
             <button type="submit" className="subir-asset-boton">Modificar</button>
             <p className="instrucciones">

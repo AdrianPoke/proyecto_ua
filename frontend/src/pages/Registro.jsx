@@ -7,8 +7,8 @@ import logo from "../logo.png";
 function Registro() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
-  const [contraseña, setContraseña] = useState("");
-  const [repetirContraseña, setRepetirContraseña] = useState("");
+  const [contrasenya, setcontrasenya] = useState("");
+  const [repetircontrasenya, setRepetircontrasenya] = useState("");
   const [errores, setErrores] = useState({});
   const navigate = useNavigate();
 
@@ -16,9 +16,9 @@ function Registro() {
     let error = "";
 
     if (!valor.trim()) error = "Este campo es obligatorio.";
-    if (campo === "contraseña" && valor && valor.length < 10)
+    if (campo === "contrasenya" && valor && valor.length < 10)
       error = "La contraseña debe tener al menos 10 caracteres.";
-    if (campo === "repetirContraseña" && valor !== contraseña)
+    if (campo === "repetircontrasenya" && valor !== contrasenya)
       error = "Las contraseñas no coinciden.";
 
     setErrores((prev) => ({ ...prev, [campo]: error }));
@@ -30,13 +30,13 @@ function Registro() {
 
     if (!nombre.trim()) nuevosErrores.nombre = "Este campo es obligatorio.";
     if (!email.trim()) nuevosErrores.email = "Este campo es obligatorio.";
-    if (!contraseña) nuevosErrores.contraseña = "Este campo es obligatorio.";
-    else if (contraseña.length < 10)
-      nuevosErrores.contraseña = "La contraseña debe tener al menos 10 caracteres.";
-    if (!repetirContraseña)
-      nuevosErrores.repetirContraseña = "Este campo es obligatorio.";
-    else if (repetirContraseña !== contraseña)
-      nuevosErrores.repetirContraseña = "Las contraseñas no coinciden.";
+    if (!contrasenya) nuevosErrores.contrasenya = "Este campo es obligatorio.";
+    else if (contrasenya.length < 10)
+      nuevosErrores.contrasenya = "La contraseña debe tener al menos 10 caracteres.";
+    if (!repetircontrasenya)
+      nuevosErrores.repetircontrasenya = "Este campo es obligatorio.";
+    else if (repetircontrasenya !== contrasenya)
+      nuevosErrores.repetircontrasenya = "Las contraseñas no coinciden.";
 
     setErrores(nuevosErrores);
     if (Object.keys(nuevosErrores).length > 0) return;
@@ -47,14 +47,14 @@ function Registro() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nombre, email, contraseña }),
+        body: JSON.stringify({ nombre, email, contrasenya }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert("Registro exitoso. Inicia sesión.");
-        navigate("/login");
+        localStorage.setItem("authToken", data.token); 
+        window.location.href = "/home"; 
       } else {
         alert(data.mensaje || "Error al registrarse.");
       }
@@ -102,31 +102,31 @@ function Registro() {
           />
 
           <label>
-            Contraseña:
-            {errores.contraseña && <span className="error"> — {errores.contraseña}</span>}
+            contraseña:
+            {errores.contrasenya && <span className="error"> — {errores.contrasenya}</span>}
           </label>
           <input
             type="password"
-            value={contraseña}
+            value={contrasenya}
             onChange={(e) => {
-              setContraseña(e.target.value);
-              validarCampo("contraseña", e.target.value);
+              setcontrasenya(e.target.value);
+              validarCampo("contrasenya", e.target.value);
             }}
             placeholder="Mínimo 10 caracteres"
           />
 
           <label>
-            Repetir Contraseña:
-            {errores.repetirContraseña && (
-              <span className="error"> — {errores.repetirContraseña}</span>
+            Repetir contraseña:
+            {errores.repetircontrasenya && (
+              <span className="error"> — {errores.repetircontrasenya}</span>
             )}
           </label>
           <input
             type="password"
-            value={repetirContraseña}
+            value={repetircontrasenya}
             onChange={(e) => {
-              setRepetirContraseña(e.target.value);
-              validarCampo("repetirContraseña", e.target.value);
+              setRepetircontrasenya(e.target.value);
+              validarCampo("repetircontrasenya", e.target.value);
             }}
             placeholder="Confirma tu contraseña"
           />

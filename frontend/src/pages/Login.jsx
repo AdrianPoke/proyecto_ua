@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-//import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/Global.css";
 import "../styles/login.css";
 import logo from "../logo.png";
@@ -7,9 +8,7 @@ import logo from "../logo.png";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  //const navigate = useNavigate();
 
-  // 🔁 Si venimos del AuthGuard tras perder el token, recargamos para actualizar el navbar
   useEffect(() => {
     const shouldReload = sessionStorage.getItem("reloadAfterRedirectToLogin");
     if (shouldReload) {
@@ -22,7 +21,7 @@ function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Por favor, ingresa tu email y contraseña.");
+      toast.error("Por favor, ingresa tu email y contraseña.", { autoClose: 5000 });
       return;
     }
 
@@ -34,24 +33,21 @@ function Login() {
         },
         body: JSON.stringify({
           email,
-          contraseña: password, // debe coincidir con el campo en el backend
+          contrasenya: password,
         }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Guardar el token JWT
         localStorage.setItem("authToken", data.token);
-
-        // Redirigir y recargar para que la barra superior se actualice
-        window.location.href = "/home";
+        window.location.href = "/home"; // 🔁 Redirección directa sin toast
       } else {
-        alert(data.mensaje || "Error al iniciar sesión.");
+        toast.error(data.mensaje || "Error al iniciar sesión.", { autoClose: 5000 });
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      alert("Error del servidor. Inténtalo más tarde.");
+      toast.error("Error del servidor. Inténtalo más tarde.", { autoClose: 5000 });
     }
   };
 
@@ -61,7 +57,6 @@ function Login() {
         <div className="login-header">
           <img src={logo} alt="Logo" className="login-logo" />
           <h2 className="subir-asset-title">Formulario de Inicio de Sesión</h2>
-
         </div>
 
         <form className="login-form" onSubmit={handleLogin}>
@@ -74,7 +69,7 @@ function Login() {
             required
           />
 
-          <label>Contraseña:</label>
+          <label>contraseña:</label>
           <input
             type="password"
             value={password}
@@ -87,13 +82,14 @@ function Login() {
             Aceptar
           </button>
 
-
           <p>
             ¿No tienes una cuenta creada?{" "}
             <a href="/registro">Regístrate aquí</a>
           </p>
         </form>
       </div>
+
+      <ToastContainer position="top-right" autoClose={5000} />
     </div>
   );
 }

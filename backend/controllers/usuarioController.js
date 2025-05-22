@@ -14,7 +14,7 @@ const obtenerUsuarios = async (req, res) => {
 const actualizarPerfil = async (req, res) => {
   try {
     const usuarioId = req.usuarioId;
-    const { nombre, contraseña, enlace_twitter, enlace_instagram, enlace_linkedin } = req.body;
+    const { nombre, contrasenya, enlace_twitter, enlace_instagram, enlace_linkedin } = req.body;
 
     const usuario = await User.findById(usuarioId);
     if (!usuario) {
@@ -23,9 +23,9 @@ const actualizarPerfil = async (req, res) => {
 
     if (nombre) usuario.nombre = nombre;
 
-    if (contraseña) {
-      const hash = await bcrypt.hash(contraseña, 10);
-      usuario.contraseña = hash;
+    if (contrasenya) {
+      const hash = await bcrypt.hash(contrasenya, 10);
+      usuario.contrasenya = hash;
     }
 
     if (enlace_twitter !== undefined) usuario.enlace_twitter = enlace_twitter;
@@ -62,7 +62,7 @@ const actualizarPerfil = async (req, res) => {
 
 const obtenerPerfil = async (req, res) => {
   try {
-    const usuario = await User.findById(req.usuarioId).select('-contraseña');
+    const usuario = await User.findById(req.usuarioId).select('-contrasenya');
     if (!usuario) {
       return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
