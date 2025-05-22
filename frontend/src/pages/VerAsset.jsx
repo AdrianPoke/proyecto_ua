@@ -20,6 +20,8 @@ const VerAsset = () => {
   const [nuevoComentario, setNuevoComentario] = useState("");
   const [esFavorito, setEsFavorito] = useState(false);
   const [cooldowns, setCooldowns] = useState({});
+  const [descargando, setDescargando] = useState(false);
+
 
   const handleFavorito = async () => {
     try {
@@ -87,6 +89,8 @@ const VerAsset = () => {
 
   const handleDescargar = async () => {
     try {
+      setDescargando(true);
+
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/asset/${id}/descargar`, {
         method: 'GET',
         headers: {
@@ -112,8 +116,11 @@ const VerAsset = () => {
     } catch (error) {
       console.error("Error en la descarga:", error);
       toast.error("Hubo un error al intentar descargar el asset.");
+    } finally {
+      setDescargando(false); 
     }
   };
+
 
   const handleComentar = async () => {
     if (!nuevoComentario.trim()) return;
@@ -338,6 +345,13 @@ const VerAsset = () => {
 
       {/* Toast notifications */}
       <ToastContainer position="top-right" autoClose={2000} />
+      {descargando && (
+        <div className="overlay-carga">
+          <div className="spinner"></div>
+          <p className="mensaje-carga">Descargando asset, por favor espera...</p>
+        </div>
+      )}
+
     </div>
   );
 };
