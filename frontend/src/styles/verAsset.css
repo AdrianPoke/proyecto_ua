@@ -412,3 +412,43 @@
   font-weight: 500;
 }
 
+
+.comentario-redes {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+
+.comentario-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.comentario-redes-inline {
+  display: flex;
+  gap: 4px;
+}
+
+.social-icon-small-comments {
+  width: 14px;
+  height: 14px;
+  opacity: 0.75;
+  margin-left: 5px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.Toastify__progress-bar {
+  background: var(--color-principal) !important;
+}
+
+.social-icon-small-comments:hover {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+
+
+
