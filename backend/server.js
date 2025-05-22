@@ -25,6 +25,11 @@ app.use('/api/categoria', categoriaRoutes);
 app.use('/api/asset', assetRoutes);  // Integración de las rutas de assets
 app.use('/api/comentario', comentarioRoutes);
 
+app.get('/', (req, res) => {
+  res.send('🎉 API funcionando correctamente');
+});
+
+
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`));
