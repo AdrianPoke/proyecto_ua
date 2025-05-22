@@ -83,7 +83,6 @@ function Perfil() {
             onClick={() => {
               localStorage.removeItem("authToken");
               navigate("/login");
-              window.location.reload();
             }}
           >
             🚪 Cerrar Sesión
