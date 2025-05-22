@@ -24,7 +24,7 @@ const VerAsset = () => {
   const handleFavorito = async () => {
     try {
       const metodo = esFavorito ? "DELETE" : "POST";
-      const res = await fetch(`http://localhost:5000/api/usuario/favoritos/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/usuario/favoritos/${id}`, {
         method: metodo,
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
@@ -49,13 +49,13 @@ const VerAsset = () => {
     const fetchData = async () => {
       try {
         const [assetRes, comentariosRes, usuarioRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/asset/${id}`, {
+          fetch(`${process.env.REACT_APP_API_URL}/api/asset/${id}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
           }),
-          fetch(`http://localhost:5000/api/comentario/${id}`, {
+          fetch(`${process.env.REACT_APP_API_URL}/api/comentario/${id}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
           }),
-          fetch(`http://localhost:5000/api/usuario/perfil`, {
+          fetch(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }
           })
         ]);
@@ -87,7 +87,7 @@ const VerAsset = () => {
 
   const handleDescargar = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/asset/${id}/descargar`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/asset/${id}/descargar`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
@@ -119,7 +119,7 @@ const VerAsset = () => {
     if (!nuevoComentario.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/comentario/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/comentario/${id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -288,7 +288,7 @@ const VerAsset = () => {
 
               try {
                 const metodo = haDadoLike ? 'DELETE' : 'POST';
-                const res = await fetch(`http://localhost:5000/api/comentario/${comentario._id}/like`, {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/api/comentario/${comentario._id}/like`, {
                   method: metodo,
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem('authToken')}`

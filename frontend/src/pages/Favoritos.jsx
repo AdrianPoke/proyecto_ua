@@ -18,12 +18,12 @@ const Favoritos = () => {
       try {
         const token = localStorage.getItem('authToken');
 
-        const resPerfil = await axios.get('http://localhost:5000/api/usuario/perfil', {
+        const resPerfil = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsuario(resPerfil.data);
 
-        const resFavoritos = await axios.get('http://localhost:5000/api/usuario/favoritos', {
+        const resFavoritos = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/favoritos`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setFavoritos(resFavoritos.data);

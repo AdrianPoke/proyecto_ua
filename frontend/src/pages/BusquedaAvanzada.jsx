@@ -23,7 +23,7 @@ function BusquedaAvanzada() {
   const dropboxToRaw = (url) => url?.replace("dl=0", "raw=1");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/asset/etiquetas")
+    axios.get(`${process.env.REACT_APP_API_URL}/api/asset/etiquetas`)
       .then(res => setEtiquetasDisponibles(res.data))
       .catch(err => console.error("Error al obtener etiquetas:", err));
   }, []);
@@ -38,7 +38,7 @@ function BusquedaAvanzada() {
         if (orden === "populares") params.append("orden", "populares");
         etiquetasSeleccionadas.forEach(etiqueta => params.append("etiquetas", etiqueta));
 
-        const res = await axios.get(`http://localhost:5000/api/asset/buscar?${params.toString()}`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/asset/buscar?${params.toString()}`, {
           headers: { Authorization: 'Bearer TU_TOKEN_AQUI' }
         });
 
@@ -52,7 +52,7 @@ function BusquedaAvanzada() {
 
   useEffect(() => {
     if (!categoria) return setFormatosDisponibles([]);
-    axios.get(`http://localhost:5000/api/categoria/${categoria}/formatos`)
+    axios.get(`${process.env.REACT_APP_API_URL}/api/categoria/${categoria}/formatos`)
       .then(res => setFormatosDisponibles(res.data.formatos_permitidos || []))
       .catch(() => setFormatosDisponibles([]));
   }, [categoria]);

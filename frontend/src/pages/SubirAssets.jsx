@@ -29,7 +29,7 @@ function SubirAssets() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/categoria")
+      .get(`${process.env.REACT_APP_API_URL}/api/categoria`)
       .then((res) => setCategorias(res.data))
       .catch((err) => console.error("❌ Error cargando categorías", err));
   }, []);
@@ -37,7 +37,7 @@ function SubirAssets() {
   useEffect(() => {
     if (!formData.categoria) return;
     axios
-      .get(`http://localhost:5000/api/categoria/${formData.categoria}/formatos`)
+      .get(`${process.env.REACT_APP_API_URL}/api/categoria/${formData.categoria}/formatos`)
       .then((res) => setFormatosPermitidos(res.data.formatos_permitidos || []))
       .catch(() => setFormatosPermitidos([]));
   }, [formData.categoria]);
@@ -112,7 +112,7 @@ function SubirAssets() {
   try {
     setIsLoading(true);
     const token = localStorage.getItem("authToken");
-    const res = await axios.post("http://localhost:5000/api/asset", data, {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/asset`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",

@@ -42,7 +42,7 @@ function Registro() {
     if (Object.keys(nuevosErrores).length > 0) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/registro", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/registro`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

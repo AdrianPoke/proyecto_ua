@@ -16,7 +16,7 @@ function Home() {
     // Intentar cargar el perfil del usuario
     if (token) {
       try {
-        const resUsuario = await axios.get('http://localhost:5000/api/usuario/perfil', {
+        const resUsuario = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -30,7 +30,7 @@ function Home() {
 
     // Cargar assets recientes
     try {
-      const resRecientes = await axios.get('http://localhost:5000/api/asset/recientes?limite=10');
+      const resRecientes = await axios.get(`${process.env.REACT_APP_API_URL}/api/asset/recientes?limite=10`);
       setAssetsRecientes(resRecientes.data);
     } catch (error) {
       console.error("❌ Error al obtener assets recientes:", error.response?.data || error.message);
@@ -39,7 +39,7 @@ function Home() {
     // Cargar assets populares
     try {
 
-      const resPopulares = await axios.get('http://localhost:5000/api/asset/populares?limite=7');
+      const resPopulares = await axios.get(`${process.env.REACT_APP_API_URL}/api/asset/populares?limite=7`);
 
       setAssetsPopulares(resPopulares.data);
     } catch (error) {

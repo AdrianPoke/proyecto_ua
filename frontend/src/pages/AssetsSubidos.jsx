@@ -22,12 +22,12 @@ const AssetsSubidos = () => {
       try {
         const token = localStorage.getItem('authToken');
 
-        const resPerfil = await axios.get('http://localhost:5000/api/usuario/perfil', {
+        const resPerfil = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsuario(resPerfil.data);
 
-        const resSubidos = await axios.get('http://localhost:5000/api/usuario/subidos', {
+        const resSubidos = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/subidos`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSubidos(resSubidos.data);
@@ -74,7 +74,7 @@ const AssetsSubidos = () => {
       setCargando(true);
       const token = localStorage.getItem("authToken");
 
-      await axios.delete(`http://localhost:5000/api/asset/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/asset/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

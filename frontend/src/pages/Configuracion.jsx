@@ -14,7 +14,7 @@ const Configuracion = () => {
     const fetchPerfil = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await axios.get("http://localhost:5000/api/usuario/perfil", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsuario(res.data);

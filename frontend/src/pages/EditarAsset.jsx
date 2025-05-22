@@ -30,7 +30,7 @@ const EditarAsset = () => {
     const fetchAsset = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const res = await axios.get(`http://localhost:5000/api/asset/${id}`, {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/asset/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const asset = res.data;
@@ -105,7 +105,7 @@ const EditarAsset = () => {
     try {
       const token = localStorage.getItem("authToken");
       setCargando(true);
-      await axios.put(`http://localhost:5000/api/asset/${id}`, data, {
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/asset/${id}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -129,7 +129,7 @@ const EditarAsset = () => {
 
   try {
     const token = localStorage.getItem("authToken");
-    await axios.delete(`http://localhost:5000/api/asset/${id}/archivo`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/api/asset/${id}/archivo`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { nombre }
     });

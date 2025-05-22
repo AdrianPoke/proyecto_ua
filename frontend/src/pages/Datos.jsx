@@ -36,7 +36,7 @@ function Datos() {
     const fetchUsuario = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await axios.get("http://localhost:5000/api/usuario/perfil", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsuario(res.data);
@@ -140,7 +140,7 @@ const handleSubmit = async (e) => {
       console.log(`${pair[0]}:`, pair[1]);
     }
 
-    await axios.put("http://localhost:5000/api/usuario/perfil", data, {
+    await axios.put(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",

@@ -30,14 +30,14 @@ const AssetsCategoria = () => {
     const fetchCategoria = async () => {
       try {
         setCargando(true);
-        const resCat = await fetch('http://localhost:5000/api/categoria');
+        const resCat = await fetch(`${process.env.REACT_APP_API_URL}/api/categoria`);
         const categorias = await resCat.json();
         const nombreBuscado = convertirSlugANombre(categoria);
         const catActual = categorias.find(cat => cat.nombre.toUpperCase() === nombreBuscado);
         if (!catActual) throw new Error('Categoría no encontrada');
         setInfoCategoria(catActual);
 
-        const resAssets = await fetch(`http://localhost:5000/api/asset/buscar?categoria=${encodeURIComponent(catActual.nombre)}`);
+        const resAssets = await fetch(`${process.env.REACT_APP_API_URL}/api/asset/buscar?categoria=${encodeURIComponent(catActual.nombre)}`);
         const assetsData = await resAssets.json();
         setAssets(assetsData);
         setError(null);
