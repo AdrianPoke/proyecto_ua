@@ -9,7 +9,8 @@ function NavBarDefault() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const navigate = useNavigate();
-  const { usuario } = useAuth();
+
+  const { usuario, cargando } = useAuth(); // ✅ Ahora sí está definido `cargando`
 
   useEffect(() => {
     const cerrar = () => setMenuAbierto(false);
@@ -24,7 +25,8 @@ function NavBarDefault() {
     }
   };
 
-  // ⛔️ Mover la condición al final del render
+  // ✅ No renderizar nada hasta saber si hay usuario o no
+  if (cargando) return null;
   if (usuario) return null;
 
   return (

@@ -10,7 +10,7 @@ function NavBarAuth() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const navigate = useNavigate();
-  const { usuario } = useAuth();
+  const { usuario, cargando } = useAuth(); // ✅ Añadido cargando
 
   useEffect(() => {
     const cerrar = () => setMenuAbierto(false);
@@ -31,6 +31,9 @@ function NavBarAuth() {
       ? url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "")
       : url;
   };
+
+  // ❌ Evita que se renderice hasta saber si hay usuario
+  if (cargando || !usuario) return null;
 
   return (
     <>
@@ -55,7 +58,6 @@ function NavBarAuth() {
           </div>
         </div>
 
-        {/* Menú horizontal escritorio */}
         <div className="navbar-right">
           <Link to="/" className="nav-link">Inicio</Link>
           <Link to="/subir-assets" className="nav-link">
@@ -68,13 +70,11 @@ function NavBarAuth() {
           </Link>
         </div>
 
-        {/* Menú hamburguesa móvil */}
         <button className="hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰
         </button>
       </nav>
 
-      {/* Sidebar para móvil */}
       <div className={`sidebar ${menuAbierto ? "activo" : ""}`}>
         <Link to="/" onClick={() => setMenuAbierto(false)}>Inicio</Link>
         <Link to="/subir-assets" onClick={() => setMenuAbierto(false)}>Subir Assets</Link>
@@ -83,7 +83,6 @@ function NavBarAuth() {
         <Link to="/perfil" onClick={() => setMenuAbierto(false)}>Perfil</Link>
       </div>
 
-      {/* Fondo para cerrar sidebar */}
       {menuAbierto && <div className="sidebar-overlay" onClick={() => setMenuAbierto(false)} />}
     </>
   );
