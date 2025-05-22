@@ -440,6 +440,10 @@
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
+.Toastify__progress-bar {
+  background: var(--color-principal) !important;
+}
+
 .social-icon-small-comments:hover {
   transform: scale(1.15);
   opacity: 1;
