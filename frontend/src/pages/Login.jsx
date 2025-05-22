@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/Global.css";
 import "../styles/login.css";
@@ -8,6 +9,8 @@ import logo from "../logo.png";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const shouldReload = sessionStorage.getItem("reloadAfterRedirectToLogin");
@@ -40,7 +43,8 @@ function Login() {
 
       if (res.ok) {
         localStorage.setItem("authToken", data.token);
-        window.location.href = "/home"; // 🔁 Redirección directa sin toast
+        navigate("/home");
+
       } else {
         toast.error(data.mensaje || "Error al iniciar sesión.", { autoClose: 5000 });
       }
