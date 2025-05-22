@@ -125,7 +125,7 @@ const VerAsset = () => {
   };
 
 
-  const handleComentar = async () => {
+const handleComentar = async () => {
   if (!nuevoComentario.trim()) return;
 
   try {
@@ -140,14 +140,20 @@ const VerAsset = () => {
 
     if (!res.ok) throw new Error("No se pudo enviar el comentario");
 
-    const nuevo = await res.json();
-    setComentarios(prev => [...prev, nuevo]);
+    // ❗ Recargar comentarios desde API
+    const actualizados = await fetch(`${process.env.REACT_APP_API_URL}/api/comentario/${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` }
+    });
+    const nuevosComentarios = await actualizados.json();
+
+    setComentarios(Array.isArray(nuevosComentarios) ? nuevosComentarios : []);
     setNuevoComentario("");
   } catch (error) {
     console.error("Error al enviar comentario:", error);
     toast.error("Error al publicar el comentario.");
   }
 };
+
 
 
   if (loading) {
