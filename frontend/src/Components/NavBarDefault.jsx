@@ -3,13 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import "../styles/NavBarAuth.css";
 import logo from "../logo.png";
+import { useAuth } from "../context/AuthContext";
 
 function NavBarDefault() {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const navigate = useNavigate();
+  const { usuario } = useAuth();
 
-  // Cerrar menú al hacer scroll
   useEffect(() => {
     const cerrar = () => setMenuAbierto(false);
     window.addEventListener("scroll", cerrar);
@@ -22,6 +23,9 @@ function NavBarDefault() {
       setBusqueda("");
     }
   };
+
+  // ⛔️ Mover la condición al final del render
+  if (usuario) return null;
 
   return (
     <>
@@ -46,7 +50,6 @@ function NavBarDefault() {
           </div>
         </div>
 
-        {/* Menú horizontal para escritorio */}
         <div className="navbar-right">
           <Link to="/" className="nav-link">Inicio</Link>
           <Link to="/categorias" className="nav-link">Categorías</Link>
@@ -55,13 +58,11 @@ function NavBarDefault() {
           <Link to="/login" className="nav-link login-button">Iniciar Sesión</Link>
         </div>
 
-        {/* Botón hamburguesa solo visible en móvil */}
         <button className="hamburguesa" onClick={() => setMenuAbierto(!menuAbierto)}>
           ☰
         </button>
       </nav>
 
-      {/* Sidebar para móvil */}
       <div className={`sidebar ${menuAbierto ? "activo" : ""}`}>
         <Link to="/" onClick={() => setMenuAbierto(false)}>Inicio</Link>
         <Link to="/categorias" onClick={() => setMenuAbierto(false)}>Categorías</Link>
@@ -70,7 +71,6 @@ function NavBarDefault() {
         <Link to="/login" onClick={() => setMenuAbierto(false)}>Iniciar Sesión</Link>
       </div>
 
-      {/* Capa de fondo que cierra el menú al hacer clic */}
       {menuAbierto && <div className="sidebar-overlay" onClick={() => setMenuAbierto(false)} />}
     </>
   );

@@ -6,6 +6,9 @@ import defaultFoto from "../icons/profile.png";
 import x from "../icons/x.png";
 import ig from "../icons/instagram.png";
 import linkedin from "../icons/linkedin.webp";
+import { useAuth } from "../context/AuthContext";
+
+
 const normalizarFoto = (url) => {
   if (!url) return defaultFoto;
   return url.includes("dropbox.com")
@@ -17,6 +20,8 @@ function Perfil() {
   const [usuario, setUsuario] = useState(null);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
 
   useEffect(() => {
     const fetchPerfil = async () => {
@@ -81,12 +86,13 @@ function Perfil() {
           <button onClick={() => navigate("/perfil/favoritos")}>⭐ Favoritos</button>
           <button
             onClick={() => {
-              localStorage.removeItem("authToken");
+              logout();
               navigate("/login");
             }}
           >
             🚪 Cerrar Sesión
           </button>
+
         </nav>
       </div>
 

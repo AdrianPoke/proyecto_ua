@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import NavBarDefault from "./NavBarDefault";
 import NavBarAuth from "./NavBarAuth";
 import Footer from "./Footer";
+import { useAuth } from "../context/AuthContext"; // ✅ Importa el contexto
 
 function Layout({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem("authToken") !== null);
+  const { usuario, cargando } = useAuth(); // ✅ Obtiene el estado desde el contexto
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuthenticated(localStorage.getItem("authToken") !== null);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  if (cargando) return null; // ⏳ Evita parpadeos o errores mientras se verifica
 
   return (
     <div className="layout-container">
-      <header>{isAuthenticated ? <NavBarAuth /> : <NavBarDefault />}</header>
-
-      {/* Contenido principal ocupa el espacio disponible */}
+      <header>{usuario ? <NavBarAuth /> : <NavBarDefault />}</header>
       <main className="content">{children}</main>
-
       <Footer />
     </div>
   );

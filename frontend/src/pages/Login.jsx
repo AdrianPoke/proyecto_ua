@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ Importa el contexto
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/Global.css";
 import "../styles/login.css";
@@ -10,7 +11,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  const { login } = useAuth(); // ✅ Usa la función login del contexto
 
   useEffect(() => {
     const shouldReload = sessionStorage.getItem("reloadAfterRedirectToLogin");
@@ -33,18 +34,14 @@ function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          contrasenya: password,
-        }),
+        body: JSON.stringify({ email, contrasenya: password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("authToken", data.token);
+        login(data.token, data.usuario); // ✅ Actualiza el contexto
         navigate("/home");
-
       } else {
         toast.error(data.mensaje || "Error al iniciar sesión.", { autoClose: 5000 });
       }
@@ -72,7 +69,7 @@ function Login() {
             required
           />
 
-          <label>contraseña:</label>
+          <label>Contraseña:</label>
           <input
             type="password"
             value={password}
