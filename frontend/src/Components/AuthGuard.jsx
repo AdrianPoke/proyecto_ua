@@ -16,7 +16,7 @@ const AuthGuard = ({ children }) => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/verify-token", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/verify-token`, {
           headers: {
             Authorization: token,
           },
