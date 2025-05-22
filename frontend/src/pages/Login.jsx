@@ -13,7 +13,6 @@ function Login() {
     const shouldReload = sessionStorage.getItem("reloadAfterRedirectToLogin");
     if (shouldReload) {
       sessionStorage.removeItem("reloadAfterRedirectToLogin");
-      window.location.reload();
     }
   }, []);
 
