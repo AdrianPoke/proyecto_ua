@@ -19,7 +19,7 @@ html, body {
 }
 
 .subir-asset-container {
-  width: 100vw;
+  width: 100%;
   padding: 40px 60px;
   box-sizing: border-box;
   background-color: var(--color-fondo);
@@ -28,9 +28,6 @@ html, body {
 .subir-logo {
   height: 32px;
 }
-
-
-
 
 .subir-asset-title {
   font-size: 24px;
@@ -45,10 +42,11 @@ html, body {
   gap: 40px;
   background-color: var(--color-menu);
   padding: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--color-borde-input);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  border-radius: 4px; /* Cambiado de 8px a 4px para igualarlo */
+  border: 1px solid var(--color-principal); /* Nuevo borde igual al login */
+  box-shadow: 0 0 38px rgba(62, 230, 118, 0.2); /* Nueva sombra igual al login */
 }
+
 
 .subir-columna {
   flex: 1;
