@@ -65,17 +65,19 @@
 }
 
 .react-select__control {
-  background-color: #1c1c1c;
+  background-color: var(--color-menu);
   border-color: var(--color-borde-input);
   color: var(--color-texto);
   border-radius: 4px;
   min-height: 40px;
 }
 
+.react-select__input {
+  color: var(--color-texto);
+}
+
 .react-select__menu {
-  background-color: #1c1c1c;
-  color: black;
-  border-radius: 4px;
+  background-color: var(--color-menu);
 }
 
 .react-select__multi-value {
@@ -86,6 +88,11 @@
 
 .react-select__multi-value__label {
   color: black;
+}
+
+.react-select__multi-value__remove {
+  color: black;
+  cursor: pointer;
 }
 
 .react-select__option--is-focused {
@@ -99,7 +106,18 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-bottom: 6px;
 }
+.ordenar > label:first-child {
+  color: var(--color-principal);
+  font-weight: 600;
+}
+
+.ordenar input[type="radio"] {
+  accent-color: var(--color-principal); /* ✅ fuerza el color del punto seleccionado */
+  cursor: pointer;
+}
+
 
 .limpiar-filtros {
   margin: 0 auto 30px auto;
