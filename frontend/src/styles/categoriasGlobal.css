@@ -57,18 +57,21 @@
 .tarjeta-categoria {
   position: relative;
   width: 100%;
-  max-width: 230px; /* Nuevo: tamaño más pequeño */
+  max-width: 230px;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 3px; /* Igual que .asset-card */
   cursor: pointer;
-  transition: transform 0.2s ease;
-  background-color: #000;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--color-menu); /* Igual que .asset-card */
+  box-shadow: 0 0 38px rgba(62, 230, 118, 0.2); /* Igual que .asset-card */
 }
 
 .tarjeta-categoria:hover {
-  transform: scale(1.03);
+  transform: scale(1.05); /* Igual que .asset-card:hover */
+  box-shadow: 0 0 20px rgba(62, 230, 118, 0.4); /* Igual que .asset-card:hover */
 }
+
 
 .tarjeta-categoria-imagen {
   width: 100%;
