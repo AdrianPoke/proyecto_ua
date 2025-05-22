@@ -49,24 +49,30 @@ const AssetsSubidos = () => {
 
   const handleEliminarAsset = (asset) => {
     confirmAlert({
-      customUI: ({ onClose }) => (
-        <div className="react-confirm-alert-body">
-          <h1>¿Eliminar este asset?</h1>
-          <p>Estás a punto de eliminar <strong>{asset.titulo}</strong>.<br />Esta acción no se puede deshacer.</p>
-          <div className="react-confirm-alert-button-group">
-            <button
-              onClick={async () => {
-                onClose();
-                await eliminarAsset(asset._id);
-              }}
-            >
-              Sí, eliminar
-            </button>
-            <button onClick={onClose}>Cancelar</button>
-          </div>
-        </div>
-      )
-    });
+  overlayClassName: "", // lo dejamos vacío por seguridad
+  overlayStyle: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backdropFilter: 'blur(3px)',
+  },
+  customUI: ({ onClose }) => (
+    <div className="modal-personalizado">
+      <h1>¿Eliminar este asset?</h1>
+      <p>Estás a punto de eliminar <strong>{asset.titulo}</strong>.<br />Esta acción no se puede deshacer.</p>
+      <div className="react-confirm-alert-button-group">
+  <button className="btn-cancelar" onClick={onClose}>Cancelar</button>
+  <button className="subir-asset-boton" onClick={async () => {
+    onClose();
+    await eliminarAsset(asset._id);
+  }}>
+    Sí, eliminar
+  </button>
+</div>
+
+    </div>
+  )
+});
+
+
   };
 
   const eliminarAsset = async (id) => {
