@@ -134,12 +134,6 @@ const handleSubmit = async (e) => {
     data.append("enlace_linkedin", formData.usuario_linkedin ? `https://linkedin.com/in/${formData.usuario_linkedin}` : "");
     if (formData.foto_perfil) data.append("foto_perfil", formData.foto_perfil);
 
-    // 🔍 LOG DEL FORM DATA
-    console.log("🔍 FormData que se va a enviar:");
-    for (let pair of data.entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
-    }
-
     await axios.put(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -147,13 +141,25 @@ const handleSubmit = async (e) => {
       },
     });
 
+    // 🔁 Vuelve a obtener los datos actualizados sin recargar
+    const perfilActualizado = await axios.get(`${process.env.REACT_APP_API_URL}/api/usuario/perfil`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setUsuario(perfilActualizado.data); // ✅ actualiza sin recargar
+    setFormData((prev) => ({
+      ...prev,
+      contrasenya: "",
+      foto_perfil: null,
+    }));
+
     setIsLoading(false);
-    window.location.reload();
   } catch (error) {
     console.error("❌ Error al actualizar el perfil", error);
     setIsLoading(false);
   }
 };
+
 
 
 
