@@ -34,13 +34,41 @@ function SubirAssets() {
       .catch((err) => console.error("❌ Error cargando categorías", err));
   }, []);
 
-  useEffect(() => {
-    if (!formData.categoria) return;
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/api/categoria/${formData.categoria}/formatos`)
-      .then((res) => setFormatosPermitidos(res.data.formatos_permitidos || []))
-      .catch(() => setFormatosPermitidos([]));
-  }, [formData.categoria]);
+useEffect(() => {
+  if (!formData.categoria) return;
+
+  axios
+    .get(`${process.env.REACT_APP_API_URL}/api/categoria/${formData.categoria}/formatos`)
+    .then((res) => {
+      const nuevosFormatos = res.data.formatos_permitidos || [];
+      setFormatosPermitidos(nuevosFormatos);
+
+      // Validar archivos seleccionados según los nuevos formatos
+      if (archivosAsset.length > 0) {
+        const extensionesInvalidas = archivosAsset.filter((file) => {
+          const ext = file.name.split(".").pop().toLowerCase();
+          return !nuevosFormatos.includes(ext);
+        });
+
+        if (extensionesInvalidas.length > 0) {
+          setErrores((prev) => ({
+            ...prev,
+            archivosAsset: `Los siguientes archivos tienen formato inválido: ${extensionesInvalidas.map(f => f.name).join(", ")}`,
+          }));
+        } else {
+          setErrores((prev) => ({ ...prev, archivosAsset: "" }));
+        }
+      }
+    })
+    .catch(() => {
+      setFormatosPermitidos([]);
+      setErrores((prev) => ({
+        ...prev,
+        archivosAsset: "Error al obtener formatos permitidos.",
+      }));
+    });
+}, [formData.categoria]);
+
 
   const validarCampo = (name, value) => {
     let error = "";
