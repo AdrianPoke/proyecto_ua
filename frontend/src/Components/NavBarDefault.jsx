@@ -10,7 +10,7 @@ function NavBarDefault() {
   const [busqueda, setBusqueda] = useState("");
   const navigate = useNavigate();
 
-  const { usuario, cargando } = useAuth(); // ✅ Ahora sí está definido `cargando`
+  const { usuario, cargando } = useAuth(); // ✅ Ahora sí estásd definido `cargando`
 
   useEffect(() => {
     const cerrar = () => setMenuAbierto(false);
